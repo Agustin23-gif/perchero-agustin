@@ -315,3 +315,7 @@ h1 em {
   .p-info .cta { font-size: clamp(13px, 1.05vw, 17px); padding: 14px 26px; }
   .p-ver { font-size: clamp(12px, .95vw, 15px); }
 }
+
+/* mientras está la portada, el perchero de atrás no se dibuja ni se anima (más liviano en celulares) */
+body.con-portada .app { visibility: hidden; }
+body.con-portada .ticker-in { animation-play-state: paused; }

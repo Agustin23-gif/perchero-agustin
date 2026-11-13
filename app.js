@@ -144,6 +144,19 @@
     return ids.includes(parecido) ? parecido : (ids.includes('blanco') ? 'blanco' : ids[0]);
   }
 
+  // Mientras se ve la portada, las remeras del perchero se preparan de a una y sin apuro,
+  // para que el celular dedique la fuerza a la animación de la portada.
+  let pendientes = [], goteando = false;
+  function luego(fn) { if (document.body.classList.contains('con-portada')) pendientes.push(fn); else fn(); }
+  function soltarPendientes() { const p = pendientes; pendientes = []; p.forEach(fn => fn()); }
+  async function goteo() {
+    if (goteando) return; goteando = true;
+    while (pendientes.length && document.body.classList.contains('con-portada')) {
+      await pendientes.shift()();
+      await new Promise(ok => (window.requestIdleCallback ? requestIdleCallback(ok, { timeout: 900 }) : setTimeout(ok, 250)));
+    }
+    goteando = false;
+  }
   function armarPerchero() {
     // las colecciones (ej. Salmos y Romanos) van aparte: solo aparecen con su propio botón
     const esColeccion = DIS.some(d => d.coleccion === filtro);
@@ -165,7 +178,7 @@
       const { swing, canvas, shirt } = prenda(W, corte, { capas: 0, hex, color }); // sin capas de grosor (Agustín prefirió sin volumen)
       b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
       if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
-      componer(canvas, d, corte, color, ladoDe(d), Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).catch(console.warn);
+      luego(() => componer(canvas, d, corte, color, ladoDe(d), Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).catch(console.warn));
       const it = { el: b, swing, d, corte, color, i, p: pend(), o: 0, cx: 0 };
       b.addEventListener('click', (e) => { if (movido) { e.preventDefault(); return; } abrir(i); });
       canvas.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !drag && hoverIdx !== i) { hoverIdx = i; it.p.w += 30; kick(); } });
@@ -469,12 +482,17 @@
       const x = rnd() * NW, y = NH * (0.08 + rnd() * 0.2);
       for (let q = 0; q < 10; q++) copo(cl, x + (rnd() - 0.5) * 260, y + (rnd() - 0.5) * 14, 40 + rnd() * 50, 7 + rnd() * 6, 0.35);
     }
-    const tinta = mk(), tc = tinta.getContext('2d');
+    // nubes teñidas: una por máscara, y solo se vuelven a teñir si cambió el color (ahorra mucho en celulares)
+    const teñidas = new Map();
     function teñir(m, col) {
+      let t = teñidas.get(m);
+      if (!t) { const cv2 = mk(); t = { cv: cv2, c: cv2.getContext('2d'), col: null }; teñidas.set(m, t); }
+      if (t.col === col) return t.cv;
+      t.col = col; const tc = t.c;
       tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, NW, NH);
       tc.fillStyle = col; tc.fillRect(0, 0, NW, NH);
       tc.globalCompositeOperation = 'destination-in'; tc.drawImage(m, 0, 0);
-      return tinta;
+      return t.cv;
     }
     // paleta a partir del color de la remera (siempre clara, para que el texto negro se lea)
     function hsl(hex) {
@@ -524,7 +542,8 @@
       if (t0) { const k = Math.min(1, (t - t0) / (dur * 1000)); const e = k * k * (3 - 2 * k); actual = mezcla(desde, destino, e); if (k >= 1) t0 = 0; }
       if (!reduce) offset += dt * 0.004;
       // se redibuja seguido solo mientras cambia de tono; si no, unas 8 veces por segundo (ahorra batería y memoria)
-      if (t0 || t - (frame.ult || 0) > 120) { frame.ult = t; dibujar(); }
+      const tapado = document.hidden || document.body.classList.contains('con-portada');
+      if (!tapado && (t0 || t - (frame.ult || 0) > 120)) { frame.ult = t; dibujar(); }
       requestAnimationFrame(frame);
     }
     tamaño(); addEventListener('resize', tamaño);
@@ -694,11 +713,13 @@
       if (!visible()) return;
       zoomK = -1; el.classList.remove('zoom'); info.hidden = true;
       el.classList.add('salir');
+      document.body.classList.remove('con-portada'); soltarPendientes();
       setTimeout(() => { el.hidden = true; if (despues) despues(); }, reduce ? 0 : 750);
     }
     function mostrar() {
       el.hidden = false; el.classList.add('salir');
       requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.remove('salir'); tocar(); }));
+      setTimeout(() => { if (visible()) document.body.classList.add('con-portada'); }, reduce ? 0 : 800);
     }
     $('#pEntrar').onclick = () => salir();
     $('#pCerrar').onclick = cerrarZoom;
@@ -761,7 +782,8 @@
           return { d, corte, color: colorDe({ color: x.color || d.color, colores: d.colores }, corte), nueva: !!x.nueva };
         }).filter(Boolean);
         N = P.length; if (N < 2) return;
-        el.hidden = false; c = ct = Math.floor(N / 2); toque = -1e9;   // arranca moviéndose apenas se entra
+        el.hidden = false; document.body.classList.add('con-portada'); c = ct = Math.floor(N / 2); toque = -1e9;
+        setTimeout(goteo, 2500);   // el perchero se va armando de fondo   // arranca moviéndose apenas se entra
         requestAnimationFrame(() => { armar(); arrancar(); });
       }
     };
@@ -781,6 +803,7 @@
       filtro = dh.coleccion;
       document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.f === filtro ? 'true' : 'false'));
     }
+    if (!dh && cfg.portada) document.body.classList.add('con-portada');   // hay portada: el perchero se arma de fondo
     armarPerchero();
     const i = lista.findIndex(d => d.id === h);
     if (i >= 0) setTimeout(() => abrir(i), 300);
