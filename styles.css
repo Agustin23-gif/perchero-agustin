@@ -207,3 +207,97 @@ h1 em {
 /* cielo de fondo */
 #cielo { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
 .app { position: relative; z-index: 1; }
+
+/* ---------- portada: 5 remeras destacadas en abanico, sobre el hueso de la marca ---------- */
+.portada {
+  position: fixed; inset: 0; z-index: 20; overflow: hidden; background: var(--pared);
+  background-image: radial-gradient(120% 70% at 50% 58%, var(--blanco) 0%, var(--pared) 55%, var(--pared-2) 100%);
+  display: grid; grid-template-rows: auto 1fr auto; touch-action: none; user-select: none; -webkit-user-select: none;
+  transition: transform .8s cubic-bezier(.7, 0, .2, 1), opacity .8s;
+}
+.portada.salir { transform: translateY(-100%); }
+.p-top { display: flex; justify-content: center; padding-top: max(14px, env(safe-area-inset-top, 0px)); position: relative; z-index: 3; }
+.p-top img { height: clamp(30px, 5vw, 44px); width: auto; display: block; }
+.p-titulo {
+  position: absolute; left: 0; right: 0; top: 9%; z-index: 0; text-align: center; pointer-events: none;
+  font-weight: 800; text-transform: uppercase; line-height: .8; letter-spacing: -.07em;
+  font-size: clamp(64px, 12.5vw, 230px); color: var(--tinta); white-space: nowrap; transition: opacity .5s, transform .6s;
+}
+.p-titulo span { display: inline; }
+.p-titulo em {
+  display: inline; margin-left: .12em; font-family: var(--f-acento); font-style: italic; font-weight: 600; text-transform: none;
+  color: var(--naranja); letter-spacing: -.04em; font-size: .62em; margin-top: -.02em;
+}
+.p-escena { position: relative; z-index: 1; min-height: 0; cursor: grab; }
+.p-escena.drag { cursor: grabbing; }
+.p-item { position: absolute; left: 50%; top: 50%; padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 50% 50%; will-change: transform, opacity; }
+.p-item .shirt { position: relative; left: 0; transform: none; }
+.p-item canvas { display: block; width: 100%; height: auto; position: relative; }
+.p-item:focus-visible { outline: none; }
+.p-item:focus-visible canvas { outline: 2px solid var(--naranja); outline-offset: 8px; border-radius: 10px; }
+.p-nueva {
+  position: absolute; top: 6%; right: 2%; z-index: 2; background: var(--naranja); color: var(--tinta);
+  font-size: 11px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase; padding: 4px 8px; border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(20, 20, 20, .18); pointer-events: none; transition: opacity .3s;
+}
+.p-pie {
+  position: relative; z-index: 3; display: grid; justify-items: center; gap: 10px; text-align: center;
+  padding: 0 var(--gutter-r) max(18px, env(safe-area-inset-bottom, 0px)) var(--gutter-l); transition: opacity .4s, transform .5s;
+}
+.p-cap { margin: 0; display: grid; gap: 3px; }
+.p-cap b { font-size: clamp(20px, 2.8vw, 30px); letter-spacing: -.05em; text-transform: uppercase; line-height: .95; }
+.p-cap span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+.p-puntos { display: flex; gap: 8px; }
+.p-puntos button { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--tinta); background: transparent; padding: 0; cursor: pointer; }
+.p-puntos button[aria-current="true"] { background: var(--naranja); border-color: var(--naranja); transform: scale(1.25); }
+.p-entrar {
+  display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
+  background: var(--tinta); color: var(--pared); border-radius: 99px; padding: 12px 22px;
+  font-size: 13px; font-weight: 800; letter-spacing: -.02em; text-transform: uppercase;
+}
+.p-entrar svg { width: 16px; height: 16px; animation: bajar 1.6s ease-in-out infinite; }
+.p-entrar:hover { background: var(--naranja); color: var(--tinta); }
+@keyframes bajar { 50% { transform: translateY(3px); } }
+
+/* zoom: la remera elegida se agranda y aparece la ficha al costado */
+.portada.zoom .p-pie, .portada.zoom .p-titulo { opacity: 0; pointer-events: none; }
+.portada.zoom .p-titulo { transform: translateY(-30px); }
+.portada.zoom .p-escena { cursor: default; }
+.p-info {
+  position: absolute; z-index: 4; right: max(4vw, var(--gutter-r)); top: 50%; width: min(400px, 40vw);
+  transform: translateY(-50%); display: grid; justify-items: start; gap: 12px; text-align: left;
+  animation: ficha .55s .15s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+@keyframes ficha { from { opacity: 0; transform: translate(24px, -50%); } }
+.p-info h2 { margin: 0; font-size: clamp(30px, 4.4vw, 58px); line-height: .88; font-weight: 800; letter-spacing: -.06em; text-transform: uppercase; text-wrap: balance; }
+.p-info .det-sub { margin: -4px 0 0; }
+.p-info .colores { margin: 0; padding-inline: 0; flex-wrap: wrap; width: auto; max-width: 100%; }
+.p-etq { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--naranja); min-height: 1em; }
+.p-etq:empty { display: none; }
+.p-cerrar {
+  border: 0; background: none; cursor: pointer; padding: 6px 0; margin-bottom: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
+.p-cerrar:hover, .p-ver:hover { color: var(--naranja); }
+.p-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 4px; }
+.p-ver {
+  border: 0; background: none; cursor: pointer; padding: 8px 0; text-decoration: underline; text-underline-offset: 4px;
+  font-size: 12px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase;
+}
+@media (max-width: 760px) {
+  .p-titulo { top: 11%; font-size: clamp(56px, 21vw, 150px); white-space: normal; }
+  .p-titulo span, .p-titulo em { display: block; margin-left: 0; }
+  .p-info {
+    left: var(--gutter-l); right: var(--gutter-r); top: auto; bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    width: auto; transform: none; justify-items: center; text-align: center; gap: 8px;
+    animation-name: fichaAbajo;
+  }
+  @keyframes fichaAbajo { from { opacity: 0; transform: translateY(24px); } }
+  .p-info .colores { justify-content: center; }
+  .p-acciones { justify-content: center; }
+  .p-cerrar { position: fixed; top: max(14px, env(safe-area-inset-top, 0px)); left: var(--gutter-l); margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portada, .p-titulo, .p-pie { transition: none; }
+  .p-entrar svg, .p-info { animation: none; }
+}

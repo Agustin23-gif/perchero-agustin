@@ -201,6 +201,25 @@
       }
     }
   },
+  "portada": [
+    {
+      "id": "you_are_a_child_of_god"
+    },
+    {
+      "id": "on_fire",
+      "color": "blanco"
+    },
+    {
+      "id": "god_is_bigger"
+    },
+    {
+      "id": "jesus_loves_you"
+    },
+    {
+      "id": "romanos_christ",
+      "nueva": true
+    }
+  ],
   "disenos": [
     {
       "id": "lisa_oversize",

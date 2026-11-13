@@ -8,11 +8,36 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&display=swap">
 <link rel="icon" href="img/logo.png">
-<link rel="stylesheet" href="styles.css?v=202611132011">
+<link rel="stylesheet" href="styles.css?v=202611132033">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
 <canvas id="cielo" aria-hidden="true"></canvas>
+<section class="portada" id="portada" aria-label="Presentación" hidden>
+  <header class="p-top">
+    <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
+  </header>
+  <div class="p-titulo" aria-hidden="true"><span>Remeras</span><em>con fe</em></div>
+  <div class="p-escena" id="pEscena" aria-label="Remeras destacadas. Deslizá para ver más."></div>
+  <div class="p-pie" id="pPie">
+    <p class="p-cap" aria-live="polite"><b id="pNombre">&nbsp;</b><span id="pSub">&nbsp;</span></p>
+    <div class="p-puntos" id="pPuntos" role="group" aria-label="Elegir remera destacada"></div>
+    <button class="p-entrar" id="pEntrar" type="button">Ver todo el perchero <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+  </div>
+  <aside class="p-info" id="pInfo" aria-label="Detalle de la remera" hidden>
+    <button class="p-cerrar" id="pCerrar" type="button" aria-label="Volver a la portada">← Volver</button>
+    <p class="p-etq" id="pEtq"></p>
+    <h2 id="pTitulo"></h2>
+    <p class="det-sub" id="pDet"></p>
+    <div class="seg" role="group" aria-label="Corte" id="pCorte"></div>
+    <div class="colores" id="pColores" role="group" aria-label="Color"></div>
+    <div class="color-name" id="pColorName"></div>
+    <div class="p-acciones">
+      <a class="cta" id="pCta" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+      <button class="p-ver" id="pVer" type="button">Ver en el perchero</button>
+    </div>
+  </aside>
+</section>
 <div class="app">
   <header class="top">
     <button class="nav" id="navColeccion" type="button">Colección</button>
@@ -66,6 +91,6 @@
 
   <footer class="ticker" aria-hidden="true"><div class="ticker-in" id="ticker"></div></footer>
 </div>
-<script src="app.js?v=202611132011"></script>
+<script src="app.js?v=202611132033"></script>
 </body>
 </html>

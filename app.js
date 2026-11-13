@@ -538,6 +538,225 @@
   })();
   function hexDe(corte, color) { return ((CFG.cortes[corte].colores.find(c => c.id === color)) || {}).hex; }
 
+  /* ---------- portada: las remeras destacadas en abanico (catalogo.json → "portada") ---------- */
+  // Al entrar, 5 remeras apoyadas y encimadas en abanico. Se deslizan con el scroll, el dedo o las flechas,
+  // y solas cada pocos segundos. Al tocar la del frente se agranda y aparece su ficha con colores y WhatsApp.
+  const Portada = (() => {
+    const el = $('#portada'), esc = $('#pEscena'), info = $('#pInfo');
+    let P = [], N = 0, c = 0, ct = 0, zoomK = -1, raf = 0, last = 0, toque = 0, auto = 0, foco = -1, medida = null, drag = null, ruedaT = 0;
+    const visible = () => !el.hidden && !el.classList.contains('salir');
+    const envolver = (r) => ((r % N) + N + N / 2) % N - N / 2;      // distancia más corta en el abanico circular
+
+    function medir() {
+      const vw = innerWidth, eh = esc.clientHeight, movil = vw < 760;
+      const Wc = movil ? Math.min(vw * 0.74, eh * 0.62) : Math.min(eh * 0.8, vw * 0.34);
+      const ZW = movil ? Math.min(vw * 0.86, 520) : Math.min(eh * 1.02, vw * 0.46, 640);
+      return { vw, eh, movil, Wc, ZW, EW: Math.max(Wc, ZW), sp: Wc * (movil ? 0.42 : 0.5) };
+    }
+    function armar() {
+      medida = medir(); esc.innerHTML = '';
+      const { EW } = medida, pad = SOMBRA_PAD.oversize;
+      P.forEach((p, k) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'p-item';
+        b.style.width = EW + 'px'; b.setAttribute('aria-label', `${p.d.nombre}. Ver detalle`);
+        const shirt = document.createElement('div'); shirt.className = 'shirt'; shirt.style.width = EW * ESCALA_CORTE[p.corte] + 'px'; shirt.style.margin = '0 auto';
+        const sw = EW * ESCALA_CORTE[p.corte];
+        const sombra = new Image(); sombra.className = 'sombra'; sombra.alt = ''; sombra.src = `img/${p.corte}/sombra.webp`;
+        sombra.style.width = sw * (1 + 2 * pad) + 'px'; sombra.style.left = (-pad * sw + sw * 0.05) + 'px'; sombra.style.top = (-pad * sw + sw * 0.06) + 'px';
+        const canvas = document.createElement('canvas'); canvas.width = Math.round(sw); canvas.height = Math.round(sw * ASPECTO[p.corte]);
+        shirt.append(sombra, canvas); b.appendChild(shirt);
+        if (p.nueva) { const t = document.createElement('span'); t.className = 'p-nueva'; t.textContent = 'Nueva colección'; shirt.appendChild(t); p.tag = t; }
+        p.el = b; p.canvas = canvas; p.cur = p.cur || null;
+        pintar(p);
+        b.addEventListener('click', (e) => {
+          if (drag && drag.movido) return;
+          if (zoomK >= 0) return;
+          const r = envolver(k - c);
+          if (Math.abs(r) < 0.35) abrirZoom(k); else { ct = c + r; tocar(); }
+        });
+        esc.appendChild(b);
+      });
+      const pts = $('#pPuntos'); pts.innerHTML = '';
+      P.forEach((p, k) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', p.d.nombre); b.onclick = () => { if (zoomK < 0) { ct = c + envolver(k - c); tocar(); } }; pts.appendChild(b); });
+      foco = -1;
+    }
+    function pintar(p) {
+      return componer(p.canvas, p.d, p.corte, p.color, ladoDe(p.d), Math.min(1100, Math.ceil(medida.EW * ESCALA_CORTE[p.corte] * Math.max(1.5, devicePixelRatio || 1)))).catch(console.warn);
+    }
+    function tocar() { toque = performance.now(); arrancar(); }
+    function arrancar() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+
+    function destino(k) {
+      const { Wc, EW, sp, movil, vw, eh } = medida;
+      if (zoomK >= 0) {
+        if (k === zoomK) {
+          let x = movil ? 0 : -vw * 0.19, y = 0;
+          let s = medida.ZW / EW;
+          if (movil) {   // arriba, dejando lugar a la ficha de abajo
+            const er = esc.getBoundingClientRect(), libre = info.getBoundingClientRect().top - 12;
+            const top = Math.max(56, er.top - 40), alto = Math.max(120, libre - top);
+            s = Math.min(s, alto / (EW * ASPECTO.oversize)); y = top + alto / 2 - (er.top + er.height / 2);
+          }
+          return { x, y, s, rot: 0, o: 1, z: 30 };
+        }
+        const r = envolver(k - c); return { x: Math.sign(r || 1) * vw * 0.75, y: 0, s: Wc / EW * 0.8, rot: r * 6, o: 0, z: 1 };
+      }
+      const r = envolver(k - c), a = Math.abs(r);
+      return {
+        x: r * sp * (1 + 0.12 * a), y: a * a * Wc * 0.025 + (movil ? eh * 0.1 : eh * 0.07), s: (Wc / EW) * (1 - 0.11 * a),
+        rot: r * 5.5, o: Math.max(0, Math.min(1, (2.5 - a) / 0.45)), z: 20 - Math.round(a * 4)
+      };
+    }
+    function frame(t) {
+      const dt = Math.min(0.05, (t - last) / 1000); last = t;
+      if (!el.hidden && zoomK < 0 && !drag && !reduce && t - toque > 4500 && t - auto > 3400) { auto = t; ct = Math.round(ct) + 1; }
+      if (!drag) c += (ct - c) * (1 - Math.exp(-dt * (reduce ? 60 : 6.5)));
+      let quieto = Math.abs(ct - c) < 0.0005;
+      const f = 1 - Math.exp(-dt * (reduce ? 60 : 8));
+      P.forEach((p, k) => {
+        const d = destino(k);
+        if (!p.cur) p.cur = { ...d };
+        for (const key of ['x', 'y', 's', 'rot', 'o']) { p.cur[key] += (d[key] - p.cur[key]) * f; if (Math.abs(d[key] - p.cur[key]) > 0.001) quieto = false; }
+        const q = p.cur;
+        p.el.style.transform = `translate(-50%,-50%) translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) rotate(${q.rot.toFixed(2)}deg) scale(${q.s.toFixed(4)})`;
+        p.el.style.opacity = q.o.toFixed(3); p.el.style.zIndex = d.z;
+        p.el.style.visibility = q.o < 0.01 ? 'hidden' : 'visible';
+        p.el.tabIndex = zoomK < 0 && Math.abs(envolver(k - c)) < 0.5 ? 0 : -1;
+        if (p.tag) p.tag.style.opacity = zoomK >= 0 ? 0 : 1;
+      });
+      const fi = ((Math.round(c) % N) + N) % N;
+      if (fi !== foco) {
+        foco = fi; const p = P[fi];
+        $('#pNombre').textContent = p.d.nombre;
+        $('#pSub').textContent = p.nueva ? 'Nueva colección · Salmos y Romanos' : (p.d.detalle || '');
+        $('#pPuntos').querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-current', k === fi ? 'true' : 'false'));
+      }
+      // sigue animando mientras hay movimiento o falta poco para el próximo paso automático
+      if (visible() && (!quieto || drag || zoomK < 0)) raf = requestAnimationFrame(frame); else raf = 0;
+    }
+
+    /* ficha (zoom) */
+    function abrirZoom(k) {
+      zoomK = k; ct = c = Math.round(c) + envolver(k - Math.round(c)); el.classList.add('zoom');
+      info.hidden = false; fichar(); arrancar();
+      setTimeout(() => $('#pCerrar').focus({ preventScroll: true }), 50);
+    }
+    function cerrarZoom() {
+      if (zoomK < 0) return; const k = zoomK; zoomK = -1; el.classList.remove('zoom'); info.hidden = true; tocar();
+      P[k].el.focus({ preventScroll: true });
+    }
+    function fichar() {
+      const p = P[zoomK], d = p.d, cfgC = CFG.cortes[p.corte];
+      $('#pEtq').textContent = p.nueva ? 'Nueva colección · Salmos y Romanos' : '';
+      $('#pTitulo').textContent = d.nombre;
+      $('#pDet').textContent = d.detalle || '';
+      const sc = $('#pCorte'); sc.innerHTML = '';
+      Object.entries(CFG.cortes).forEach(([id, cc]) => {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = cc.nombre;
+        b.setAttribute('aria-pressed', id === p.corte ? 'true' : 'false'); b.disabled = !d.cortes.includes(id);
+        b.onclick = () => { if (id === p.corte) return; p.corte = id; p.color = colorDe({ color: p.color, colores: d.colores }, id); armarUna(p); fichar(); };
+        sc.appendChild(b);
+      });
+      const cs = $('#pColores'); cs.innerHTML = '';
+      coloresDe(d, p.corte).forEach(col => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'tag';
+        b.style.setProperty('--c', col.hex); b.title = col.nombre; b.setAttribute('aria-label', col.nombre);
+        b.setAttribute('aria-pressed', col.id === p.color ? 'true' : 'false');
+        b.onclick = () => { p.color = col.id; pintar(p); fichar(); };
+        cs.appendChild(b);
+      });
+      const col = cfgC.colores.find(x => x.id === p.color);
+      $('#pColorName').textContent = d.colores && d.colores.length === 1 ? `Color: ${col ? col.nombre : ''} · única opción` : `Color: ${col ? col.nombre : ''}`;
+      const msg = `Hola Agustín! Me interesa la remera "${d.nombre}" en corte ${cfgC.nombre}, color ${col ? col.nombre : ''}.`;
+      $('#pCta').href = CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`;
+    }
+    function armarUna(p) {   // al cambiar de corte cambia el tamaño de la remera
+      const sw = medida.EW * ESCALA_CORTE[p.corte], pad = SOMBRA_PAD[p.corte];
+      const shirt = p.el.querySelector('.shirt'), sombra = shirt.querySelector('.sombra');
+      shirt.style.width = sw + 'px'; sombra.src = `img/${p.corte}/sombra.webp`;
+      sombra.style.width = sw * (1 + 2 * pad) + 'px'; sombra.style.left = (-pad * sw + sw * 0.05) + 'px'; sombra.style.top = (-pad * sw + sw * 0.06) + 'px';
+      p.canvas.width = Math.round(sw); p.canvas.height = Math.round(sw * ASPECTO[p.corte]);
+      pintar(p);
+    }
+
+    /* salir hacia el perchero */
+    function salir(despues) {
+      if (!visible()) return;
+      zoomK = -1; el.classList.remove('zoom'); info.hidden = true;
+      el.classList.add('salir');
+      setTimeout(() => { el.hidden = true; if (despues) despues(); }, reduce ? 0 : 750);
+    }
+    function mostrar() {
+      el.hidden = false; el.classList.add('salir');
+      requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.remove('salir'); tocar(); }));
+    }
+    $('#pEntrar').onclick = () => salir();
+    $('#pCerrar').onclick = cerrarZoom;
+    $('#pVer').onclick = () => {
+      const d = P[zoomK].d, corte = P[zoomK].corte, color = P[zoomK].color;
+      salir(() => {
+        const f = d.coleccion || (DIS.some(x => x.coleccion === filtro) ? 'todo' : filtro);
+        if (f !== filtro) { const chip = document.querySelector(`.chip[data-f="${f}"]`); if (chip) chip.click(); }
+        let i = lista.findIndex(x => x.id === d.id);
+        if (i < 0) { document.querySelector('.chip[data-f="todo"]').click(); i = lista.findIndex(x => x.id === d.id); }
+        if (i >= 0) { centrar(i); setTimeout(() => { abrir(i); if (sel) { sel.corte = d.cortes.includes(corte) ? corte : sel.corte; sel.color = colorDe({ color, colores: d.colores }, sel.corte); textos(); pintarFig(); } }, 450); }
+      });
+    };
+    document.querySelector('.top img').style.cursor = 'pointer';
+    document.querySelector('.top img').addEventListener('click', () => { if (detail.hidden) mostrar(); });
+
+    /* gestos */
+    esc.addEventListener('pointerdown', (e) => {
+      if (zoomK >= 0 || e.button) return;
+      drag = { x: e.clientX, y: e.clientY, c0: c, movido: false, id: e.pointerId }; tocar();
+    });
+    addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.movido && Math.hypot(dx, dy) > 7) { drag.movido = true; esc.classList.add('drag'); try { esc.setPointerCapture(e.pointerId); } catch (_) {} }
+      if (drag.movido && Math.abs(dx) >= Math.abs(dy) * 0.6) { c = drag.c0 - dx / medida.sp; ct = c; }
+      drag.dx = dx; drag.dy = dy;
+    });
+    const soltar = (e) => {
+      if (!drag || (e.pointerId !== undefined && e.pointerId !== drag.id)) return;
+      const dx = drag.dx || 0, dy = drag.dy || 0, d0 = drag;
+      esc.classList.remove('drag');
+      if (d0.movido && medida.movil && dy < -70 && Math.abs(dy) > Math.abs(dx) * 1.3) salir();       // deslizar hacia arriba: al perchero
+      else if (d0.movido) ct = Math.abs(dx) > medida.sp * 0.12 ? (dx < 0 ? Math.ceil(c - 0.02) : Math.floor(c + 0.02)) : Math.round(c);
+      tocar();
+      setTimeout(() => { if (drag === d0) drag = null; }, 0);
+    };
+    addEventListener('pointerup', soltar); addEventListener('pointercancel', soltar);
+    el.addEventListener('wheel', (e) => {
+      if (!visible()) return; e.preventDefault();
+      if (zoomK >= 0) return;
+      ct += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) / 380; tocar();
+      clearTimeout(ruedaT); ruedaT = setTimeout(() => { ct = Math.round(ct); arrancar(); }, 140);
+    }, { passive: false });
+    addEventListener('keydown', (e) => {
+      if (!visible()) return;
+      if (zoomK >= 0) { if (e.key === 'Escape') cerrarZoom(); return; }
+      if (e.key === 'ArrowRight') { ct = Math.round(ct) + 1; tocar(); }
+      if (e.key === 'ArrowLeft') { ct = Math.round(ct) - 1; tocar(); }
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); salir(); }
+    });
+    let rT = 0;
+    addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { if (!el.hidden) { const z = zoomK; armar(); zoomK = z; tocar(); } }, 200); });
+
+    return {
+      iniciar(lista) {
+        P = (lista || []).map(x => {
+          const d = DIS.find(y => y.id === x.id); if (!d) return null;
+          const corte = x.corte || d.cortes[0];
+          return { d, corte, color: colorDe({ color: x.color || d.color, colores: d.colores }, corte), nueva: !!x.nueva };
+        }).filter(Boolean);
+        N = P.length; if (N < 2) return;
+        el.hidden = false; c = ct = Math.floor(N / 2); toque = performance.now();
+        requestAnimationFrame(() => { armar(); arrancar(); });
+      }
+    };
+  })();
+
   /* ---------- inicio ---------- */
   fetch('catalogo.json').then(r => r.json()).then(cfg => {
     CFG = cfg; DIS = cfg.disenos;
@@ -555,5 +774,6 @@
     armarPerchero();
     const i = lista.findIndex(d => d.id === h);
     if (i >= 0) setTimeout(() => abrir(i), 300);
+    else Portada.iniciar(cfg.portada);   // con un link directo a una remera no se muestra la portada
   }).catch(err => { $('#capName').textContent = 'No se pudo cargar el catálogo'; console.error(err); });
 })();
