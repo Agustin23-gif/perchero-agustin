@@ -33,14 +33,14 @@
       const dw = dis.naturalWidth * r, dh = dis.naturalHeight * r;
       const x = W * e.cx - dw / 2, y = H * (ancho ? e.topAncho : e.top);
       const off = document.createElement('canvas'); off.width = W; off.height = H;
-      const o = off.getContext('2d');
+      const o = off.getContext('2d'); o.imageSmoothingQuality = 'high';
       o.drawImage(dis, x, y, dw, dh);
       o.globalCompositeOperation = 'multiply'; o.drawImage(luz, 0, 0, W, H);   // pliegues y luz de la tela
       o.globalCompositeOperation = 'destination-in'; o.drawImage(dis, x, y, dw, dh);
       est = off;
     }
     canvas.width = W; canvas.height = H;
-    const c = canvas.getContext('2d');
+    const c = canvas.getContext('2d'); c.imageSmoothingQuality = 'high';
     c.clearRect(0, 0, W, H);
     c.drawImage(base, 0, 0, W, H);
     if (est) { c.globalAlpha = 0.97; c.drawImage(est, 0, 0); c.globalAlpha = 1; }
@@ -159,7 +159,7 @@
       const { swing, canvas, shirt } = prenda(W, corte, { capas: 0, hex, color }); // sin capas de grosor (Agustín prefirió sin volumen)
       b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
       if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
-      componer(canvas, d, corte, color, 'frente', Math.min(620, W * 1.8)).catch(console.warn);
+      componer(canvas, d, corte, color, 'frente', Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).catch(console.warn);
       const it = { el: b, swing, d, corte, color, i, p: pend(), o: 0, cx: 0 };
       b.addEventListener('click', (e) => { if (movido) { e.preventDefault(); return; } abrir(i); });
       canvas.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !drag && hoverIdx !== i) { hoverIdx = i; it.p.w += 30; kick(); } });
@@ -223,7 +223,10 @@
       const ry = (1 - it.o) * GIRO * lado;
       const empuje = reduce ? 0 : Math.max(-700, Math.min(700, -acc * 0.04 - v * 0.015));
       if (pasoPendulo(it.p, dt, empuje)) vivo = true;
-      it.el.style.transform = `translate3d(${it.cx - W / 2}px,${topOff}px,0) perspective(1100px) rotateY(${ry}deg)`;
+      // la de frente va sin 3D: así Safari (iPhone) la dibuja nítida y no estira una imagen chica
+      it.el.style.transform = Math.abs(ry) < 0.4
+        ? `translate(${it.cx - W / 2}px,${topOff}px)`
+        : `translate3d(${it.cx - W / 2}px,${topOff}px,0) perspective(1100px) rotateY(${ry}deg)`;
       it.el.style.zIndex = 500 - Math.abs(it.i - activo) * 2 + Math.round(it.o);
       it.swing.style.transform = `rotate(${it.p.a}deg)`;
       it.el.classList.toggle('frente', it.o > 0.5);
