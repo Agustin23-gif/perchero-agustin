@@ -551,8 +551,10 @@
     function medir() {
       const vw = innerWidth, eh = esc.clientHeight, movil = vw < 760;
       const Wc = movil ? Math.min(vw * 0.74, eh * 0.62) : Math.min(eh * 0.8, vw * 0.34);
-      const ZW = movil ? Math.min(vw * 0.86, 520) : Math.min(eh * 1.02, vw * 0.46, 640);
-      return { vw, eh, movil, Wc, ZW, EW: Math.max(Wc, ZW), sp: Wc * (movil ? 0.42 : 0.5) };
+      const ZW = movil ? Math.min(vw * 0.86, 520) : Math.min(innerHeight * 0.76, vw * 0.44, 980);
+      // en compu, remera y ficha forman un bloque centrado (antes la ficha quedaba muy a la derecha)
+      const infoW = Math.min(560, Math.max(340, vw * 0.3)), gap = Math.max(24, vw * 0.035);
+      return { vw, eh, movil, Wc, ZW, infoW, gap, EW: Math.max(Wc, ZW), sp: Wc * (movil ? 0.42 : 0.5) };
     }
     function armar() {
       medida = medir(); esc.innerHTML = '';
@@ -591,7 +593,7 @@
       const { Wc, EW, sp, movil, vw, eh } = medida;
       if (zoomK >= 0) {
         if (k === zoomK) {
-          let x = movil ? 0 : -vw * 0.19, y = 0;
+          let x = movil ? 0 : -(medida.gap + medida.infoW) / 2, y = 0;
           let s = medida.ZW / EW;
           if (movil) {   // arriba, dejando lugar a la ficha de abajo
             const er = esc.getBoundingClientRect(), libre = info.getBoundingClientRect().top - 12;
@@ -640,8 +642,14 @@
     /* ficha (zoom) */
     function abrirZoom(k) {
       zoomK = k; ct = c = Math.round(c) + envolver(k - Math.round(c)); el.classList.add('zoom');
-      info.hidden = false; fichar(); arrancar();
+      info.hidden = false; ubicarFicha(); fichar(); arrancar();
       setTimeout(() => $('#pCerrar').focus({ preventScroll: true }), 50);
+    }
+    function ubicarFicha() {
+      const m = medida;
+      if (m.movil) { info.style.left = info.style.width = ''; return; }
+      info.style.width = m.infoW + 'px';
+      info.style.left = (m.vw / 2 - (m.gap + m.infoW) / 2 + m.ZW / 2 + m.gap) + 'px';
     }
     function cerrarZoom() {
       if (zoomK < 0) return; const k = zoomK; zoomK = -1; el.classList.remove('zoom'); info.hidden = true; tocar();
@@ -743,7 +751,7 @@
       if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); salir(); }
     });
     let rT = 0;
-    addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { if (!el.hidden) { const z = zoomK; armar(); zoomK = z; tocar(); } }, 200); });
+    addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { if (!el.hidden) { const z = zoomK; armar(); zoomK = z; if (z >= 0) ubicarFicha(); tocar(); } }, 200); });
 
     return {
       iniciar(lista) {
