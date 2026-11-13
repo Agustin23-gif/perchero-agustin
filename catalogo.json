@@ -1,0 +1,409 @@
+{
+ "marca": "Agustín diseños personalizados",
+ "whatsapp": "",
+ "instagram": "agustindisenos_personalizado",
+ "parecidos": {
+  "verde_musgo": "verde_botella",
+  "beige": "blanco",
+  "marfil": "blanco",
+  "verde_botella": "verde_musgo",
+  "gris_melange": "blanco",
+  "naranja": "beige"
+ },
+ "cortes": {
+  "oversize": {
+   "nombre": "Oversize",
+   "lados": [
+    "frente",
+    "espalda"
+   ],
+   "colores": [
+    {
+     "id": "negro",
+     "nombre": "Negro",
+     "hex": "#1C1C1C"
+    },
+    {
+     "id": "blanco",
+     "nombre": "Blanco",
+     "hex": "#F7F6F2"
+    },
+    {
+     "id": "beige",
+     "nombre": "Beige",
+     "hex": "#DAC7AB"
+    },
+    {
+     "id": "marfil",
+     "nombre": "Marfil",
+     "hex": "#F0E6C9"
+    },
+    {
+     "id": "verde_musgo",
+     "nombre": "Verde musgo",
+     "hex": "#5B613C"
+    }
+   ],
+   "estampa": {
+    "frente": {
+     "cx": 0.5,
+     "top": 0.215,
+     "ancho": 0.37,
+     "alto": 0.5,
+     "topAncho": 0.27,
+     "anchoAncho": 0.56
+    },
+    "espalda": {
+     "cx": 0.5,
+     "top": 0.17,
+     "ancho": 0.42,
+     "alto": 0.55,
+     "topAncho": 0.22,
+     "anchoAncho": 0.58
+    }
+   }
+  },
+  "basica": {
+   "nombre": "Básica",
+   "lados": [
+    "frente"
+   ],
+   "colores": [
+    {
+     "id": "blanco",
+     "nombre": "Blanco",
+     "hex": "#F4F3EF"
+    },
+    {
+     "id": "negro",
+     "nombre": "Negro",
+     "hex": "#1A1A1A"
+    },
+    {
+     "id": "gris_melange",
+     "nombre": "Gris melange",
+     "hex": "#A9A9A7"
+    },
+    {
+     "id": "gris_plomo",
+     "nombre": "Gris plomo",
+     "hex": "#6C6C6E"
+    },
+    {
+     "id": "azul_marino",
+     "nombre": "Azul marino",
+     "hex": "#1A2140"
+    },
+    {
+     "id": "azul_francia",
+     "nombre": "Azul francia",
+     "hex": "#2152B8"
+    },
+    {
+     "id": "celeste",
+     "nombre": "Celeste",
+     "hex": "#8FC3EA"
+    },
+    {
+     "id": "turquesa",
+     "nombre": "Turquesa",
+     "hex": "#1796C6"
+    },
+    {
+     "id": "verde_botella",
+     "nombre": "Verde botella",
+     "hex": "#1D3D2C"
+    },
+    {
+     "id": "verde_bandera",
+     "nombre": "Verde bandera",
+     "hex": "#0D8642"
+    },
+    {
+     "id": "verde_manzana",
+     "nombre": "Verde manzana",
+     "hex": "#6FC230"
+    },
+    {
+     "id": "amarillo",
+     "nombre": "Amarillo",
+     "hex": "#F5C61C"
+    },
+    {
+     "id": "amarillo_oro",
+     "nombre": "Amarillo oro",
+     "hex": "#F2A614"
+    },
+    {
+     "id": "naranja",
+     "nombre": "Naranja",
+     "hex": "#F05F12"
+    },
+    {
+     "id": "salmon",
+     "nombre": "Salmón",
+     "hex": "#F6AD90"
+    },
+    {
+     "id": "rosa",
+     "nombre": "Rosa",
+     "hex": "#F3AECC"
+    },
+    {
+     "id": "fucsia",
+     "nombre": "Fucsia",
+     "hex": "#C21A5B"
+    },
+    {
+     "id": "rojo",
+     "nombre": "Rojo",
+     "hex": "#BD1620"
+    },
+    {
+     "id": "bordo",
+     "nombre": "Bordó",
+     "hex": "#7A1422"
+    },
+    {
+     "id": "lila",
+     "nombre": "Lila",
+     "hex": "#B8A0DC"
+    },
+    {
+     "id": "violeta",
+     "nombre": "Violeta",
+     "hex": "#5B2EA0"
+    },
+    {
+     "id": "marron",
+     "nombre": "Marrón",
+     "hex": "#5A3A25"
+    }
+   ],
+   "estampa": {
+    "frente": {
+     "cx": 0.5,
+     "top": 0.215,
+     "ancho": 0.36,
+     "alto": 0.46,
+     "topAncho": 0.26,
+     "anchoAncho": 0.5
+    }
+   }
+  }
+ },
+ "disenos": [
+  {
+   "id": "lisa_oversize",
+   "nombre": "Oversize lisa",
+   "detalle": "Corte oversize · 5 colores",
+   "lisa": true,
+   "cortes": [
+    "oversize"
+   ],
+   "color": "beige"
+  },
+  {
+   "id": "lisa_basica",
+   "nombre": "Básica lisa",
+   "detalle": "Corte clásico · 22 colores",
+   "lisa": true,
+   "cortes": [
+    "basica"
+   ],
+   "color": "naranja"
+  },
+  {
+   "id": "god_is_bigger",
+   "nombre": "God is bigger",
+   "detalle": "Than your fear",
+   "frente": "disenos/god_is_bigger.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "negro"
+  },
+  {
+   "id": "his_plan_is_perfect",
+   "nombre": "His plan is perfect",
+   "detalle": "Colección fe",
+   "frente": "disenos/his_plan_is_perfect.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "verde_musgo"
+  },
+  {
+   "id": "you_are_a_child_of_god",
+   "nombre": "You are a child of God",
+   "detalle": "John 1:12",
+   "frente": "disenos/you_are_a_child_of_god.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "marfil"
+  },
+  {
+   "id": "on_fire",
+   "nombre": "On fire",
+   "detalle": "Psalm 42:2",
+   "frente": "disenos/on_fire.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "marfil"
+  },
+  {
+   "id": "he_must_become_greater",
+   "nombre": "He must become greater",
+   "detalle": "John 3:30",
+   "frente": "disenos/he_must_become_greater.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "beige"
+  },
+  {
+   "id": "god_is_love",
+   "nombre": "God is love",
+   "detalle": "1 John 4:8",
+   "frente": "disenos/god_is_love.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "blanco"
+  },
+  {
+   "id": "life_is_better_with_jesus",
+   "nombre": "Life is better with Jesus",
+   "detalle": "Colección fe",
+   "frente": "disenos/life_is_better_with_jesus.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "blanco"
+  },
+  {
+   "id": "jesus_corriendo",
+   "nombre": "Jesus",
+   "detalle": "Ilustración",
+   "frente": "disenos/jesus_corriendo.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "verde_musgo"
+  },
+  {
+   "id": "jesus_loves_you",
+   "nombre": "Jesus loves you",
+   "detalle": "Colección fe",
+   "frente": "disenos/jesus_loves_you.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "marfil"
+  },
+  {
+   "id": "jesus_is_my_bestie",
+   "nombre": "Jesus is my bestie",
+   "detalle": "Colección fe",
+   "frente": "disenos/jesus_is_my_bestie.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "negro"
+  },
+  {
+   "id": "jesus_is_the_way",
+   "nombre": "Jesus is the way",
+   "detalle": "King of kings",
+   "frente": "disenos/jesus_is_the_way.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "negro"
+  },
+  {
+   "id": "church_kids",
+   "nombre": "Church kids",
+   "detalle": "Colección kids",
+   "frente": "disenos/church_kids.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "blanco"
+  },
+  {
+   "id": "coronas_y_paloma",
+   "nombre": "Rey · Salvador · Espíritu",
+   "detalle": "Corona, espinas y paloma",
+   "frente": "disenos/coronas_y_paloma.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "blanco"
+  },
+  {
+   "id": "dont_be_afraid",
+   "nombre": "Don't be afraid",
+   "detalle": "I'm here for you",
+   "frente": "disenos/dont_be_afraid.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "marfil"
+  },
+  {
+   "id": "jesus_always_wins",
+   "nombre": "Jesus always wins",
+   "detalle": "Colección fe",
+   "frente": "disenos/jesus_always_wins.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "negro"
+  },
+  {
+   "id": "victory",
+   "nombre": "The greatest victory",
+   "detalle": "1 Cor 15:57",
+   "frente": "disenos/victory.webp",
+   "espalda": null,
+   "cortes": [
+    "oversize",
+    "basica"
+   ],
+   "color": "beige"
+  }
+ ]
+}

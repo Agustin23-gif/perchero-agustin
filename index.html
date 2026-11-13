@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Perchero interactivo de remeras personalizadas en DTF: oversize y básicas.">
+<title>Perchero Agustín</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&display=swap">
+<link rel="icon" href="img/logo.png">
+<link rel="stylesheet" href="styles.css">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <button class="nav" id="navColeccion" type="button">Colección</button>
+    <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
+    <a class="nav" id="navContacto" href="#" target="_blank" rel="noopener">Contacto</a>
+  </header>
+
+  <main class="stage" id="stage">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">Remeras personalizadas en DTF</p>
+        <h1>Elegí tu <em>remera</em></h1>
+      </div>
+      <div class="chips" role="group" aria-label="Filtrar por corte">
+        <button class="chip" type="button" data-f="todo" aria-pressed="true">Todo</button>
+        <button class="chip" type="button" data-f="oversize" aria-pressed="false">Oversize</button>
+        <button class="chip" type="button" data-f="basica" aria-pressed="false">Básica</button>
+      </div>
+    </section>
+
+    <div class="rack" id="rack" aria-label="Perchero de remeras. Deslizá para ver más.">
+      <div class="rod"></div>
+      <div class="track" id="track"></div>
+    </div>
+
+    <p class="caption" id="caption" aria-live="polite"><b id="capName">&nbsp;</b><span id="capHint">Deslizá el perchero · tocá una remera</span></p>
+
+    <section class="detail" id="detail" hidden aria-label="Detalle de la remera">
+      <button class="det-close" id="detClose" type="button">← Volver al perchero</button>
+      <div class="det-view" id="detView">
+        <button class="arrow prev" id="prev" type="button" aria-label="Remera anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div class="det-fig" id="detFig"></div>
+        <button class="arrow next" id="next" type="button" aria-label="Remera siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="det-info">
+        <h2 id="detName"></h2>
+        <p class="det-sub" id="detSub"></p>
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Corte" id="segCorte"></div>
+          <div class="seg" role="group" aria-label="Lado" id="segLado"></div>
+        </div>
+        <div class="colores-wrap"><div class="colores" id="colores" role="group" aria-label="Color"></div></div>
+        <div class="color-name" id="colorName"></div>
+        <a class="cta" id="cta" href="#" target="_blank" rel="noopener">Consultar</a>
+        <div class="count" id="count"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="ticker" aria-hidden="true"><div class="ticker-in" id="ticker"></div></footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
