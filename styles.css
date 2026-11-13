@@ -76,7 +76,7 @@ h1 em {
 .track { position: absolute; inset: 0; z-index: 1; }
 
 .item {
-  position: absolute; top: 0; left: 0; padding: 0; border: 0; background: none; cursor: pointer;
+  position: absolute; transform-style: preserve-3d; top: 0; left: 0; padding: 0; border: 0; background: none; cursor: pointer;
   will-change: transform; transform-style: preserve-3d;
 }
 .item { pointer-events: none; }
@@ -90,7 +90,7 @@ h1 em {
 }
 .item:focus-visible { outline: none; }
 .item:focus-visible .shirt canvas { outline: 2px solid var(--naranja); outline-offset: 6px; border-radius: 8px; }
-.swing { position: relative; transform-origin: 50% var(--pivot, 6px); will-change: transform; }
+.swing { position: relative; transform-style: preserve-3d; transform-origin: 50% var(--pivot, 6px); will-change: transform; }
 .hook { position: absolute; left: 50%; top: 0; transform: translateX(-50%); overflow: visible; z-index: 0; }
 .shirt { z-index: 1; }
 .shirt { position: absolute; left: 50%; transform: translateX(-50%); }
@@ -184,4 +184,12 @@ h1 em {
 @media (prefers-reduced-motion: reduce) {
   .ticker-in { animation: none; }
   .item .shirt, .tag { transition: none; }
+}
+
+/* volumen de la remera de costado */
+.item .shirt { transform-style: preserve-3d; }
+.shirt canvas { transform: translateZ(0.5px); }
+.capa {
+  position: absolute; left: 0; top: 0; pointer-events: none; transform-origin: 50% 0;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }

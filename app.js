@@ -67,7 +67,13 @@
     return { swB, hookH, sw, sh, shirtTop, alto: shirtTop + sh };
   }
   // Arma la percha + remera. Devuelve el nodo .swing y el canvas.
-  function prenda(w, corte) {
+  // Oscurece un color hex (k entre 0 y 1).
+  function oscurecer(hex, k) {
+    const n = parseInt(hex.slice(1), 16), f = (v) => Math.round(v * (1 - k));
+    return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`;
+  }
+  // grosor: { capas, hex, color } → capas de tela detrás del frente, para que de costado tenga volumen.
+  function prenda(w, corte, grosor) {
     const g = geometria(w, corte);
     const swing = document.createElement('div'); swing.className = 'swing';
     swing.style.width = w + 'px'; swing.style.height = g.alto + 'px';
@@ -85,7 +91,22 @@
     sombra.style.left = (-pad * g.sw + g.sw * 0.06) + 'px'; sombra.style.top = (-pad * g.sw + g.sw * 0.07) + 'px';
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(g.sw); canvas.height = Math.round(g.sh);
-    shirt.append(sombra, canvas); swing.appendChild(shirt);
+    shirt.append(sombra);
+    if (grosor && grosor.capas) {
+      const prof = g.sw * 0.075;                       // profundidad de la remera colgada (pecho + espalda + percha)
+      const url = `url(img/${corte}/frente_${grosor.color}.webp)`;
+      for (let k = grosor.capas; k >= 1; k--) {
+        const c = document.createElement('div'); c.className = 'capa';
+        c.style.width = g.sw + 'px'; c.style.height = g.sh + 'px';
+        c.style.background = oscurecer(grosor.hex, 0.1 + 0.22 * (k / grosor.capas));
+        c.style.webkitMaskImage = c.style.maskImage = url;
+        // las capas del fondo se encogen un poco: la tela se cierra hacia la espalda
+        const esc = 1 - 0.012 * (k / grosor.capas);
+        c.style.transform = `translateZ(${-prof * k / grosor.capas}px) scale(${esc}, ${1 - 0.01 * k / grosor.capas})`;
+        shirt.appendChild(c);
+      }
+    }
+    shirt.append(canvas); swing.appendChild(shirt);
     return { swing, canvas, hookH: g.hookH, sw: g.sw, shirt };
   }
   /* ---------- péndulo ---------- */
@@ -103,7 +124,7 @@
   const rack = $('#rack'), track = $('#track');
   let topOff = 0, items = [], W = 0, S = 0, E = 0, x = 0, v = 0, vPrev = 0, minX = 0, maxX = 0, viewW = 0;
   let drag = null, movido = false, rafOn = false, last = 0, hoverIdx = -1, activo = 0;
-  const GIRO = 66; // grados de las remeras que están de costado
+  const GIRO = 58; // grados de las remeras que están de costado
 
   function corteDe(d) { return filtro === 'todo' ? d.cortes[0] : filtro; }
   function colorDe(d, corte) {
@@ -127,7 +148,8 @@
       const corte = corteDe(d), color = colorDe(d, corte);
       const b = document.createElement('button'); b.type = 'button'; b.className = 'item';
       b.setAttribute('aria-label', `${d.nombre}, corte ${CFG.cortes[corte].nombre}. Ver detalle`);
-      const { swing, canvas, shirt } = prenda(W, corte);
+      const hex = (CFG.cortes[corte].colores.find(c => c.id === color) || {}).hex || '#cccccc';
+      const { swing, canvas, shirt } = prenda(W, corte, { capas: viewW < 600 ? 8 : 12, hex, color });
       b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
       if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
       componer(canvas, d, corte, color, 'frente', Math.min(620, W * 1.8)).catch(console.warn);
