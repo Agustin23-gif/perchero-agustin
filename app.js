@@ -49,22 +49,28 @@
   /* ---------- percha de madera + gancho ---------- */
   // Medidas de la percha tomadas de la foto de la remera básica (relativas al ancho de la básica).
   const PERCHA = { ancho: 0.2598, izq: -0.1371, arriba: -0.096, prop: 186 / 379 };
-  function gancho(h) {
+  // Gancho visto de frente, como en un perchero real: un alambre recto que sube desde la percha
+  // y se curva por encima de la barra.
+  function gancho(alto, rc, rodH) {
     const ns = 'http://www.w3.org/2000/svg';
     const s = document.createElementNS(ns, 'svg');
-    s.setAttribute('viewBox', '0 0 40 60'); s.setAttribute('class', 'hook');
-    s.style.height = h + 'px'; s.style.width = (h * 40 / 60) + 'px';
-    s.innerHTML = `<defs><linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="#4E4C49"/><stop offset=".45" stop-color="#D9D8D4"/><stop offset="1" stop-color="#7C7A76"/></linearGradient></defs>
-      <path d="M20 61 V42 C20 35 27.5 32 27.5 20 C27.5 10 20.5 4.6 15.5 6.6 C12 8 11.6 12.6 13.8 14.6" fill="none" stroke="url(#gm)" stroke-width="2.6" stroke-linecap="round"/>`;
+    const ancho = rodH * 2.2;
+    s.setAttribute('viewBox', `0 0 ${ancho} ${alto}`); s.setAttribute('class', 'hook');
+    s.style.height = alto + 'px'; s.style.width = ancho + 'px';
+    const cx = ancho / 2, r = rodH * 0.62, top = rc - r, grosor = Math.max(1.6, rodH * 0.2);
+    s.innerHTML = `<defs><linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="#55534F"/><stop offset=".5" stop-color="#C9C7C2"/><stop offset="1" stop-color="#6E6C68"/></linearGradient></defs>
+      <path d="M${cx} ${alto} V${rc + r * 0.2} C${cx} ${top - r * 0.9} ${cx + r * 1.7} ${top - r * 0.9} ${cx + r * 1.55} ${rc + r * 0.35}" fill="none" stroke="url(#gm)" stroke-width="${grosor}" stroke-linecap="round"/>`;
     return s;
   }
   function geometria(w, corte) {
     const swB = w * ESCALA_CORTE.basica;
-    const hookH = w * 0.17;
+    const hookH = w * 0.2;
+    const rodH = Math.max(8, Math.min(14, w * 0.036));
+    const rc = rodH * 0.9;                            // centro de la barra, desde arriba de la prenda
     const sw = w * ESCALA_CORTE[corte];
     const sh = sw * ASPECTO[corte];
     const shirtTop = hookH - PERCHA.arriba * swB;
-    return { swB, hookH, sw, sh, shirtTop, alto: shirtTop + sh };
+    return { swB, hookH, rodH, rc, sw, sh, shirtTop, alto: shirtTop + sh };
   }
   // Arma la percha + remera. Devuelve el nodo .swing y el canvas.
   // Oscurece un color hex (k entre 0 y 1).
@@ -77,8 +83,8 @@
     const g = geometria(w, corte);
     const swing = document.createElement('div'); swing.className = 'swing';
     swing.style.width = w + 'px'; swing.style.height = g.alto + 'px';
-    swing.style.setProperty('--pivot', (g.hookH * 0.12) + 'px');
-    swing.appendChild(gancho(g.hookH + 2));
+    swing.style.setProperty('--pivot', g.rc + 'px');
+    swing.appendChild(gancho(g.hookH + 2, g.rc, g.rodH));
     const madera = new Image(); madera.className = 'madera'; madera.alt = ''; madera.src = 'img/percha.webp';
     const mw = PERCHA.ancho * g.swB;
     madera.style.width = mw + 'px'; madera.style.left = (w / 2 + PERCHA.izq * g.swB) + 'px'; madera.style.top = g.hookH + 'px';
@@ -107,7 +113,7 @@
       }
     }
     shirt.append(canvas); swing.appendChild(shirt);
-    return { swing, canvas, hookH: g.hookH, sw: g.sw, shirt };
+    return { swing, canvas, hookH: g.hookH, sw: g.sw, shirt, g };
   }
   /* ---------- péndulo ---------- */
   const pend = () => ({ a: 0, w: 0 });
@@ -142,7 +148,8 @@
     S = W * 0.3; E = W * 0.86;
     const g = geometria(W, 'oversize');
     topOff = Math.max(6, (h - g.alto) * 0.4);
-    rack.style.setProperty('--rod-y', (topOff + g.hookH * 0.1 - 3) + 'px');
+    rack.style.setProperty('--rod-y', (topOff + g.rc - g.rodH / 2) + 'px');
+    rack.style.setProperty('--rod-h', g.rodH + 'px');
     track.innerHTML = ''; items = [];
     lista.forEach((d, i) => {
       const corte = corteDe(d), color = colorDe(d, corte);
@@ -297,6 +304,8 @@
     await componer(nuevo.canvas, d, sel.corte, sel.color, sel.lado, Math.round(w * (devicePixelRatio > 1 ? 2 : 1.4))).catch(console.warn);
     detFig.innerHTML = ''; detFig.appendChild(nuevo.swing);
     detFig.style.width = w + 'px'; detFig.style.marginLeft = (-w / 2) + 'px';
+    detView.style.setProperty('--rod-y', (nuevo.g.rc - nuevo.g.rodH / 2) + 'px');
+    detView.style.setProperty('--rod-h', nuevo.g.rodH + 'px');
     fig = nuevo;
     if (dir && !reduce) nuevo.swing.animate([{ transform: `translateX(${dir * 60}%) rotate(${dir * -10}deg)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
   }
