@@ -132,16 +132,20 @@
   let drag = null, movido = false, rafOn = false, last = 0, hoverIdx = -1, activo = 0;
   const GIRO = 66; // grados de las remeras que están de costado
 
-  function corteDe(d) { return filtro === 'todo' ? d.cortes[0] : filtro; }
+  function corteDe(d) { return CFG.cortes[filtro] && d.cortes.includes(filtro) ? filtro : d.cortes[0]; }
+  // lado que se muestra primero: el que tiene el diseño (la colección Salmos y Romanos va en la espalda)
+  function ladoDe(d) { return d.lado || (!d.frente && d.espalda ? 'espalda' : 'frente'); }
+  // colores permitidos de un diseño en un corte (algunas colecciones van solo en negro)
+  function coloresDe(d, corte) { const cs = CFG.cortes[corte].colores; return d.colores ? cs.filter(c => d.colores.includes(c.id)) : cs; }
   function colorDe(d, corte) {
-    const ids = CFG.cortes[corte].colores.map(c => c.id);
+    const ids = coloresDe(d, corte).map(c => c.id);
     if (ids.includes(d.color)) return d.color;
     const parecido = (CFG.parecidos || {})[d.color];   // ej.: verde musgo (oversize) → verde botella (básica)
     return ids.includes(parecido) ? parecido : (ids.includes('blanco') ? 'blanco' : ids[0]);
   }
 
   function armarPerchero() {
-    lista = DIS.filter(d => filtro === 'todo' || d.cortes.includes(filtro));
+    lista = DIS.filter(d => filtro === 'todo' || d.cortes.includes(filtro) || d.coleccion === filtro);
     const h = rack.clientHeight; viewW = rack.clientWidth;
     const g1 = { alto: geometria(300, 'oversize').alto / 300 }; // proporción alto/ancho
     W = Math.max(130, Math.min(360, (h - 16) / g1.alto, viewW * (viewW < 600 ? 0.62 : 0.26)));
@@ -159,7 +163,7 @@
       const { swing, canvas, shirt } = prenda(W, corte, { capas: 0, hex, color }); // sin capas de grosor (Agustín prefirió sin volumen)
       b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
       if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
-      componer(canvas, d, corte, color, 'frente', Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).catch(console.warn);
+      componer(canvas, d, corte, color, ladoDe(d), Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).catch(console.warn);
       const it = { el: b, swing, d, corte, color, i, p: pend(), o: 0, cx: 0 };
       b.addEventListener('click', (e) => { if (movido) { e.preventDefault(); return; } abrir(i); });
       canvas.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !drag && hoverIdx !== i) { hoverIdx = i; it.p.w += 30; kick(); } });
@@ -329,7 +333,7 @@
       const b = document.createElement('button'); b.type = 'button'; b.textContent = c.nombre;
       b.setAttribute('aria-pressed', id === sel.corte ? 'true' : 'false');
       b.disabled = !d.cortes.includes(id);
-      b.onclick = () => { if (id === sel.corte) return; sel.corte = id; sel.color = colorDe({ color: sel.color }, id); if (!CFG.cortes[id].lados.includes(sel.lado)) sel.lado = 'frente'; textos(); pintarFig().then(() => empujar(60)); };
+      b.onclick = () => { if (id === sel.corte) return; sel.corte = id; sel.color = colorDe({ color: sel.color, colores: d.colores }, id); if (!CFG.cortes[id].lados.includes(sel.lado)) sel.lado = 'frente'; textos(); pintarFig().then(() => empujar(60)); };
       sc.appendChild(b);
     });
     // lado
@@ -344,7 +348,7 @@
     });
     // colores
     const cs = $('#colores'); cs.innerHTML = '';
-    cfgC.colores.forEach(c => {
+    coloresDe(d, sel.corte).forEach(c => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'tag';
       b.style.setProperty('--c', c.hex); b.setAttribute('aria-label', c.nombre); b.title = c.nombre;
       b.setAttribute('aria-pressed', c.id === sel.color ? 'true' : 'false');
@@ -373,7 +377,7 @@
 
   async function abrir(i) {
     const d = lista[i], it = items[i];
-    sel = { i, corte: it ? it.corte : d.cortes[0], color: it ? it.color : d.color, lado: 'frente' };
+    sel = { i, corte: it ? it.corte : d.cortes[0], color: it ? it.color : d.color, lado: ladoDe(d) };
     const desde = it ? it.el.querySelector('canvas').getBoundingClientRect() : null;
     detail.hidden = false; stage.classList.add('open');
     textos(); await pintarFig();
@@ -401,7 +405,7 @@
     const n = (sel.i + dir + lista.length) % lista.length;
     const d = lista[n];
     const corte = d.cortes.includes(sel.corte) ? sel.corte : d.cortes[0];
-    sel = { i: n, corte, color: colorDe(d, corte), lado: 'frente' };
+    sel = { i: n, corte, color: colorDe(d, corte), lado: ladoDe(d) };
     textos(); pintarFig(dir).then(() => empujar(dir * -90));
   }
   $('#prev').onclick = () => mover(-1);
