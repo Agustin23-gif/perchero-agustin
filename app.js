@@ -124,7 +124,7 @@
   const rack = $('#rack'), track = $('#track');
   let topOff = 0, items = [], W = 0, S = 0, E = 0, x = 0, v = 0, vPrev = 0, minX = 0, maxX = 0, viewW = 0;
   let drag = null, movido = false, rafOn = false, last = 0, hoverIdx = -1, activo = 0;
-  const GIRO = 58; // grados de las remeras que están de costado
+  const GIRO = 66; // grados de las remeras que están de costado
 
   function corteDe(d) { return filtro === 'todo' ? d.cortes[0] : filtro; }
   function colorDe(d, corte) {
@@ -149,7 +149,7 @@
       const b = document.createElement('button'); b.type = 'button'; b.className = 'item';
       b.setAttribute('aria-label', `${d.nombre}, corte ${CFG.cortes[corte].nombre}. Ver detalle`);
       const hex = (CFG.cortes[corte].colores.find(c => c.id === color) || {}).hex || '#cccccc';
-      const { swing, canvas, shirt } = prenda(W, corte, { capas: viewW < 600 ? 8 : 12, hex, color });
+      const { swing, canvas, shirt } = prenda(W, corte, { capas: 0, hex, color }); // sin capas de grosor (Agustín prefirió sin volumen)
       b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
       if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
       componer(canvas, d, corte, color, 'frente', Math.min(620, W * 1.8)).catch(console.warn);
