@@ -79,10 +79,20 @@ h1 em {
   position: absolute; top: 0; left: 0; padding: 0; border: 0; background: none; cursor: pointer;
   will-change: transform; transform-style: preserve-3d;
 }
+.item { pointer-events: none; }
+.item canvas { pointer-events: auto; }
+.item:not(.frente) .shirt canvas { filter: brightness(.92); }
+.madera { position: absolute; max-width: none; pointer-events: none; }
+.etiqueta {
+  position: absolute; top: 4%; right: 8%; z-index: 2; background: var(--blanco); color: var(--tinta);
+  font-size: 10px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase; padding: 3px 6px; border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(20, 20, 20, .2); pointer-events: none;
+}
 .item:focus-visible { outline: none; }
 .item:focus-visible .shirt canvas { outline: 2px solid var(--naranja); outline-offset: 6px; border-radius: 8px; }
 .swing { position: relative; transform-origin: 50% var(--pivot, 6px); will-change: transform; }
-.hook { position: absolute; left: 50%; top: 0; transform: translateX(-50%); overflow: visible; }
+.hook { position: absolute; left: 50%; top: 0; transform: translateX(-50%); overflow: visible; z-index: 0; }
+.shirt { z-index: 1; }
 .shirt { position: absolute; left: 50%; transform: translateX(-50%); }
 .shirt canvas { display: block; width: 100%; height: auto; position: relative; }
 .shirt .sombra { position: absolute; max-width: none; pointer-events: none; }

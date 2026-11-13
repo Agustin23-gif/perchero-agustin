@@ -4,9 +4,9 @@
 (() => {
   const $ = (s) => document.querySelector(s);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const ASPECTO = { oversize: 1050 / 1064, basica: 665 / 638 };
+  const ASPECTO = { oversize: 1050 / 1064, basica: 733 / 720 };
   const ESCALA_CORTE = { oversize: 1, basica: 0.84 }; // la básica se ve más angosta, como en la realidad
-  const SOMBRA_PAD = { oversize: 60 / 720, basica: 60 / 638 };
+  const SOMBRA_PAD = { oversize: 60 / 720, basica: 60 / 720 };
 
   let CFG, DIS = [], lista = [], filtro = 'todo';
 
@@ -46,38 +46,48 @@
     if (est) { c.globalAlpha = 0.97; c.drawImage(est, 0, 0); c.globalAlpha = 1; }
   }
 
-  /* ---------- percha (gancho) ---------- */
+  /* ---------- percha de madera + gancho ---------- */
+  // Medidas de la percha tomadas de la foto de la remera básica (relativas al ancho de la básica).
+  const PERCHA = { ancho: 0.2598, izq: -0.1371, arriba: -0.096, prop: 186 / 379 };
   function gancho(h) {
     const ns = 'http://www.w3.org/2000/svg';
     const s = document.createElementNS(ns, 'svg');
     s.setAttribute('viewBox', '0 0 40 60'); s.setAttribute('class', 'hook');
     s.style.height = h + 'px'; s.style.width = (h * 40 / 60) + 'px';
-    s.innerHTML = `<defs><linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="#5E5C59"/><stop offset=".45" stop-color="#E9E8E5"/><stop offset="1" stop-color="#8F8D89"/></linearGradient></defs>
-      <path d="M20 60 V40 C20 33 27.5 31 27.5 20 C27.5 10 20.5 4.6 15.5 6.6 C12 8 11.6 12.6 13.8 14.6" fill="none" stroke="url(#gm)" stroke-width="3.2" stroke-linecap="round"/>
-      <rect x="13" y="52" width="14" height="8" rx="2" fill="#2A2724"/>`;
+    s.innerHTML = `<defs><linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="#4E4C49"/><stop offset=".45" stop-color="#D9D8D4"/><stop offset="1" stop-color="#7C7A76"/></linearGradient></defs>
+      <path d="M20 61 V42 C20 35 27.5 32 27.5 20 C27.5 10 20.5 4.6 15.5 6.6 C12 8 11.6 12.6 13.8 14.6" fill="none" stroke="url(#gm)" stroke-width="2.6" stroke-linecap="round"/>`;
     return s;
+  }
+  function geometria(w, corte) {
+    const swB = w * ESCALA_CORTE.basica;
+    const hookH = w * 0.17;
+    const sw = w * ESCALA_CORTE[corte];
+    const sh = sw * ASPECTO[corte];
+    const shirtTop = hookH - PERCHA.arriba * swB;
+    return { swB, hookH, sw, sh, shirtTop, alto: shirtTop + sh };
   }
   // Arma la percha + remera. Devuelve el nodo .swing y el canvas.
   function prenda(w, corte) {
-    const hookH = w * 0.2;
-    const sw = w * ESCALA_CORTE[corte];
-    const sh = sw * ASPECTO[corte];
+    const g = geometria(w, corte);
     const swing = document.createElement('div'); swing.className = 'swing';
-    swing.style.width = w + 'px'; swing.style.height = (hookH + sh) + 'px';
-    swing.style.setProperty('--pivot', (hookH * 0.12) + 'px');
-    swing.appendChild(gancho(hookH));
+    swing.style.width = w + 'px'; swing.style.height = g.alto + 'px';
+    swing.style.setProperty('--pivot', (g.hookH * 0.12) + 'px');
+    swing.appendChild(gancho(g.hookH + 2));
+    const madera = new Image(); madera.className = 'madera'; madera.alt = ''; madera.src = 'img/percha.webp';
+    const mw = PERCHA.ancho * g.swB;
+    madera.style.width = mw + 'px'; madera.style.left = (w / 2 + PERCHA.izq * g.swB) + 'px'; madera.style.top = g.hookH + 'px';
+    swing.appendChild(madera);
     const shirt = document.createElement('div'); shirt.className = 'shirt';
-    shirt.style.width = sw + 'px'; shirt.style.top = (hookH * 0.9) + 'px';
+    shirt.style.width = g.sw + 'px'; shirt.style.top = g.shirtTop + 'px';
     const pad = SOMBRA_PAD[corte];
     const sombra = new Image(); sombra.className = 'sombra'; sombra.alt = ''; sombra.src = `img/${corte}/sombra.webp`;
-    sombra.style.width = sw * (1 + 2 * pad) + 'px';
-    sombra.style.left = (-pad * sw + sw * 0.06) + 'px'; sombra.style.top = (-pad * sw + sw * 0.07) + 'px';
+    sombra.style.width = g.sw * (1 + 2 * pad) + 'px';
+    sombra.style.left = (-pad * g.sw + g.sw * 0.06) + 'px'; sombra.style.top = (-pad * g.sw + g.sw * 0.07) + 'px';
     const canvas = document.createElement('canvas');
-    canvas.width = Math.round(sw); canvas.height = Math.round(sh);
+    canvas.width = Math.round(g.sw); canvas.height = Math.round(g.sh);
     shirt.append(sombra, canvas); swing.appendChild(shirt);
-    return { swing, canvas, hookH, sw };
+    return { swing, canvas, hookH: g.hookH, sw: g.sw, shirt };
   }
-
   /* ---------- péndulo ---------- */
   const pend = () => ({ a: 0, w: 0 });
   function pasoPendulo(p, dt, empuje) {
@@ -88,9 +98,12 @@
   }
 
   /* ---------- perchero ---------- */
+  // Como en una tienda: las remeras cuelgan de costado y la que señalás (o la del centro, en el celu)
+  // gira y se pone de frente, abriéndose lugar entre las demás.
   const rack = $('#rack'), track = $('#track');
-  let topOff = 0, items = [], W = 0, paso = 0, x = 0, v = 0, vPrev = 0, minX = 0, maxX = 0, viewW = 0;
-  let drag = null, movido = false, rafOn = false, last = 0, hoverIdx = -1;
+  let topOff = 0, items = [], W = 0, S = 0, E = 0, x = 0, v = 0, vPrev = 0, minX = 0, maxX = 0, viewW = 0;
+  let drag = null, movido = false, rafOn = false, last = 0, hoverIdx = -1, activo = 0;
+  const GIRO = 66; // grados de las remeras que están de costado
 
   function corteDe(d) { return filtro === 'todo' ? d.cortes[0] : filtro; }
   function colorDe(d, corte) {
@@ -103,76 +116,92 @@
   function armarPerchero() {
     lista = DIS.filter(d => filtro === 'todo' || d.cortes.includes(filtro));
     const h = rack.clientHeight; viewW = rack.clientWidth;
-    W = Math.max(110, Math.min(330, h * 0.66, viewW * (viewW < 600 ? 0.5 : 0.22)));
-    paso = W * 0.8;
+    const g1 = geometria(1, 'oversize');
+    W = Math.max(130, Math.min(360, (h - 16) / g1.alto, viewW * (viewW < 600 ? 0.62 : 0.26)));
+    S = W * 0.3; E = W * 0.86;
+    const g = geometria(W, 'oversize');
+    topOff = Math.max(6, (h - g.alto) * 0.4);
+    rack.style.setProperty('--rod-y', (topOff + g.hookH * 0.1 - 3) + 'px');
     track.innerHTML = ''; items = [];
     lista.forEach((d, i) => {
       const corte = corteDe(d), color = colorDe(d, corte);
       const b = document.createElement('button'); b.type = 'button'; b.className = 'item';
       b.setAttribute('aria-label', `${d.nombre}, corte ${CFG.cortes[corte].nombre}. Ver detalle`);
-      const { swing, canvas, hookH } = prenda(W, corte);
+      const { swing, canvas, shirt } = prenda(W, corte);
       b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
-      const alto = hookH + W * ASPECTO.oversize;
-      topOff = Math.max(8, (h - alto) * 0.38);
-      rack.style.setProperty('--rod-y', (topOff + hookH * 0.12 - 3) + 'px');
-      componer(canvas, d, corte, color, 'frente', Math.min(560, W * 2)).catch(console.warn);
-      const it = { el: b, swing, d, corte, color, i, p: pend() };
+      if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
+      componer(canvas, d, corte, color, 'frente', Math.min(620, W * 1.8)).catch(console.warn);
+      const it = { el: b, swing, d, corte, color, i, p: pend(), o: 0, cx: 0 };
       b.addEventListener('click', (e) => { if (movido) { e.preventDefault(); return; } abrir(i); });
-      b.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !drag) { it.p.w += (e.movementX || 1) > 0 ? 40 : -40; hoverIdx = i; kick(); } });
-      b.addEventListener('pointerleave', () => { if (hoverIdx === i) hoverIdx = -1; });
+      canvas.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !drag && hoverIdx !== i) { hoverIdx = i; it.p.w += 30; kick(); } });
       b.addEventListener('focus', () => { centrar(i); });
       items.push(it);
     });
-    const total = (lista.length - 1) * paso + W;
-    const margen = Math.max(16, viewW * 0.06);
-    if (total + 2 * margen <= viewW) { minX = maxX = (viewW - total) / 2; }
-    else { maxX = margen; minX = viewW - total - margen; }
-    x = minX === maxX ? minX : Math.min(maxX, Math.max(minX, x));
-    if (minX !== maxX && !armado) { x = maxX; v = -500; } // pequeña entrada animada
+    const n = lista.length;
+    maxX = viewW / 2 - (S + E) / 2;
+    minX = viewW / 2 - ((n - 1) * S + (S + E) / 2);
+    if (!armado) { activo = Math.min(n - 1, viewW < 600 ? 1 : Math.floor(n / 2) > 3 ? 3 : 0); x = viewW / 2 - (activo * S + (S + E) / 2) + 260; v = 0; }
+    x = Math.min(maxX + 300, Math.max(minX - 300, x));
+    items.forEach((it, k) => { it.o = k === activo ? 1 : 0; it.p.a = reduce ? 0 : (k % 2 ? 5 : -5); });
     armado = true;
-    // las remeras entran balanceándose
-    items.forEach((it, k) => { it.p.a = reduce ? 0 : (k % 2 ? 6 : -6); });
     kick();
   }
   let armado = false;
+  rack.addEventListener('pointerleave', () => { hoverIdx = -1; kick(); });
 
+  // posición del centro de cada remera según cuánto está abierta cada una
+  function layout() {
+    let acc = x;
+    for (const it of items) { const ancho = S + E * it.o; it.cx = acc + ancho / 2; acc += ancho; }
+  }
   function centrar(i) {
-    if (minX === maxX) return;
-    const objetivo = viewW / 2 - (i * paso + W / 2);
-    v = (objetivo - x) * 6; kick();
+    hoverIdx = -1; activo = i;
+    const objetivo = viewW / 2 - (i * S + (S + E) / 2);
+    v = (objetivo - x) * 5; kick();
   }
 
   function kick() { if (!rafOn) { rafOn = true; last = performance.now(); requestAnimationFrame(loop); } }
   function loop(t) {
     const dt = Math.min(0.033, (t - last) / 1000); last = t;
     let vivo = false;
+    layout();
+    // cuál remera está de frente: la señalada con el mouse o la más cercana al centro
+    if (hoverIdx >= 0) activo = hoverIdx;
+    else if (!drag || drag.h) {
+      let mejor = 1e9;
+      for (const it of items) { const dd = Math.abs(it.cx - viewW / 2); if (dd < mejor) { mejor = dd; activo = it.i; } }
+    }
     if (!drag) {
       x += v * dt;
-      const fr = Math.pow(0.04, dt); v *= fr;                 // inercia
-      if (x > maxX) { v += (maxX - x) * 120 * dt; v *= 0.85; }  // rebote suave en los bordes
-      if (x < minX) { v += (minX - x) * 120 * dt; v *= 0.85; }
-      if (Math.abs(v) > 2 || x > maxX + 0.5 || x < minX - 0.5) vivo = true;
-      else { v = 0; x = Math.min(maxX, Math.max(minX, x)); }
+      v *= Math.pow(0.05, dt);                                 // inercia
+      if (x > maxX) { v += (maxX - x) * 110 * dt; v *= 0.86; } // rebote suave en los bordes
+      if (x < minX) { v += (minX - x) * 110 * dt; v *= 0.86; }
+      // al soltar, la remera del centro se acomoda (no cuando el mouse está señalando una)
+      if (hoverIdx < 0 && Math.abs(v) < 220 && items[activo]) {
+        const diff = viewW / 2 - items[activo].cx;
+        x += diff * Math.min(1, dt * 7);
+        if (Math.abs(diff) > 0.6) vivo = true;
+      }
+      if (Math.abs(v) > 3) vivo = true; else v = 0;
     } else vivo = true;
     const acc = (v - vPrev) / Math.max(dt, 0.001); vPrev = v;
-    let centro = -1, mejor = 1e9;
+    layout();
     for (const it of items) {
-      const px = x + it.i * paso;
-      const cx = px + W / 2 - viewW / 2;
-      if (Math.abs(cx) < mejor) { mejor = Math.abs(cx); centro = it.i; }
-      const ry = reduce ? 0 : Math.max(-28, Math.min(28, -cx / viewW * 34));   // curvatura 3D del perchero
-      const empuje = reduce ? 0 : Math.max(-900, Math.min(900, -acc * 0.05 - v * 0.02));
+      const meta = it.i === activo ? 1 : 0;
+      it.o += (meta - it.o) * Math.min(1, dt * (reduce ? 30 : 8));
+      if (Math.abs(meta - it.o) > 0.002) vivo = true; else it.o = meta;
+      const lado = it.i < activo ? 1 : -1;
+      const ry = (1 - it.o) * GIRO * lado;
+      const empuje = reduce ? 0 : Math.max(-700, Math.min(700, -acc * 0.04 - v * 0.015));
       if (pasoPendulo(it.p, dt, empuje)) vivo = true;
-      it.el.style.transform = `translate3d(${px}px,${topOff}px,0) perspective(900px) rotateY(${ry}deg)`;
-      it.el.style.zIndex = 1000 - Math.round(Math.abs(cx));
+      it.el.style.transform = `translate3d(${it.cx - W / 2}px,${topOff}px,0) perspective(1100px) rotateY(${ry}deg)`;
+      it.el.style.zIndex = 500 - Math.abs(it.i - activo) * 2 + Math.round(it.o);
       it.swing.style.transform = `rotate(${it.p.a}deg)`;
+      it.el.classList.toggle('frente', it.o > 0.5);
     }
-    const idx = hoverIdx >= 0 ? hoverIdx : centro;
-    if (items[idx]) $('#capName').textContent = items[idx].d.nombre;
+    if (items[activo]) $('#capName').textContent = items[activo].d.nombre;
     if (vivo) requestAnimationFrame(loop); else rafOn = false;
   }
-
-  // arrastre con mouse o dedo
   rack.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
     drag = { x0: e.clientX, y0: e.clientY, xs: x, t: performance.now(), lx: e.clientX, lt: performance.now(), id: e.pointerId, h: null };
@@ -236,7 +265,7 @@
   function medidasFig(corte) {
     const vh = detView.clientHeight, vw = detView.clientWidth;
     const flechas = vw < 600 ? 84 : 140;
-    let w = Math.min(520, (vh * 0.98) / (0.2 + ESCALA_CORTE[corte] * ASPECTO[corte]), vw - flechas);
+    let w = Math.min(520, (vh * 0.98) / geometria(1, corte).alto, vw - flechas);
     return Math.max(120, w);
   }
   async function pintarFig(dir = 0) {

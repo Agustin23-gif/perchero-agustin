@@ -27,6 +27,7 @@ Se ve en: **https://agustin23-gif.github.io/perchero-agustin/**
 - `frente` / `espalda`: el archivo que va en cada lado (`null` si ese lado va liso).
 - `color`: el color con el que aparece colgado en el perchero.
   Oversize: `negro`, `blanco`, `beige`, `marfil`, `verde_musgo`. Básica: ver la lista en `catalogo.json`.
+- `etiqueta` (opcional): un cartelito en la remera del perchero, ej. `"etiqueta": "Nuevo"`.
 - El orden de la lista es el orden del perchero.
 
 La página estampa el diseño sobre la foto real de la remera, con los pliegues de la tela.
