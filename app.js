@@ -544,6 +544,7 @@
   const Portada = (() => {
     const el = $('#portada'), esc = $('#pEscena'), info = $('#pInfo');
     let P = [], N = 0, c = 0, ct = 0, zoomK = -1, raf = 0, last = 0, toque = 0, auto = 0, foco = -1, medida = null, drag = null, ruedaT = 0;
+    const VELOCIDAD = 0.42;   // remeras por segundo que pasan solas
     const visible = () => !el.hidden && !el.classList.contains('salir');
     const envolver = (r) => ((r % N) + N + N / 2) % N - N / 2;      // distancia más corta en el abanico circular
 
@@ -609,7 +610,8 @@
     }
     function frame(t) {
       const dt = Math.min(0.05, (t - last) / 1000); last = t;
-      if (!el.hidden && zoomK < 0 && !drag && !reduce && t - toque > 4500 && t - auto > 3400) { auto = t; ct = Math.round(ct) + 1; }
+      // movimiento lento y constante, como una vidriera que gira; se pausa un momento si la persona las mueve
+      if (!el.hidden && zoomK < 0 && !drag && !reduce && t - toque > 1600) ct += dt * VELOCIDAD;
       if (!drag) c += (ct - c) * (1 - Math.exp(-dt * (reduce ? 60 : 6.5)));
       let quieto = Math.abs(ct - c) < 0.0005;
       const f = 1 - Math.exp(-dt * (reduce ? 60 : 8));
@@ -751,7 +753,7 @@
           return { d, corte, color: colorDe({ color: x.color || d.color, colores: d.colores }, corte), nueva: !!x.nueva };
         }).filter(Boolean);
         N = P.length; if (N < 2) return;
-        el.hidden = false; c = ct = Math.floor(N / 2); toque = performance.now();
+        el.hidden = false; c = ct = Math.floor(N / 2); toque = -1e9;   // arranca moviéndose apenas se entra
         requestAnimationFrame(() => { armar(); arrancar(); });
       }
     };
