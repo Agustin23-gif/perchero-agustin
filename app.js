@@ -54,19 +54,19 @@
   function gancho(alto, rc, rodH) {
     const ns = 'http://www.w3.org/2000/svg';
     const s = document.createElementNS(ns, 'svg');
-    const ancho = rodH * 2.2;
+    const ancho = rodH * 2.6;
     s.setAttribute('viewBox', `0 0 ${ancho} ${alto}`); s.setAttribute('class', 'hook');
     s.style.height = alto + 'px'; s.style.width = ancho + 'px';
-    const cx = ancho / 2, r = rodH * 0.62, top = rc - r, grosor = Math.max(1.6, rodH * 0.2);
+    const cx = ancho / 2 - rodH * 0.35, r = rodH * 0.62, top = rc - r, grosor = Math.max(2, rodH * 0.26);
     s.innerHTML = `<defs><linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="#55534F"/><stop offset=".5" stop-color="#C9C7C2"/><stop offset="1" stop-color="#6E6C68"/></linearGradient></defs>
       <path d="M${cx} ${alto} V${rc + r * 0.2} C${cx} ${top - r * 0.9} ${cx + r * 1.7} ${top - r * 0.9} ${cx + r * 1.55} ${rc + r * 0.35}" fill="none" stroke="url(#gm)" stroke-width="${grosor}" stroke-linecap="round"/>`;
     return s;
   }
   function geometria(w, corte) {
     const swB = w * ESCALA_CORTE.basica;
-    const hookH = w * 0.2;
     const rodH = Math.max(8, Math.min(14, w * 0.036));
-    const rc = rodH * 0.9;                            // centro de la barra, desde arriba de la prenda
+    const rc = rodH * 1.1;                            // centro de la barra, desde arriba de la prenda
+    const hookH = rc + rodH * 1.7;                    // gancho corto: la percha queda justo debajo de la barra
     const sw = w * ESCALA_CORTE[corte];
     const sh = sw * ASPECTO[corte];
     const shirtTop = hookH - PERCHA.arriba * swB;
@@ -143,7 +143,7 @@
   function armarPerchero() {
     lista = DIS.filter(d => filtro === 'todo' || d.cortes.includes(filtro));
     const h = rack.clientHeight; viewW = rack.clientWidth;
-    const g1 = geometria(1, 'oversize');
+    const g1 = { alto: geometria(300, 'oversize').alto / 300 }; // proporción alto/ancho
     W = Math.max(130, Math.min(360, (h - 16) / g1.alto, viewW * (viewW < 600 ? 0.62 : 0.26)));
     S = W * 0.3; E = W * 0.86;
     const g = geometria(W, 'oversize');
@@ -294,7 +294,7 @@
   function medidasFig(corte) {
     const vh = detView.clientHeight, vw = detView.clientWidth;
     const flechas = vw < 600 ? 84 : 140;
-    let w = Math.min(520, (vh * 0.98) / geometria(1, corte).alto, vw - flechas);
+    let w = Math.min(520, (vh * 0.98) / (geometria(400, corte).alto / 400), vw - flechas);
     return Math.max(120, w);
   }
   async function pintarFig(dir = 0) {
