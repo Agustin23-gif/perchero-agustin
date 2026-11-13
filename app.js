@@ -223,10 +223,14 @@
       const ry = (1 - it.o) * GIRO * lado;
       const empuje = reduce ? 0 : Math.max(-700, Math.min(700, -acc * 0.04 - v * 0.015));
       if (pasoPendulo(it.p, dt, empuje)) vivo = true;
-      // la de frente va sin 3D: así Safari (iPhone) la dibuja nítida y no estira una imagen chica
-      it.el.style.transform = Math.abs(ry) < 0.4
-        ? `translate(${it.cx - W / 2}px,${topOff}px)`
-        : `translate3d(${it.cx - W / 2}px,${topOff}px,0) perspective(1100px) rotateY(${ry}deg)`;
+      // Sin 3D real: Safari en iPhone dibuja borrosas las capas 3D. El giro de costado se simula
+      // en 2D (se angosta y se inclina un poco), y la remera de frente queda sin ninguna escala.
+      const x = (it.cx - W / 2).toFixed(1);
+      if (Math.abs(ry) < 0.4) it.el.style.transform = `translate(${x}px,${topOff}px)`;
+      else {
+        const sx = Math.max(0.12, Math.cos(ry * Math.PI / 180));
+        it.el.style.transform = `translate(${x}px,${topOff}px) skewY(${(-lado * (1 - it.o) * 6).toFixed(2)}deg) scaleX(${sx.toFixed(3)})`;
+      }
       it.el.style.zIndex = 500 - Math.abs(it.i - activo) * 2 + Math.round(it.o);
       it.swing.style.transform = `rotate(${it.p.a}deg)`;
       it.el.classList.toggle('frente', it.o > 0.5);
@@ -490,7 +494,7 @@
     const css = (c) => `hsl(${c[0].toFixed(1)} ${c[1].toFixed(1)}% ${c[2].toFixed(1)}%)`;
     let offset = 0, last = 0, ultimoHex = null;
     function tamaño() {
-      const r = Math.min(1, 900 / Math.max(innerWidth, 1));
+      const r = Math.min(1, 640 / Math.max(innerWidth, 1));
       cv.width = Math.round(innerWidth * r); cv.height = Math.round(innerHeight * r);
     }
     function dibujar() {
@@ -513,7 +517,8 @@
       const dt = Math.min(0.1, (t - (last || t)) / 1000); last = t;
       if (t0) { const k = Math.min(1, (t - t0) / (dur * 1000)); const e = k * k * (3 - 2 * k); actual = mezcla(desde, destino, e); if (k >= 1) t0 = 0; }
       if (!reduce) offset += dt * 0.004;
-      dibujar();
+      // se redibuja seguido solo mientras cambia de tono; si no, unas 8 veces por segundo (ahorra batería y memoria)
+      if (t0 || t - (frame.ult || 0) > 120) { frame.ult = t; dibujar(); }
       requestAnimationFrame(frame);
     }
     tamaño(); addEventListener('resize', tamaño);

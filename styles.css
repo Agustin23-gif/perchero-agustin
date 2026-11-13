@@ -89,11 +89,10 @@ h1 em {
 .track { position: absolute; inset: 0; z-index: 1; }
 
 .item {
-  position: absolute; top: 0; left: 0; padding: 0; border: 0; background: none; cursor: pointer;
+  position: absolute; top: 0; left: 0; transform-origin: 50% 0; padding: 0; border: 0; background: none; cursor: pointer;
 }
 .item { pointer-events: none; }
 .item canvas { pointer-events: auto; }
-.item:not(.frente) .shirt canvas { filter: brightness(.92); }
 .madera { position: absolute; max-width: none; pointer-events: none; }
 .etiqueta {
   position: absolute; top: 4%; right: 8%; z-index: 2; background: var(--blanco); color: var(--tinta);
