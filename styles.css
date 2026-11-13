@@ -52,6 +52,8 @@ h1 em {
   font-family: var(--f-acento); font-style: italic; font-weight: 600; text-transform: none;
   color: var(--naranja); letter-spacing: -.03em; padding-right: .05em;
 }
+/* sobre el cielo (que cambia de tono según la remera) "remera" va en blanco con una sombra suave: contrasta con cualquier color */
+.app h1 em { color: var(--blanco); text-shadow: 0 1px 1px rgba(20, 20, 20, .28), 0 3px 18px rgba(20, 20, 20, .22); }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip {
   border: 1.5px solid var(--tinta); background: transparent; border-radius: 99px;
