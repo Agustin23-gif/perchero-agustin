@@ -66,7 +66,8 @@
   "basica": {
    "nombre": "Básica",
    "lados": [
-    "frente"
+    "frente",
+    "espalda"
    ],
    "colores": [
     {
@@ -188,6 +189,14 @@
      "alto": 0.46,
      "topAncho": 0.27,
      "anchoAncho": 0.5
+    },
+    "espalda": {
+     "cx": 0.5,
+     "top": 0.17,
+     "ancho": 0.4,
+     "alto": 0.55,
+     "topAncho": 0.22,
+     "anchoAncho": 0.52
     }
    }
   }
