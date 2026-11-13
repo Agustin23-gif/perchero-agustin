@@ -714,7 +714,7 @@
       zoomK = -1; el.classList.remove('zoom'); info.hidden = true;
       el.classList.add('salir');
       document.body.classList.remove('con-portada'); soltarPendientes();
-      setTimeout(() => { el.hidden = true; if (despues) despues(); }, reduce ? 0 : 750);
+      setTimeout(() => { el.hidden = true; if (despues) despues(); Aviso.mostrar(900); }, reduce ? 0 : 750);
     }
     function mostrar() {
       el.hidden = false; el.classList.add('salir');
@@ -789,6 +789,29 @@
     };
   })();
 
+  /* ---------- aviso: invita a ver la colección nueva ---------- */
+  // Aparece al llegar al perchero (en "Todo"). Se cierra solo, con la ×, o al entrar a la colección.
+  const Aviso = (() => {
+    const el = $('#aviso'); let timer = 0, visto = false;
+    try { visto = sessionStorage.getItem('aviso-sr') === '1'; } catch (e) {}
+    function ocultar() {
+      if (el.hidden) return; clearTimeout(timer); el.classList.add('fuera');
+      setTimeout(() => { el.hidden = true; el.classList.remove('fuera'); }, 380);
+      visto = true; try { sessionStorage.setItem('aviso-sr', '1'); } catch (e) {}
+    }
+    function mostrar(espera = 1200) {
+      if (visto || !DIS.some(d => d.coleccion === 'salmos_romanos')) return;
+      setTimeout(() => {
+        if (visto || filtro !== 'todo' || !detail.hidden || document.body.classList.contains('con-portada')) return;
+        el.hidden = false; clearTimeout(timer); timer = setTimeout(ocultar, 12000);
+      }, espera);
+    }
+    $('#avisoX').onclick = ocultar;
+    $('#avisoVer').onclick = () => { ocultar(); const chip = document.querySelector('.chip[data-f="salmos_romanos"]'); if (chip) chip.click(); };
+    document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { if (b.dataset.f === 'salmos_romanos') ocultar(); }));
+    return { mostrar, ocultar };
+  })();
+
   /* ---------- inicio ---------- */
   fetch('catalogo.json').then(r => r.json()).then(cfg => {
     CFG = cfg; DIS = cfg.disenos;
@@ -807,6 +830,7 @@
     armarPerchero();
     const i = lista.findIndex(d => d.id === h);
     if (i >= 0) setTimeout(() => abrir(i), 300);
-    else Portada.iniciar(cfg.portada);   // con un link directo a una remera no se muestra la portada
+    else if (cfg.portada) Portada.iniciar(cfg.portada);
+    else Aviso.mostrar();   // con un link directo a una remera no se muestra la portada
   }).catch(err => { $('#capName').textContent = 'No se pudo cargar el catálogo'; console.error(err); });
 })();
