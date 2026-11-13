@@ -203,6 +203,218 @@
   },
   "disenos": [
     {
+      "id": "lisa_oversize",
+      "nombre": "Oversize lisa",
+      "detalle": "Corte oversize · 5 colores",
+      "lisa": true,
+      "cortes": [
+        "oversize"
+      ],
+      "color": "beige"
+    },
+    {
+      "id": "lisa_basica",
+      "nombre": "Básica lisa",
+      "detalle": "Corte clásico · 22 colores",
+      "lisa": true,
+      "cortes": [
+        "basica"
+      ],
+      "color": "naranja"
+    },
+    {
+      "id": "god_is_bigger",
+      "nombre": "God is bigger",
+      "detalle": "Than your fear",
+      "frente": "disenos/god_is_bigger.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro"
+    },
+    {
+      "id": "his_plan_is_perfect",
+      "nombre": "His plan is perfect",
+      "detalle": "Colección fe",
+      "frente": "disenos/his_plan_is_perfect.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "verde_musgo"
+    },
+    {
+      "id": "you_are_a_child_of_god",
+      "nombre": "You are a child of God",
+      "detalle": "John 1:12",
+      "frente": "disenos/you_are_a_child_of_god.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "marfil"
+    },
+    {
+      "id": "on_fire",
+      "nombre": "On fire",
+      "detalle": "Psalm 42:2",
+      "frente": "disenos/on_fire.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "marfil"
+    },
+    {
+      "id": "he_must_become_greater",
+      "nombre": "He must become greater",
+      "detalle": "John 3:30",
+      "frente": "disenos/he_must_become_greater.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "beige"
+    },
+    {
+      "id": "god_is_love",
+      "nombre": "God is love",
+      "detalle": "1 John 4:8",
+      "frente": "disenos/god_is_love.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "blanco"
+    },
+    {
+      "id": "life_is_better_with_jesus",
+      "nombre": "Life is better with Jesus",
+      "detalle": "Colección fe",
+      "frente": "disenos/life_is_better_with_jesus.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "blanco"
+    },
+    {
+      "id": "jesus_corriendo",
+      "nombre": "Jesus",
+      "detalle": "Ilustración",
+      "frente": "disenos/jesus_corriendo.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "verde_musgo"
+    },
+    {
+      "id": "jesus_loves_you",
+      "nombre": "Jesus loves you",
+      "detalle": "Colección fe",
+      "frente": "disenos/jesus_loves_you.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "marfil"
+    },
+    {
+      "id": "jesus_is_my_bestie",
+      "nombre": "Jesus is my bestie",
+      "detalle": "Colección fe",
+      "frente": "disenos/jesus_is_my_bestie.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro"
+    },
+    {
+      "id": "jesus_is_the_way",
+      "nombre": "Jesus is the way",
+      "detalle": "King of kings",
+      "frente": "disenos/jesus_is_the_way.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro"
+    },
+    {
+      "id": "church_kids",
+      "nombre": "Church kids",
+      "detalle": "Colección kids",
+      "frente": "disenos/church_kids.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "blanco"
+    },
+    {
+      "id": "coronas_y_paloma",
+      "nombre": "Rey · Salvador · Espíritu",
+      "detalle": "Corona, espinas y paloma",
+      "frente": "disenos/coronas_y_paloma.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "blanco"
+    },
+    {
+      "id": "dont_be_afraid",
+      "nombre": "Don't be afraid",
+      "detalle": "I'm here for you",
+      "frente": "disenos/dont_be_afraid.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "marfil"
+    },
+    {
+      "id": "jesus_always_wins",
+      "nombre": "Jesus always wins",
+      "detalle": "Colección fe",
+      "frente": "disenos/jesus_always_wins.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro"
+    },
+    {
+      "id": "victory",
+      "nombre": "The greatest victory",
+      "detalle": "1 Cor 15:57",
+      "frente": "disenos/victory.webp",
+      "espalda": null,
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "beige"
+    },
+    {
       "id": "romanos_cielo",
       "nombre": "Romanos · Cielo",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
@@ -617,218 +829,6 @@
         "negro"
       ],
       "coleccion": "salmos_romanos"
-    },
-    {
-      "id": "lisa_oversize",
-      "nombre": "Oversize lisa",
-      "detalle": "Corte oversize · 5 colores",
-      "lisa": true,
-      "cortes": [
-        "oversize"
-      ],
-      "color": "beige"
-    },
-    {
-      "id": "lisa_basica",
-      "nombre": "Básica lisa",
-      "detalle": "Corte clásico · 22 colores",
-      "lisa": true,
-      "cortes": [
-        "basica"
-      ],
-      "color": "naranja"
-    },
-    {
-      "id": "god_is_bigger",
-      "nombre": "God is bigger",
-      "detalle": "Than your fear",
-      "frente": "disenos/god_is_bigger.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "negro"
-    },
-    {
-      "id": "his_plan_is_perfect",
-      "nombre": "His plan is perfect",
-      "detalle": "Colección fe",
-      "frente": "disenos/his_plan_is_perfect.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "verde_musgo"
-    },
-    {
-      "id": "you_are_a_child_of_god",
-      "nombre": "You are a child of God",
-      "detalle": "John 1:12",
-      "frente": "disenos/you_are_a_child_of_god.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "marfil"
-    },
-    {
-      "id": "on_fire",
-      "nombre": "On fire",
-      "detalle": "Psalm 42:2",
-      "frente": "disenos/on_fire.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "marfil"
-    },
-    {
-      "id": "he_must_become_greater",
-      "nombre": "He must become greater",
-      "detalle": "John 3:30",
-      "frente": "disenos/he_must_become_greater.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "beige"
-    },
-    {
-      "id": "god_is_love",
-      "nombre": "God is love",
-      "detalle": "1 John 4:8",
-      "frente": "disenos/god_is_love.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "blanco"
-    },
-    {
-      "id": "life_is_better_with_jesus",
-      "nombre": "Life is better with Jesus",
-      "detalle": "Colección fe",
-      "frente": "disenos/life_is_better_with_jesus.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "blanco"
-    },
-    {
-      "id": "jesus_corriendo",
-      "nombre": "Jesus",
-      "detalle": "Ilustración",
-      "frente": "disenos/jesus_corriendo.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "verde_musgo"
-    },
-    {
-      "id": "jesus_loves_you",
-      "nombre": "Jesus loves you",
-      "detalle": "Colección fe",
-      "frente": "disenos/jesus_loves_you.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "marfil"
-    },
-    {
-      "id": "jesus_is_my_bestie",
-      "nombre": "Jesus is my bestie",
-      "detalle": "Colección fe",
-      "frente": "disenos/jesus_is_my_bestie.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "negro"
-    },
-    {
-      "id": "jesus_is_the_way",
-      "nombre": "Jesus is the way",
-      "detalle": "King of kings",
-      "frente": "disenos/jesus_is_the_way.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "negro"
-    },
-    {
-      "id": "church_kids",
-      "nombre": "Church kids",
-      "detalle": "Colección kids",
-      "frente": "disenos/church_kids.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "blanco"
-    },
-    {
-      "id": "coronas_y_paloma",
-      "nombre": "Rey · Salvador · Espíritu",
-      "detalle": "Corona, espinas y paloma",
-      "frente": "disenos/coronas_y_paloma.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "blanco"
-    },
-    {
-      "id": "dont_be_afraid",
-      "nombre": "Don't be afraid",
-      "detalle": "I'm here for you",
-      "frente": "disenos/dont_be_afraid.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "marfil"
-    },
-    {
-      "id": "jesus_always_wins",
-      "nombre": "Jesus always wins",
-      "detalle": "Colección fe",
-      "frente": "disenos/jesus_always_wins.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "negro"
-    },
-    {
-      "id": "victory",
-      "nombre": "The greatest victory",
-      "detalle": "1 Cor 15:57",
-      "frente": "disenos/victory.webp",
-      "espalda": null,
-      "cortes": [
-        "oversize",
-        "basica"
-      ],
-      "color": "beige"
     }
   ]
 }

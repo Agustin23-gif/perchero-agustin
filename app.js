@@ -145,7 +145,9 @@
   }
 
   function armarPerchero() {
-    lista = DIS.filter(d => filtro === 'todo' || d.cortes.includes(filtro) || d.coleccion === filtro);
+    // las colecciones (ej. Salmos y Romanos) van aparte: solo aparecen con su propio botón
+    const esColeccion = DIS.some(d => d.coleccion === filtro);
+    lista = DIS.filter(d => esColeccion ? d.coleccion === filtro : !d.coleccion && (filtro === 'todo' || d.cortes.includes(filtro)));
     const h = rack.clientHeight; viewW = rack.clientWidth;
     const g1 = { alto: geometria(300, 'oversize').alto / 300 }; // proporción alto/ancho
     W = Math.max(130, Math.min(360, (h - 16) / g1.alto, viewW * (viewW < 600 ? 0.62 : 0.26)));
@@ -544,8 +546,13 @@
     const frase = ['Remeras personalizadas en DTF', 'Oversize y básicas', 'Creatividad & calidad', 'Nuevos diseños', 'Hacemos tu diseño'];
     const t = $('#ticker'); const linea = frase.map(f => `<span>${f} ✦</span>`).join('');
     t.innerHTML = linea + linea + linea + linea;
-    armarPerchero();
     const h = location.hash.slice(1).replace(/-/g, '_');
+    const dh = DIS.find(d => d.id === h);
+    if (dh && dh.coleccion) {   // link directo a una remera de una colección: abrir con ese filtro
+      filtro = dh.coleccion;
+      document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.f === filtro ? 'true' : 'false'));
+    }
+    armarPerchero();
     const i = lista.findIndex(d => d.id === h);
     if (i >= 0) setTimeout(() => abrir(i), 300);
   }).catch(err => { $('#capName').textContent = 'No se pudo cargar el catálogo'; console.error(err); });
