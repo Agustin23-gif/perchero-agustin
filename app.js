@@ -229,6 +229,7 @@
       it.el.classList.toggle('frente', it.o > 0.5);
     }
     if (items[activo]) $('#capName').textContent = items[activo].d.nombre;
+    if (items[activo] && detail.hidden) Cielo.tono(hexDe(items[activo].corte, items[activo].color));
     if (vivo) requestAnimationFrame(loop); else rafOn = false;
   }
   rack.addEventListener('pointerdown', (e) => {
@@ -345,6 +346,7 @@
       if (c.id === sel.color) requestAnimationFrame(() => b.scrollIntoView({ block: 'nearest', inline: 'center' }));
     });
     const col = cfgC.colores.find(c => c.id === sel.color);
+    if (col) Cielo.tono(col.hex);
     $('#colorName').textContent = `Color: ${col ? col.nombre : ''}`;
     // contacto
     const msg = `Hola Agustín! Me interesa la remera "${d.nombre}" en corte ${cfgC.nombre}, color ${col ? col.nombre : ''}.`;
@@ -418,6 +420,109 @@
   detView.addEventListener('pointercancel', finSwipe);
 
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { armado = true; armarPerchero(); if (!detail.hidden) pintarFig(); }, 150); });
+
+  /* ---------- cielo de atardecer que toma el tono de la remera ---------- */
+  const Cielo = (() => {
+    const cv = document.getElementById('cielo');
+    if (!cv || !cv.getContext) return { tono() {} };
+    const ctx = cv.getContext('2d');
+    const NW = 1200, NH = 640;
+    const mk = () => { const c = document.createElement('canvas'); c.width = NW; c.height = NH; return c; };
+    const mLuz = mk(), mSom = mk();
+    const cl = mLuz.getContext('2d'), cs = mSom.getContext('2d');
+    let semilla = 7; const rnd = () => (semilla = (semilla * 16807) % 2147483647) / 2147483647;
+    // nubes hechas de "copos" redondos agrupados, con la base más plana; se repiten en X sin corte
+    function copo(c, x, y, rx, ry, a) {
+      for (const dx of [-NW, 0, NW]) {
+        c.save(); c.translate(x + dx, y); c.scale(1, ry / rx);
+        const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+        g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(0.55, `rgba(255,255,255,${a * 0.75})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+        c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, Math.PI * 2); c.fill(); c.restore();
+      }
+    }
+    function nube(cx, cy, ancho, alto, n) {
+      for (let k = 0; k < n; k++) {
+        const t = rnd(), x = cx + (t - 0.5) * ancho, hump = Math.sin(t * Math.PI);
+        const r = (0.35 + rnd() * 0.65) * alto * (0.5 + hump * 0.8);
+        const y = cy - hump * alto * 0.45 * rnd();
+        copo(cs, x, y - r * 0.28, r, r * 0.8, 0.55);     // sombra: arriba del copo
+        copo(cl, x, y + r * 0.12, r * 0.92, r * 0.62, 0.8); // luz: abajo, donde pega el sol
+      }
+    }
+    // banco de nubes bajas (cerca del horizonte) y algunas más chicas arriba
+    for (let k = 0; k < 9; k++) nube(rnd() * NW, NH * (0.78 + rnd() * 0.16), 220 + rnd() * 260, 70 + rnd() * 60, 26);
+    for (let k = 0; k < 7; k++) nube(rnd() * NW, NH * (0.42 + rnd() * 0.22), 160 + rnd() * 200, 40 + rnd() * 34, 16);
+    for (let k = 0; k < 6; k++) { // jirones altos, alargados
+      const x = rnd() * NW, y = NH * (0.08 + rnd() * 0.2);
+      for (let q = 0; q < 10; q++) copo(cl, x + (rnd() - 0.5) * 260, y + (rnd() - 0.5) * 14, 40 + rnd() * 50, 7 + rnd() * 6, 0.35);
+    }
+    const tinta = mk(), tc = tinta.getContext('2d');
+    function teñir(m, col) {
+      tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, NW, NH);
+      tc.fillStyle = col; tc.fillRect(0, 0, NW, NH);
+      tc.globalCompositeOperation = 'destination-in'; tc.drawImage(m, 0, 0);
+      return tinta;
+    }
+    // paleta a partir del color de la remera (siempre clara, para que el texto negro se lea)
+    function hsl(hex) {
+      const n = parseInt(hex.slice(1), 16); let r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let h = 0, s = 0;
+      if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+        h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+      return [h, s, l];
+    }
+    function paleta(hex) {
+      const [h, s, l] = hsl(hex || '#DAC7AB');
+      if (s < 0.14 || (l < 0.16 && s < 0.4) || (l > 0.78 && s < 0.6)) {
+        // neutros (negro, blanco, gris, marfil, beige): atardecer naranja de la marca
+        const oscuro = l < 0.3 ? 1 : 0;
+        return [[20 - oscuro * 8, 72, 72 - oscuro * 6], [28, 86, 79], [38, 92, 88], [32, 100, 96], [345 + oscuro * 10, 34, 74 - oscuro * 8]];
+      }
+      const mez = (a, b, t) => a + (((b - a + 540) % 360) - 180) * t;
+      return [[h, 50, 66], [h, 60, 77], [h, 58, 88], [h, 70, 96], [mez(h, h + 25, 1), 26, 72]];
+    }
+    let actual = paleta(), destino = actual, desde = actual, t0 = 0, dur = 1;
+    const lerpH = (a, b, t) => a + (((b - a + 540) % 360) - 180) * t;
+    function mezcla(p, q, t) { return p.map((c, i) => [lerpH(c[0], q[i][0], t), c[1] + (q[i][1] - c[1]) * t, c[2] + (q[i][2] - c[2]) * t]); }
+    const css = (c) => `hsl(${c[0].toFixed(1)} ${c[1].toFixed(1)}% ${c[2].toFixed(1)}%)`;
+    let offset = 0, last = 0, ultimoHex = null;
+    function tamaño() {
+      const r = Math.min(1, 900 / Math.max(innerWidth, 1));
+      cv.width = Math.round(innerWidth * r); cv.height = Math.round(innerHeight * r);
+    }
+    function dibujar() {
+      const W = cv.width, H = cv.height;
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, css(actual[0])); g.addColorStop(0.55, css(actual[1])); g.addColorStop(1, css(actual[2]));
+      ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      // resplandor del sol detrás del horizonte
+      const sol = ctx.createRadialGradient(W * 0.5, H * 0.95, 0, W * 0.5, H * 0.95, H * 0.7);
+      sol.addColorStop(0, css([actual[3][0], 100, 97]).replace(')', ' / .75)')); sol.addColorStop(1, css(actual[2]).replace(')', ' / 0)'));
+      ctx.fillStyle = sol; ctx.fillRect(0, 0, W, H);
+      const ch = H * 1.0, cw = ch * NW / NH, ox = -((offset % 1) * cw);
+      for (const [m, col, a] of [[mSom, actual[4], 0.75], [mLuz, actual[3], 0.92]]) {
+        const tt = teñir(m, css(col)); ctx.globalAlpha = a;
+        for (let x = ox; x < W; x += cw) ctx.drawImage(tt, x, H - ch, cw, ch);
+      }
+      ctx.globalAlpha = 1;
+    }
+    function frame(t) {
+      const dt = Math.min(0.1, (t - (last || t)) / 1000); last = t;
+      if (t0) { const k = Math.min(1, (t - t0) / (dur * 1000)); const e = k * k * (3 - 2 * k); actual = mezcla(desde, destino, e); if (k >= 1) t0 = 0; }
+      if (!reduce) offset += dt * 0.004;
+      dibujar();
+      requestAnimationFrame(frame);
+    }
+    tamaño(); addEventListener('resize', tamaño);
+    requestAnimationFrame(frame);
+    return {
+      tono(hex) {
+        if (!hex || hex === ultimoHex) return; ultimoHex = hex;
+        desde = actual; destino = paleta(hex); t0 = performance.now(); dur = reduce ? 0.01 : 1.1;
+      }
+    };
+  })();
+  function hexDe(corte, color) { return ((CFG.cortes[corte].colores.find(c => c.id === color)) || {}).hex; }
 
   /* ---------- inicio ---------- */
   fetch('catalogo.json').then(r => r.json()).then(cfg => {
