@@ -42,6 +42,11 @@
           "id": "verde_musgo",
           "nombre": "Verde musgo",
           "hex": "#5B613C"
+        },
+        {
+          "id": "azul_marino",
+          "nombre": "Azul marino",
+          "hex": "#23304F"
         }
       ],
       "estampa": {
