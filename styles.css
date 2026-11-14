@@ -359,8 +359,15 @@ body.con-portada .ticker-in { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .aviso { animation: none; } .chip-col::after { animation: none; } }
 
 /* ---------- cómo pedir ---------- */
-.nav-pedir { color: var(--naranja); }
-.nav-pedir:hover { color: var(--tinta); }
+.nav.nav-pedir {
+  justify-self: start; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  background: var(--tinta); color: var(--pared); border-radius: 99px; padding: 8px 14px 8px 11px;
+  box-shadow: 0 4px 14px -6px rgba(20, 20, 20, .5);
+}
+.nav.nav-pedir::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--naranja); flex: none; }
+.nav.nav-pedir:hover { background: var(--naranja); color: var(--tinta); }
+.nav.nav-pedir:hover::before { background: var(--tinta); }
+@media (max-width: 400px) { .nav.nav-pedir { padding: 7px 11px; gap: 5px; font-size: 10px; letter-spacing: .04em; } .nav.nav-pedir::before { width: 5px; height: 5px; } }
 .item-pedido .etiqueta { background: var(--naranja); }
 .p-pedir {
   border: 0; background: none; cursor: pointer; padding: 2px 4px; color: var(--gris);
