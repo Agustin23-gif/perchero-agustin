@@ -9,6 +9,24 @@
   const SOMBRA_PAD = { oversize: 60 / 720, basica: 60 / 720 };
 
   let CFG, DIS = [], lista = [], filtro = 'todo';
+  const TU_DISENO = { id: 'tu_diseno', pedido: true, nombre: '¿Tenés tu propio diseño?', cortes: ['oversize', 'basica'], color: 'blanco', etiqueta: 'Tu idea' };
+
+  // remera lisa con un recuadro punteado "tu diseño acá"
+  function marcarHueco(canvas, corte) {
+    const c = canvas.getContext('2d'), W = canvas.width, H = canvas.height;
+    const e = CFG.cortes[corte].estampa.frente;
+    const w = W * e.ancho, h = Math.min(H * e.alto * 0.62, w * 1.05), x = W * e.cx - w / 2, y = H * (e.top + 0.03);
+    c.save();
+    c.strokeStyle = '#FF7A00'; c.lineWidth = Math.max(2, W * 0.006); c.setLineDash([W * 0.018, W * 0.012]);
+    c.beginPath(); c.roundRect ? c.roundRect(x, y, w, h, W * 0.02) : c.rect(x, y, w, h); c.stroke();
+    c.setLineDash([]); c.fillStyle = '#FF7A00'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    const f = w * 0.15;
+    c.font = `800 ${f}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+    c.fillText('TU', W * e.cx, y + h * 0.3); c.fillText('DISEÑO', W * e.cx, y + h * 0.5); c.fillText('ACÁ', W * e.cx, y + h * 0.7);
+    c.lineWidth = Math.max(1.5, W * 0.004); const s = f * 0.32, sx = x + w - s * 1.2, sy = y + s * 1.2;   // destello
+    c.beginPath(); c.moveTo(sx - s, sy); c.lineTo(sx + s, sy); c.moveTo(sx, sy - s); c.lineTo(sx, sy + s); c.stroke();
+    c.restore();
+  }
 
   /* ---------- imágenes y composición ---------- */
   const imgs = new Map();
@@ -161,6 +179,7 @@
     // las colecciones (ej. Salmos y Romanos) van aparte: solo aparecen con su propio botón
     const esColeccion = DIS.some(d => d.coleccion === filtro);
     lista = DIS.filter(d => esColeccion ? d.coleccion === filtro : !d.coleccion && (filtro === 'todo' || d.cortes.includes(filtro)));
+    if (!esColeccion) lista.push(TU_DISENO);   // al final: remera lisa para pedir un diseño propio
     const h = rack.clientHeight; viewW = rack.clientWidth;
     const g1 = { alto: geometria(300, 'oversize').alto / 300 }; // proporción alto/ancho
     W = Math.max(130, Math.min(360, (h - 16) / g1.alto, viewW * (viewW < 600 ? 0.62 : 0.26)));
@@ -178,8 +197,9 @@
       const { swing, canvas, shirt } = prenda(W, corte, { capas: 0, hex, color }); // sin capas de grosor (Agustín prefirió sin volumen)
       b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
       if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
-      luego(() => componer(canvas, d, corte, color, ladoDe(d), Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).catch(console.warn));
+      luego(() => componer(canvas, d, corte, color, ladoDe(d), Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).then(() => { if (d.pedido) marcarHueco(canvas, corte); }).catch(console.warn));
       const it = { el: b, swing, d, corte, color, i, p: pend(), o: 0, cx: 0 };
+      if (d.pedido) { b.classList.add('item-pedido'); b.setAttribute('aria-label', 'Pedí una remera con tu propio diseño. Ver cómo pedir'); }
       b.addEventListener('click', (e) => { if (movido) { e.preventDefault(); return; } abrir(i); });
       canvas.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !drag && hoverIdx !== i) { hoverIdx = i; it.p.w += 30; kick(); } });
       b.addEventListener('focus', () => { centrar(i); });
@@ -392,6 +412,7 @@
 
   async function abrir(i) {
     const d = lista[i], it = items[i];
+    if (d.pedido) return Pedido.abrir();
     sel = { i, corte: it ? it.corte : d.cortes[0], color: it ? it.color : d.color, lado: ladoDe(d) };
     const desde = it ? it.el.querySelector('canvas').getBoundingClientRect() : null;
     detail.hidden = false; stage.classList.add('open');
@@ -417,7 +438,8 @@
   }
   function mover(dir) {
     if (!sel) return;
-    const n = (sel.i + dir + lista.length) % lista.length;
+    let n = (sel.i + dir + lista.length) % lista.length;
+    if (lista[n].pedido) n = (n + dir + lista.length) % lista.length;   // las flechas saltean la tarjeta "tu diseño"
     const d = lista[n];
     const corte = d.cortes.includes(sel.corte) ? sel.corte : d.cortes[0];
     sel = { i: n, corte, color: colorDe(d, corte), lado: ladoDe(d) };
@@ -426,9 +448,8 @@
   $('#prev').onclick = () => mover(-1);
   $('#next').onclick = () => mover(1);
   $('#detClose').onclick = cerrar;
-  $('#navColeccion').onclick = cerrar;
   document.addEventListener('keydown', (e) => {
-    if (detail.hidden) return;
+    if (detail.hidden || !$('#pedido').hidden) return;
     if (e.key === 'Escape') cerrar();
     if (e.key === 'ArrowRight' && !e.target.closest('.colores')) mover(1);
     if (e.key === 'ArrowLeft' && !e.target.closest('.colores')) mover(-1);
@@ -765,7 +786,7 @@
       clearTimeout(ruedaT); ruedaT = setTimeout(() => { ct = Math.round(ct); arrancar(); }, 140);
     }, { passive: false });
     addEventListener('keydown', (e) => {
-      if (!visible()) return;
+      if (!visible() || !$('#pedido').hidden) return;
       if (zoomK >= 0) { if (e.key === 'Escape') cerrarZoom(); return; }
       if (e.key === 'ArrowRight') { ct = Math.round(ct) + 1; tocar(); }
       if (e.key === 'ArrowLeft') { ct = Math.round(ct) - 1; tocar(); }
@@ -810,6 +831,34 @@
     $('#avisoVer').onclick = () => { ocultar(); const chip = document.querySelector('.chip[data-f="salmos_romanos"]'); if (chip) chip.click(); };
     document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { if (b.dataset.f === 'salmos_romanos') ocultar(); }));
     return { mostrar, ocultar };
+  })();
+
+  /* ---------- cómo pedir (diseño propio) ---------- */
+  const Pedido = (() => {
+    const el = $('#pedido'); let antes = null;
+    function abrir() {
+      if (!el.hidden) return;
+      antes = document.activeElement;
+      const nb = CFG.cortes.basica ? CFG.cortes.basica.colores.length : 0, no = CFG.cortes.oversize ? CFG.cortes.oversize.colores.length : 0;
+      $('#pedColores').textContent = `${nb} colores en remera básica y ${no} en oversize.`;
+      const msg = 'Hola Agustín! Quiero una remera con mi propio diseño. Te cuento mi idea:';
+      $('#pedCta').href = CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`;
+      $('#pedCta').textContent = CFG.whatsapp ? 'Pedir mi diseño por WhatsApp' : 'Pedir mi diseño por Instagram';
+      $('#pedVer').textContent = document.body.classList.contains('con-portada') ? 'Ver el catálogo' : 'Seguir viendo el perchero';
+      el.hidden = false; Aviso.ocultar();
+      el.querySelector('.ped-caja').focus({ preventScroll: true });
+    }
+    function cerrar() {
+      if (el.hidden) return;
+      el.hidden = true;
+      if (antes && antes.focus) antes.focus({ preventScroll: true });
+    }
+    $('#pedX').onclick = cerrar; $('#pedFondo').onclick = cerrar;
+    $('#pedVer').onclick = () => { cerrar(); const e = $('#pEntrar'); if (document.body.classList.contains('con-portada') && e) e.click(); };
+    $('#navPedir').onclick = () => abrir();
+    $('#pPedir').onclick = (e) => { e.stopPropagation(); abrir(); };
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !el.hidden) { e.stopPropagation(); cerrar(); } }, true);
+    return { abrir, cerrar };
   })();
 
   /* ---------- inicio ---------- */

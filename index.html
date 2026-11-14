@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&display=swap">
 <link rel="icon" href="img/logo.png">
-<link rel="stylesheet" href="styles.css?v=202611141956">
+<link rel="stylesheet" href="styles.css?v=202611142004">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -24,6 +24,7 @@
   <div class="p-pie" id="pPie">
     <p class="p-cap" aria-live="polite"><b id="pNombre">&nbsp;</b><span id="pSub">&nbsp;</span></p>
     <div class="p-puntos" id="pPuntos" role="group" aria-label="Elegir remera destacada"></div>
+    <button class="p-pedir" id="pPedir" type="button">¿Tenés tu propio diseño? <b>Cómo pedir</b></button>
     <button class="p-entrar" id="pEntrar" type="button">Ver todo el perchero <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
   </div>
   <aside class="p-info" id="pInfo" aria-label="Detalle de la remera" hidden>
@@ -42,7 +43,7 @@
 </section>
 <div class="app">
   <header class="top">
-    <button class="nav" id="navColeccion" type="button">Colección</button>
+    <button class="nav nav-pedir" id="navPedir" type="button">Cómo pedir</button>
     <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
     <a class="nav" id="navContacto" href="#" target="_blank" rel="noopener">Contacto</a>
   </header>
@@ -103,6 +104,25 @@
   </aside>
   <footer class="ticker" aria-hidden="true"><div class="ticker-in" id="ticker"></div></footer>
 </div>
-<script src="app.js?v=202611141956"></script>
+<div class="pedido" id="pedido" role="dialog" aria-modal="true" aria-labelledby="pedTit" hidden>
+  <div class="ped-fondo" id="pedFondo"></div>
+  <div class="ped-caja" tabindex="-1">
+    <button class="ped-x" id="pedX" type="button" aria-label="Cerrar">×</button>
+    <p class="ped-eti">Tu remera en 4 pasos</p>
+    <h2 id="pedTit">Cómo <em>pedir</em></h2>
+    <p class="ped-intro">¿No encontraste lo que buscabas? Hacemos tu diseño: mandanos tu idea, una foto o tu logo y lo estampamos.</p>
+    <ol class="ped-pasos">
+      <li><b>Elegí o mandá tu diseño</b><span>De nuestro catálogo o tu propia idea, foto o logo.</span></li>
+      <li><b>Elegí color y talle</b><span id="pedColores">Remera básica u oversize, en varios colores.</span></li>
+      <li><b>Confirmá por WhatsApp</b><span>Te mandamos la prueba del diseño antes de estampar.</span></li>
+      <li><b>Retirá o recibí</b><span>Cuando esté lista coordinamos el retiro o el envío.</span></li>
+    </ol>
+    <div class="ped-acciones">
+      <a class="cta" id="pedCta" href="#" target="_blank" rel="noopener">Pedir mi diseño por WhatsApp</a>
+      <button class="ped-ver" id="pedVer" type="button">Ver el catálogo</button>
+    </div>
+  </div>
+</div>
+<script src="app.js?v=202611142004"></script>
 </body>
 </html>
