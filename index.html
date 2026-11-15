@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&display=swap">
 <link rel="icon" href="img/logo.png">
-<link rel="stylesheet" href="styles.css?v=202611142015">
+<link rel="stylesheet" href="styles.css?v=202611151801">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -67,7 +67,7 @@
       <div class="track" id="track"></div>
     </div>
 
-    <p class="caption" id="caption" aria-live="polite"><b id="capName">&nbsp;</b><span id="capHint">Deslizá el perchero · tocá una remera</span></p>
+    <p class="caption" id="caption" aria-live="polite"><b id="capName">&nbsp;</b><span id="capHint">Deslizá el perchero · tocá una remera</span><a class="mas-abajo" href="#i-colecciones">Colecciones, cómo pedir y más ↓</a></p>
 
     <section class="detail" id="detail" hidden aria-label="Detalle de la remera">
       <button class="det-close" id="detClose" type="button">← Volver al perchero</button>
@@ -104,6 +104,97 @@
   </aside>
   <footer class="ticker" aria-hidden="true"><div class="ticker-in" id="ticker"></div></footer>
 </div>
+<div class="info" id="info">
+<section class="i-sec" id="i-colecciones">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Colecciones</p><h2>¿Qué estás <em>buscando?</em></h2></div>
+    <p class="i-bajada">Diseños listos para elegir en oversize o básica, o una remera hecha desde cero con tu idea.</p>
+  </div>
+  <div class="i-cols">
+    <a class="i-col i-col-fe i-rev" href="#" data-ir="todo">
+      <div><p class="i-n">18 diseños · oversize y básica</p><h3>Colección <em>fe</em></h3></div>
+      <img src="img/inicio/you_are_a_child_of_god_marfil.webp" alt="" loading="lazy" width="900" height="887">
+      <span class="i-btn i-btn-t i-ir">Ver diseños →</span>
+    </a>
+    <a class="i-col i-col-sr i-rev" style="--d:.1s" href="#" data-ir="salmos_romanos">
+      <span class="i-nuevo">Nuevo</span>
+      <div><p class="i-n">26 diseños · en la espalda · negro</p><h3>Salmos <em>y</em> Romanos</h3></div>
+      <img src="img/inicio/salmos_fuego_negro.webp" alt="" loading="lazy" width="900" height="887">
+      <span class="i-btn i-btn-n i-ir">Ver colección →</span>
+    </a>
+    <a class="i-col i-col-tu i-rev" style="--d:.2s" href="#i-como-pedir">
+      <div><p class="i-n">Tu idea, foto o logo</p><h3>Tu propio <em>diseño</em></h3></div>
+      <div class="i-hueco" aria-hidden="true">Tu<br>diseño<br>acá</div>
+      <span class="i-btn i-btn-t i-ir">Cómo pedir →</span>
+    </a>
+  </div>
+</section>
+
+<section class="i-sec" id="i-destacadas" style="padding-top:0">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Las más pedidas</p><h2>Elegí tu <em>remera</em></h2></div>
+    <p class="i-bajada">Tocá una para verla en el perchero, cambiar el color y consultar por WhatsApp.</p>
+  </div>
+  <div class="i-grilla" id="iGrilla"></div>
+  <div class="i-mas i-rev"><a class="i-btn i-btn-l" href="#" data-ir="todo">Ver todas en el perchero →</a></div>
+</section>
+
+<section class="i-reales" id="i-clientes">
+  <div class="i-sec">
+    <div class="i-rev">
+      <p class="i-eti">Hecho de verdad</p>
+      <h2>Remeras <em>reales,</em> clientes reales</h2>
+      <p class="i-bajada">Cada remera se estampa a mano en DTF, con colores que duran lavado tras lavado. Antes de estampar te mandamos la prueba del diseño para que lo apruebes.</p>
+      <a class="i-btn i-btn-n" href="#i-como-pedir">Quiero la mía</a>
+    </div>
+    <div class="i-collage" id="iCollage">
+      <figure class="i-c1 i-rev" data-par="-30"><img src="img/inicio/foto_anime.webp" alt="Remera negra con diseño anime colgada en percha" loading="lazy"><figcaption>Recién estampada</figcaption></figure>
+      <figure class="i-c2 i-rev" data-par="25" style="--d:.1s"><img src="img/inicio/foto_cliente_cafe.webp" alt="Clienta de espaldas con remera negra estampada Café" loading="lazy"><figcaption>Puesta por un cliente</figcaption></figure>
+      <figure class="i-c3 i-rev" data-par="-20" style="--d:.2s"><img src="img/inicio/foto_cliente_galatas.webp" alt="Cliente mostrando la espalda de remera marrón con Gálatas 2:20" loading="lazy"><figcaption>Puesta por un cliente</figcaption></figure>
+      <figure class="i-c4 i-rev" data-par="35" style="--d:.3s"><img src="img/inicio/foto_pedido.webp" alt="Espalda de remera negra con diseño de pedido personalizado" loading="lazy" style="background:#fff;object-fit:contain"><figcaption>Pedido personalizado</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="i-sec" id="i-como-pedir">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Tu remera en 4 pasos</p><h2>Cómo <em>pedir</em></h2></div>
+    <p class="i-bajada">¿No encontraste lo que buscabas? Hacemos tu diseño: mandanos tu idea, una foto o tu logo y lo estampamos.</p>
+  </div>
+  <ol class="i-pasos">
+    <li class="i-rev"><b>Elegí o mandá tu diseño</b><span>De nuestro catálogo o tu propia idea, foto o logo.</span></li>
+    <li class="i-rev" style="--d:.08s"><b>Elegí color y talle</b><span>22 colores en remera básica y 6 en oversize.</span></li>
+    <li class="i-rev" style="--d:.16s"><b>Confirmá por WhatsApp</b><span>Te mandamos la prueba del diseño antes de estampar.</span></li>
+    <li class="i-rev" style="--d:.24s"><b>Retirá o recibí</b><span>Cuando esté lista coordinamos el retiro o el envío.</span></li>
+  </ol>
+</section>
+
+<section class="i-sec" id="i-colores" style="padding-top:0">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Colores disponibles</p><h2>Del <em>color</em> que quieras</h2></div>
+  </div>
+  <div class="i-colores i-rev">
+    <div class="i-fila"><b>Oversize <small>· 6 colores</small></b><div class="i-pastillas" id="iOver"></div></div>
+    <div class="i-fila"><b>Básica <small>· 22 colores</small></b><div class="i-pastillas" id="iBas"></div></div>
+  </div>
+</section>
+
+<section class="i-final">
+  <div class="i-sec">
+    <p class="i-eti i-rev" style="color:var(--tinta)">¿Tenés una idea?</p>
+    <h2 class="i-rev">La hacemos <em>remera</em></h2>
+    <p class="i-rev">Escribinos por WhatsApp con tu idea, foto o logo y te respondemos con la prueba del diseño.</p>
+    <div class="i-acc i-rev">
+      <a class="i-btn i-btn-t" href="https://wa.me/595983671590?text=Hola%20Agust%C3%ADn!%20Quiero%20una%20remera%20con%20mi%20propio%20dise%C3%B1o.%20Te%20cuento%20mi%20idea%3A" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+      <a class="i-btn i-btn-l" href="https://instagram.com/agustindisenos_personalizado" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</section>
+<footer class="i-pie">
+  <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
+  <span>Remeras personalizadas en DTF · Creatividad &amp; calidad</span>
+</footer>
+</div>
 <div class="pedido" id="pedido" role="dialog" aria-modal="true" aria-labelledby="pedTit" hidden>
   <div class="ped-fondo" id="pedFondo"></div>
   <div class="ped-caja" tabindex="-1">
@@ -123,6 +214,6 @@
     </div>
   </div>
 </div>
-<script src="app.js?v=202611142015"></script>
+<script src="app.js?v=202611151801"></script>
 </body>
 </html>

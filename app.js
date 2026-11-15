@@ -305,8 +305,11 @@
   window.addEventListener('pointerup', soltar);
   window.addEventListener('pointercancel', soltar);
   rack.addEventListener('wheel', (e) => {
-    const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    const vertical = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+    const d = vertical ? e.deltaY : e.deltaX;
     if (minX === maxX) return;
+    // con la rueda vertical: si el perchero ya llegó al final (o la página está bajada), se deja bajar la página
+    if (vertical && (window.scrollY > 2 || (d > 0 && x <= minX + 1) || (d < 0 && x >= maxX - 1))) return;
     e.preventDefault(); x -= d; x = Math.min(maxX + 40, Math.max(minX - 40, x)); v = -d * 18; kick();
   }, { passive: false });
   rack.addEventListener('keydown', (e) => {
@@ -413,6 +416,8 @@
   async function abrir(i) {
     const d = lista[i], it = items[i];
     if (d.pedido) return Pedido.abrir();
+    if (window.scrollY > 0) window.scrollTo(0, 0);
+    document.body.classList.add('quieto');
     sel = { i, corte: it ? it.corte : d.cortes[0], color: it ? it.color : d.color, lado: ladoDe(d) };
     const desde = it ? it.el.querySelector('canvas').getBoundingClientRect() : null;
     detail.hidden = false; stage.classList.add('open');
@@ -433,6 +438,7 @@
     if (detail.hidden) return;
     const i = sel ? sel.i : -1;
     detail.hidden = true; stage.classList.remove('open'); fig = null;
+    if ($('#pedido').hidden) document.body.classList.remove('quieto');
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     if (items[i]) { centrar(i); items[i].p.w += 70; kick(); items[i].el.focus({ preventScroll: true }); }
   }
@@ -845,12 +851,13 @@
       $('#pedCta').href = CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`;
       $('#pedCta').textContent = CFG.whatsapp ? 'Pedir mi diseño por WhatsApp' : 'Pedir mi diseño por Instagram';
       $('#pedVer').textContent = document.body.classList.contains('con-portada') ? 'Ver el catálogo' : 'Seguir viendo el perchero';
-      el.hidden = false; Aviso.ocultar();
+      el.hidden = false; Aviso.ocultar(); document.body.classList.add('quieto');
       el.querySelector('.ped-caja').focus({ preventScroll: true });
     }
     function cerrar() {
       if (el.hidden) return;
       el.hidden = true;
+      if (detail.hidden) document.body.classList.remove('quieto');
       if (antes && antes.focus) antes.focus({ preventScroll: true });
     }
     $('#pedX').onclick = cerrar; $('#pedFondo').onclick = cerrar;
@@ -859,6 +866,50 @@
     $('#pPedir').onclick = (e) => { e.stopPropagation(); abrir(); };
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !el.hidden) { e.stopPropagation(); cerrar(); } }, true);
     return { abrir, cerrar };
+  })();
+
+  /* ---------- secciones de información (debajo del perchero) ---------- */
+  const Info = (() => {
+    const DESTACADAS = { god_is_bigger: 'negro', jesus_loves_you: 'marfil', on_fire: 'blanco', victory: 'beige', jesus_corriendo: 'verde_musgo', jesus_always_wins: 'negro', dont_be_afraid: 'marfil', church_kids: 'blanco' };
+    function subir(fn) {
+      const listo = () => setTimeout(fn, 60);
+      if (window.scrollY < 4) return listo();
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      let t = 0; const espera = () => (window.scrollY < 4 || ++t > 90) ? listo() : requestAnimationFrame(espera); espera();
+    }
+    function filtrar(f) { const chip = document.querySelector(`.chip[data-f="${f}"]`); if (chip && chip.getAttribute('aria-pressed') !== 'true') chip.click(); }
+    function armar() {
+      const g = $('#iGrilla');
+      Object.entries(DESTACADAS).forEach(([id, color], k) => {
+        const d = DIS.find(x => x.id === id); if (!d) return;
+        const a = document.createElement('a'); a.className = 'i-rem i-rev ' + (['negro', 'verde_musgo', 'azul_marino'].includes(color) ? 'i-oscura' : 'i-clara'); a.style.setProperty('--d', (k % 4) * .07 + 's');
+        a.href = '#' + id.replace(/_/g, '-');
+        a.innerHTML = `<figure><img src="img/inicio/${id}_${color}.webp" alt="" loading="lazy" width="900" height="887"></figure><div><b></b><span></span></div>`;
+        a.querySelector('b').textContent = d.nombre; a.querySelector('span').textContent = d.detalle || '';
+        a.querySelector('img').alt = 'Remera ' + d.nombre;
+        a.addEventListener('click', (e) => { e.preventDefault(); subir(() => { filtrar('todo'); const i = lista.findIndex(x => x.id === id); if (i >= 0) { centrar(i); setTimeout(() => abrir(i), 250); } }); });
+        g.appendChild(a);
+      });
+      const pint = (el, corte) => (CFG.cortes[corte] ? CFG.cortes[corte].colores : []).forEach(c => { const i = document.createElement('i'); i.style.background = c.hex; i.title = c.nombre; el.appendChild(i); });
+      pint($('#iOver'), 'oversize'); pint($('#iBas'), 'basica');
+      document.querySelectorAll('.info [data-ir]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); subir(() => filtrar(a.dataset.ir)); }));
+      document.querySelectorAll('.info a[href^="#i-"], .mas-abajo').forEach(a => a.addEventListener('click', (e) => {
+        const t = document.querySelector(a.getAttribute('href')); if (!t) return;
+        e.preventDefault(); t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }));
+      const io = new IntersectionObserver((es) => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('i-in'); io.unobserve(x.target); } }), { rootMargin: '0px 0px -8% 0px' });
+      document.querySelectorAll('.i-rev').forEach(el => io.observe(el));
+      const col = $('#iCollage'), pars = [...col.querySelectorAll('[data-par]')]; let pend = false;
+      addEventListener('scroll', () => {
+        if (pend) return; pend = true;
+        requestAnimationFrame(() => {
+          pend = false;
+          const c = col.getBoundingClientRect(), q = (c.top + c.height / 2 - innerHeight / 2) / innerHeight;
+          if (Math.abs(q) < 1.5) pars.forEach(f => f.style.setProperty('--y', (q * f.dataset.par).toFixed(1) + 'px'));
+        });
+      }, { passive: true });
+    }
+    return { armar };
   })();
 
   /* ---------- inicio ---------- */
@@ -877,6 +928,7 @@
     }
     if (!dh && cfg.portada) document.body.classList.add('con-portada');   // hay portada: el perchero se arma de fondo
     armarPerchero();
+    Info.armar();
     const i = lista.findIndex(d => d.id === h);
     if (i >= 0) setTimeout(() => abrir(i), 300);
     else if (cfg.portada) Portada.iniciar(cfg.portada);
