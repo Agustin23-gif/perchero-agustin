@@ -1,0 +1,1668 @@
+<title>Perchero Agustín</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600&display=swap">
+<style>
+/* Perchero: fondo hueso de pared, barra metálica a lo ancho, remeras colgadas en fila; una sola pieza audaz (el título con la palabra en serif naranja) y todo lo demás quieto. */
+:root {
+  --pared: #EDE9E2;      /* blanco hueso de la marca */
+  --pared-2: #E3DED5;    /* sombra de pared, piso */
+  --tinta: #141414;      /* negro de la marca */
+  --gris: #6B655E;       /* texto secundario, gris cálido */
+  --naranja: #FF7A00;    /* protagonista */
+  --blanco: #FBFAF7;
+  --metal-1: #F4F4F2; --metal-2: #9C9A96; --metal-3: #5E5C59;
+  --f-titulo: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+  --f-acento: "Playfair Display", "Times New Roman", Georgia, serif;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: light;
+}
+body {
+  margin: 0; background: var(--pared); color: var(--tinta);
+  font-family: var(--f-titulo); font-size: 14px; overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+.app { height: 100vh; height: 100svh; display: grid; grid-template-rows: auto 1fr auto; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--naranja); outline-offset: 3px; }
+
+/* ---------- encabezado ---------- */
+.top {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+  padding-block: 14px 6px; padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+}
+.top img { height: clamp(30px, 5vw, 44px); width: auto; display: block; }
+.nav {
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--tinta); text-decoration: none; background: none; border: 0; padding: 6px 0; cursor: pointer;
+}
+.nav:last-child { justify-self: end; }
+.nav:hover { color: var(--naranja); }
+
+/* ---------- escenario ---------- */
+.stage { position: relative; display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
+.intro {
+  display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 10px 24px;
+  padding-block: 4px 0; padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+  transition: opacity .4s, filter .4s;
+}
+.eyebrow { margin: 0 0 4px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+h1 {
+  margin: 0; font-weight: 800; text-transform: uppercase; line-height: .86;
+  font-size: clamp(40px, 8.4vw, 104px); letter-spacing: -.06em; text-wrap: balance;
+}
+h1 em {
+  font-family: var(--f-acento); font-style: italic; font-weight: 600; text-transform: none;
+  color: var(--naranja); letter-spacing: -.03em; padding-right: .05em;
+}
+/* sobre el cielo (que cambia de tono según la remera) "remera" va en blanco con una sombra suave: contrasta con cualquier color */
+.app h1 em { color: var(--blanco); text-shadow: 0 1px 1px rgba(20, 20, 20, .28), 0 3px 18px rgba(20, 20, 20, .22); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  border: 1.5px solid var(--tinta); background: transparent; border-radius: 99px;
+  padding: 7px 14px; font-size: 12px; font-weight: 700; letter-spacing: -.01em; text-transform: uppercase; cursor: pointer;
+}
+.chip[aria-pressed="true"] { background: var(--tinta); color: var(--pared); }
+
+/* ---------- perchero ---------- */
+.rack { position: relative; overflow: hidden; touch-action: pan-y; cursor: grab; transition: opacity .45s, filter .45s; user-select: none; -webkit-user-select: none; }
+.rack.drag { cursor: grabbing; }
+/* perchero de acero: barra arriba que se curva en dos patas a los costados */
+.rod {
+  --r: var(--rod-h, 10px);
+  position: absolute; z-index: 0; pointer-events: none;
+  top: var(--rod-y, 30px); bottom: 0;
+  left: max(10px, env(safe-area-inset-left, 0px)); right: max(10px, env(safe-area-inset-right, 0px));
+  border: var(--r) solid var(--metal-2); border-bottom: 0;
+  border-radius: calc(var(--r) * 3.4) calc(var(--r) * 3.4) 0 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 1px 0 0 rgba(255, 255, 255, .35), inset -1px 0 0 rgba(255, 255, 255, .35),
+              0 -1px 0 rgba(255, 255, 255, .6), 0 9px 14px -8px rgba(20, 20, 20, .28);
+}
+.rod::before, .det-rod { /* brillo de metal pulido en la barra */
+  content: ""; position: absolute; height: var(--r);
+  background: linear-gradient(to bottom, #6F6D69 0%, #F3F2EE 28%, #C2C0BB 50%, #85837F 76%, #A3A19C 100%);
+}
+.rod::before { top: calc(var(--r) * -1); left: calc(var(--r) * 2.4); right: calc(var(--r) * 2.4); }
+.rod::after { /* brillo vertical en las patas */
+  content: ""; position: absolute; inset: calc(var(--r) * 2.4) calc(var(--r) * -1) 0;
+  border-left: var(--r) solid transparent; border-right: var(--r) solid transparent;
+  background: none;
+  border-image: linear-gradient(to right, #6F6D69, #F3F2EE 35%, #A3A19C 70%, #7E7C78) 1;
+  border-top: 0; border-bottom: 0;
+}
+.det-rod { --r: var(--rod-h, 10px); left: 0; right: 0; top: var(--rod-y, 0); z-index: 0; border-radius: var(--r); box-shadow: 0 9px 14px -8px rgba(20, 20, 20, .28); }
+.track { position: absolute; inset: 0; z-index: 1; }
+
+.item {
+  position: absolute; top: 0; left: 0; transform-origin: 50% 0; padding: 0; border: 0; background: none; cursor: pointer;
+}
+.item { pointer-events: none; }
+.item canvas { pointer-events: auto; }
+.madera { position: absolute; max-width: none; pointer-events: none; }
+.etiqueta {
+  position: absolute; top: 4%; right: 8%; z-index: 2; background: var(--blanco); color: var(--tinta);
+  font-size: 10px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase; padding: 3px 6px; border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(20, 20, 20, .2); pointer-events: none;
+}
+.item:focus-visible { outline: none; }
+.item:focus-visible .shirt canvas { outline: 2px solid var(--naranja); outline-offset: 6px; border-radius: 8px; }
+.swing { position: relative; transform-origin: 50% var(--pivot, 6px); }
+.hook { position: absolute; left: 50%; top: 0; transform: translateX(-50%); overflow: visible; z-index: 0; }
+.shirt { z-index: 1; }
+.shirt { position: absolute; left: 50%; transform: translateX(-50%); }
+.shirt canvas { display: block; width: 100%; height: auto; position: relative; }
+.shirt .sombra { position: absolute; max-width: none; pointer-events: none; }
+.item .shirt { transition: transform .35s cubic-bezier(.2, .8, .2, 1); }
+@media (hover: hover) {
+  .item:hover .shirt { transform: translateX(-50%) translateY(-4px) scale(1.035); }
+}
+
+.caption {
+  text-align: center; min-height: 3.2em; display: grid; align-content: center; gap: 2px;
+  padding-block: 6px 10px; padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+  transition: opacity .3s;
+}
+.caption b { font-size: clamp(16px, 2.2vw, 22px); letter-spacing: -.045em; text-transform: uppercase; }
+.caption span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+
+/* ---------- vista de detalle ---------- */
+.stage.open .intro, .stage.open .rack, .stage.open .caption { opacity: .14; filter: blur(7px); pointer-events: none; }
+.detail {
+  position: absolute; inset: 0; z-index: 5; display: grid; grid-template-rows: 1fr auto;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r); padding-block: 0 8px;
+}
+.det-close {
+  position: absolute; top: 4px; left: var(--gutter-l); z-index: 3; border: 0; background: none; cursor: pointer;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 8px 0;
+}
+.det-close:hover { color: var(--naranja); }
+.det-view { position: relative; min-height: 0; touch-action: pan-y; margin-top: 40px; }
+.det-fig { position: absolute; left: 50%; top: 0; z-index: 1; }
+.det-fig .swing { --pivot: 6px; }
+.arrow {
+  position: absolute; top: 50%; z-index: 3; width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid var(--tinta); background: var(--pared); display: grid; place-items: center; cursor: pointer;
+  transform: translateY(-50%);
+}
+.arrow:hover { background: var(--tinta); color: var(--pared); }
+.arrow.prev { left: 0; } .arrow.next { right: 0; }
+.arrow svg { width: 18px; height: 18px; }
+
+.det-info { display: grid; justify-items: center; gap: 10px; text-align: center; min-width: 0; }
+.det-info h2, .p-info h2 { max-width: 100%; overflow-wrap: break-word; }
+.det-info h2 {
+  margin: 0; font-size: clamp(26px, 4.4vw, 46px); line-height: .9; font-weight: 800;
+  letter-spacing: -.055em; text-transform: uppercase; text-wrap: balance;
+}
+.det-sub { margin: -4px 0 0; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+.controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.seg { display: inline-flex; border: 1.5px solid var(--tinta); border-radius: 99px; padding: 2px; }
+.seg button {
+  border: 0; background: none; border-radius: 99px; padding: 6px 13px; cursor: pointer;
+  font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: -.01em;
+}
+.seg button[aria-pressed="true"] { background: var(--tinta); color: var(--pared); }
+.seg button:disabled { opacity: .35; cursor: default; }
+.colores-wrap { max-width: min(100%, 640px); overflow-x: auto; scrollbar-width: none; }
+.colores-wrap::-webkit-scrollbar { display: none; }
+.colores { display: flex; gap: 6px; padding: 6px 4px 4px; width: max-content; margin-inline: auto; }
+.tag { /* etiqueta colgante */
+  position: relative; width: 26px; height: 36px; border: 0; padding: 0; cursor: pointer;
+  background: var(--c); border-radius: 3px 3px 5px 5px;
+  box-shadow: inset 0 0 0 1px rgba(20, 20, 20, .14), 0 2px 4px rgba(20, 20, 20, .12);
+  transition: transform .2s;
+}
+.tag::before { content: ""; position: absolute; top: 5px; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--pared); box-shadow: inset 0 0 0 1px rgba(20, 20, 20, .25); }
+.tag[aria-pressed="true"] { transform: translateY(-4px); box-shadow: 0 0 0 2px var(--pared), 0 0 0 3.5px var(--naranja); }
+.tag:hover { transform: translateY(-3px); }
+.color-name { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); min-height: 1.2em; }
+.cta {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  background: var(--naranja); color: var(--tinta); border-radius: 99px; padding: 11px 20px;
+  font-size: 13px; font-weight: 800; letter-spacing: -.02em; text-transform: uppercase;
+}
+.cta:hover { background: var(--tinta); color: var(--pared); }
+.count { font-size: 11px; color: var(--gris); font-variant-numeric: tabular-nums; letter-spacing: .04em; }
+
+/* ---------- cinta ---------- */
+.ticker { background: var(--naranja); overflow: hidden; white-space: nowrap; padding-block: 7px; }
+.ticker-in { display: inline-flex; animation: cinta 38s linear infinite; }
+.ticker span { font-size: 12px; font-weight: 800; letter-spacing: -.02em; text-transform: uppercase; padding-right: 18px; color: var(--tinta); }
+@keyframes cinta { to { transform: translateX(-50%); } }
+
+@media (max-width: 640px) {
+  .intro { justify-content: center; text-align: center; }
+  .intro > div { width: 100%; }
+  .chips { justify-content: center; width: 100%; }
+  .arrow { width: 38px; height: 38px; }
+  .det-info { gap: 8px; }
+}
+@media (max-height: 640px) and (max-width: 640px) { .eyebrow { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ticker-in { animation: none; }
+  .item .shirt, .tag { transition: none; }
+}
+
+/* volumen de la remera de costado */
+.shirt canvas { transform: translateZ(0.5px); }
+.capa {
+  position: absolute; left: 0; top: 0; pointer-events: none; transform-origin: 50% 0;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+
+/* cielo de fondo */
+#cielo { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; pointer-events: none; }
+.app { position: relative; z-index: 1; }
+
+/* ---------- portada: 5 remeras destacadas en abanico, sobre el hueso de la marca ---------- */
+.portada {
+  position: fixed; inset: 0; z-index: 20; overflow: hidden; background: var(--pared);
+  background-image: radial-gradient(120% 70% at 50% 58%, var(--blanco) 0%, var(--pared) 55%, var(--pared-2) 100%);
+  display: grid; grid-template-rows: auto 1fr auto; touch-action: none; user-select: none; -webkit-user-select: none;
+  transition: transform .8s cubic-bezier(.7, 0, .2, 1), opacity .8s;
+}
+.portada.salir { transform: translateY(-100%); }
+.p-top { display: flex; justify-content: center; padding-top: max(14px, env(safe-area-inset-top, 0px)); position: relative; z-index: 3; }
+.p-top img { height: clamp(30px, 5vw, 44px); width: auto; display: block; }
+.p-titulo {
+  position: absolute; left: 0; right: 0; top: 9%; z-index: 0; text-align: center; pointer-events: none;
+  font-weight: 800; text-transform: uppercase; line-height: .8; letter-spacing: -.07em;
+  font-size: clamp(64px, 12.5vw, 230px); color: var(--tinta); white-space: nowrap; transition: opacity .5s, transform .6s;
+}
+.p-titulo span { display: inline; }
+.p-titulo em {
+  display: inline; margin-left: .12em; font-family: var(--f-acento); font-style: italic; font-weight: 600; text-transform: none;
+  color: var(--naranja); letter-spacing: -.04em; font-size: .62em; margin-top: -.02em;
+}
+.p-escena { position: relative; z-index: 1; min-height: 0; cursor: grab; }
+.p-escena.drag { cursor: grabbing; }
+.p-item { position: absolute; left: 50%; top: 50%; padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 50% 50%; will-change: transform, opacity; }
+.p-item .shirt { position: relative; left: 0; transform: none; }
+.p-item canvas { display: block; width: 100%; height: auto; position: relative; }
+.p-item:focus-visible { outline: none; }
+.p-item:focus-visible canvas { outline: 2px solid var(--naranja); outline-offset: 8px; border-radius: 10px; }
+.p-nueva {
+  position: absolute; top: 6%; right: 2%; z-index: 2; background: var(--naranja); color: var(--tinta);
+  font-size: 11px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase; padding: 4px 8px; border-radius: 3px;
+  box-shadow: 0 2px 6px rgba(20, 20, 20, .18); pointer-events: none; transition: opacity .3s;
+}
+.p-pie {
+  position: relative; z-index: 3; display: grid; justify-items: center; gap: 10px; text-align: center;
+  padding: 0 var(--gutter-r) max(18px, env(safe-area-inset-bottom, 0px)) var(--gutter-l); transition: opacity .4s, transform .5s;
+}
+.p-cap { margin: 0; display: grid; gap: 3px; }
+.p-cap b { font-size: clamp(20px, 2.8vw, 30px); letter-spacing: -.05em; text-transform: uppercase; line-height: .95; }
+.p-cap span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+.p-puntos { display: flex; gap: 8px; }
+.p-puntos button { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--tinta); background: transparent; padding: 0; cursor: pointer; }
+.p-puntos button[aria-current="true"] { background: var(--naranja); border-color: var(--naranja); transform: scale(1.25); }
+.p-entrar {
+  display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
+  background: var(--tinta); color: var(--pared); border-radius: 99px; padding: 12px 22px;
+  font-size: 13px; font-weight: 800; letter-spacing: -.02em; text-transform: uppercase;
+}
+.p-entrar svg { width: 16px; height: 16px; animation: bajar 1.6s ease-in-out infinite; }
+.p-entrar:hover { background: var(--naranja); color: var(--tinta); }
+@keyframes bajar { 50% { transform: translateY(3px); } }
+
+/* zoom: la remera elegida se agranda y aparece la ficha al costado */
+.portada.zoom .p-pie, .portada.zoom .p-titulo { opacity: 0; pointer-events: none; }
+.portada.zoom .p-titulo { transform: translateY(-30px); }
+.portada.zoom .p-escena { cursor: default; }
+.p-info {
+  position: absolute; z-index: 4; left: 55%; top: 50%; width: min(520px, 34vw);
+  transform: translateY(-50%); display: grid; justify-items: start; gap: 12px; text-align: left;
+  animation: ficha .55s .15s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+@keyframes ficha { from { opacity: 0; transform: translate(24px, -50%); } }
+.p-info h2 { margin: 0; font-size: clamp(34px, 4.6vw, 84px); line-height: .88; font-weight: 800; letter-spacing: -.06em; text-transform: uppercase; text-wrap: balance; }
+.p-info .det-sub { margin: -4px 0 0; }
+.p-info .colores { margin: 0; padding-inline: 0; flex-wrap: wrap; width: auto; max-width: 100%; }
+.p-etq { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--naranja); min-height: 1em; }
+.p-etq:empty { display: none; }
+.p-cerrar {
+  border: 0; background: none; cursor: pointer; padding: 6px 0; margin-bottom: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
+.p-cerrar:hover, .p-ver:hover { color: var(--naranja); }
+.p-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 4px; }
+.p-ver {
+  border: 0; background: none; cursor: pointer; padding: 8px 0; text-decoration: underline; text-underline-offset: 4px;
+  font-size: 12px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase;
+}
+@media (max-width: 760px) {
+  .p-titulo { top: 11%; font-size: clamp(56px, 21vw, 150px); white-space: normal; }
+  .p-titulo span, .p-titulo em { display: block; margin-left: 0; }
+  .p-info {
+    left: var(--gutter-l); right: var(--gutter-r); top: auto; bottom: max(14px, env(safe-area-inset-bottom, 0px));
+    width: auto; transform: none; justify-items: center; text-align: center; gap: 8px;
+    animation-name: fichaAbajo;
+  }
+  @keyframes fichaAbajo { from { opacity: 0; transform: translateY(24px); } }
+  .p-info .colores { justify-content: center; }
+  .p-acciones { justify-content: center; }
+  .p-cerrar { position: fixed; top: max(14px, env(safe-area-inset-top, 0px)); left: var(--gutter-l); margin: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portada, .p-titulo, .p-pie { transition: none; }
+  .p-entrar svg, .p-info { animation: none; }
+}
+
+/* ficha de la portada en compu: todo un poco más grande */
+@media (min-width: 761px) {
+  .p-info { gap: 16px; }
+  .p-info .det-sub, .p-info .color-name, .p-etq { font-size: clamp(11px, .95vw, 15px); }
+  .p-cerrar { font-size: clamp(11px, .9vw, 14px); }
+  .p-info .seg button { font-size: clamp(11.5px, .95vw, 15px); padding: 8px 16px; }
+  .p-info .tag { width: clamp(26px, 2.2vw, 36px); height: clamp(36px, 3vw, 50px); }
+  .p-info .colores { gap: 8px; }
+  .p-info .cta { font-size: clamp(13px, 1.05vw, 17px); padding: 14px 26px; }
+  .p-ver { font-size: clamp(12px, .95vw, 15px); }
+}
+
+/* mientras está la portada, el perchero de atrás no se dibuja ni se anima (más liviano en celulares) */
+body.con-portada .app { visibility: hidden; }
+body.con-portada .ticker-in { animation-play-state: paused; }
+
+/* ---------- aviso de la colección nueva ---------- */
+.chip-col { position: relative; }
+.chip-col[aria-pressed="false"]::after { /* puntito naranja que late: "hay algo nuevo acá" */
+  content: ""; position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%;
+  background: var(--naranja); box-shadow: 0 0 0 2px var(--pared); animation: latido 1.6s ease-in-out infinite;
+}
+.chip-col[aria-pressed="false"] { border-color: var(--naranja); }
+@keyframes latido { 50% { transform: scale(1.35); opacity: .75; } }
+.aviso {
+  position: fixed; z-index: 12; left: var(--gutter-l); bottom: calc(46px + env(safe-area-inset-bottom, 0px));
+  width: min(380px, calc(100vw - var(--gutter-l) - var(--gutter-r)));
+  display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center;
+  background: var(--tinta); color: var(--pared); border-radius: 14px; padding: 12px 14px 12px 12px;
+  box-shadow: 0 14px 34px -10px rgba(20, 20, 20, .55);
+  animation: avisoEntra .6s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+.aviso.fuera { opacity: 0; transform: translateY(16px); transition: opacity .35s, transform .35s; pointer-events: none; }
+@keyframes avisoEntra { from { opacity: 0; transform: translateY(24px); } }
+.aviso-img { width: 70px; height: 70px; border-radius: 10px; background: #161616; display: grid; place-items: center; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.aviso-img img { width: 92%; height: auto; display: block; }
+.aviso-txt { display: grid; gap: 2px; min-width: 0; }
+.aviso-txt p { margin: 0; }
+.aviso-eti { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--naranja); }
+.aviso-tit { font-size: 16px; font-weight: 800; letter-spacing: -.035em; text-transform: uppercase; line-height: 1; }
+.aviso-sub { font-size: 11px; color: #BDB7AE; }
+.aviso-btn {
+  justify-self: start; margin-top: 6px; border: 0; cursor: pointer; border-radius: 99px; padding: 8px 14px;
+  background: var(--naranja); color: var(--tinta); font-size: 12px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase;
+}
+.aviso-btn:hover { background: var(--pared); }
+.aviso-x {
+  position: absolute; top: 4px; right: 6px; width: 28px; height: 28px; border: 0; background: none; cursor: pointer;
+  color: #BDB7AE; font-size: 20px; line-height: 1;
+}
+.aviso-x:hover { color: var(--pared); }
+.stage.open ~ .aviso, body.con-portada .aviso { display: none; }
+@media (prefers-reduced-motion: reduce) { .aviso { animation: none; } .chip-col::after { animation: none; } }
+
+/* ---------- cómo pedir ---------- */
+.nav.nav-pedir {
+  justify-self: start; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  background: var(--tinta); color: var(--pared); border-radius: 99px; padding: 8px 14px 8px 11px;
+  box-shadow: 0 4px 14px -6px rgba(20, 20, 20, .5);
+}
+.nav.nav-pedir::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--naranja); flex: none; }
+.nav.nav-pedir:hover { background: var(--naranja); color: var(--tinta); }
+.nav.nav-pedir:hover::before { background: var(--tinta); }
+@media (max-width: 400px) { .nav.nav-pedir { padding: 7px 11px; gap: 5px; font-size: 10px; letter-spacing: .04em; } .nav.nav-pedir::before { width: 5px; height: 5px; } }
+.item-pedido .etiqueta { background: var(--naranja); }
+.p-pedir {
+  border: 0; background: none; cursor: pointer; padding: 2px 4px; color: var(--gris);
+  font-size: 12px; font-weight: 700; letter-spacing: -.01em;
+}
+.p-pedir b { color: var(--naranja); text-transform: uppercase; letter-spacing: -.02em; text-decoration: underline; text-underline-offset: 3px; }
+.p-pedir:hover b { color: var(--tinta); }
+.pedido { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px var(--gutter-r) 16px var(--gutter-l); }
+.ped-fondo { position: absolute; inset: 0; background: rgba(20, 20, 20, .55); animation: pedFade .3s ease backwards; }
+.ped-caja {
+  position: relative; width: min(500px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; outline: none;
+  background: var(--pared); color: var(--tinta); border-radius: 18px; padding: 26px 24px 22px;
+  border-top: 6px solid var(--naranja); box-shadow: 0 24px 60px -18px rgba(20, 20, 20, .6);
+  animation: pedEntra .45s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+@keyframes pedFade { from { opacity: 0; } }
+@keyframes pedEntra { from { opacity: 0; transform: translateY(22px) scale(.98); } }
+.ped-x { position: absolute; top: 8px; right: 10px; width: 36px; height: 36px; border: 0; background: none; cursor: pointer; font-size: 26px; line-height: 1; color: var(--gris); }
+.ped-x:hover { color: var(--naranja); }
+.ped-eti { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--naranja); }
+.ped-caja h2 { margin: 2px 0 6px; font-family: var(--f-titulo); font-weight: 800; font-size: clamp(38px, 9vw, 52px); letter-spacing: -.06em; line-height: .9; text-transform: uppercase; }
+.ped-caja h2 em { font-family: var(--f-acento); font-style: italic; font-weight: 600; text-transform: none; color: var(--naranja); letter-spacing: -.03em; }
+.ped-intro { margin: 0 0 14px; font-size: 14px; line-height: 1.4; color: var(--gris); }
+.ped-pasos { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 12px; counter-reset: paso; }
+.ped-pasos li { counter-increment: paso; display: grid; grid-template-columns: 42px 1fr; column-gap: 12px; align-items: center; }
+.ped-pasos li::before {
+  content: counter(paso); grid-row: span 2; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--naranja); color: var(--tinta); font-weight: 800; font-size: 20px; letter-spacing: -.04em;
+}
+.ped-pasos b { font-size: 16px; letter-spacing: -.04em; text-transform: uppercase; line-height: 1.05; }
+.ped-pasos span { font-size: 13px; color: var(--gris); line-height: 1.3; }
+.ped-acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.ped-ver { border: 0; background: none; cursor: pointer; padding: 6px 0; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta); }
+.ped-ver:hover { color: var(--naranja); }
+@media (prefers-reduced-motion: reduce) { .ped-fondo, .ped-caja { animation: none; } }
+
+/* la página baja hasta las secciones de información, salvo con la portada, el detalle o la ventana abiertos */
+body.con-portada, body.quieto { overflow: hidden; }
+.mas-abajo { display: block; margin-top: 6px; font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--tinta); text-decoration: underline; text-decoration-color: var(--naranja); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.mas-abajo:hover { color: var(--naranja); }
+.stage.open .mas-abajo { visibility: hidden; }
+
+/* ---------- secciones de información (debajo del perchero) ---------- */
+.info { position: relative; z-index: 0; background: var(--pared); --g: var(--gutter-l); --acento: var(--f-acento); font-size: 14px; }
+.info img { display: block; max-width: 100%; }
+.info a { color: inherit; }
+.info .i-btn-t { color: var(--pared); } .info .i-btn-n, .info .i-col-sr { color: var(--tinta); } .info .i-col-sr .i-btn-n { color: var(--pared); } .info .i-col-fe .i-btn-t { color: var(--tinta); }
+.info em { font-family: var(--acento); font-weight: 600; font-style: italic; text-transform: none; letter-spacing: -.02em; }
+.i-eti { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--naranja); margin: 0 0 8px; }
+.info h2 { font-weight: 800; text-transform: uppercase; letter-spacing: -.06em; line-height: .9; font-size: clamp(40px, 7vw, 96px); margin: 0; }
+.info h2 em { color: var(--naranja); }
+.i-btn { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; border-radius: 99px; padding: 13px 22px; font-size: 13px; font-weight: 800; letter-spacing: -.02em; text-transform: uppercase; transition: background .2s, color .2s; }
+.i-btn-n { background: var(--naranja); color: var(--tinta); }
+.i-btn-n:hover { background: var(--tinta); color: var(--pared); }
+.i-btn-t { background: var(--tinta); color: var(--pared); }
+.i-btn-t:hover { background: var(--naranja); color: var(--tinta); }
+.i-btn-l { border: 1.5px solid currentColor; }
+.i-btn-l:hover { background: var(--tinta); color: var(--pared); border-color: var(--tinta); }
+
+/* ---------- secciones ---------- */
+.i-sec { padding: clamp(70px, 11vw, 140px) var(--g); max-width: 1320px; margin: 0 auto; }
+.i-sec-cab { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; margin-bottom: clamp(28px, 4vw, 48px); }
+.i-sec-cab p.i-bajada { margin: 0; max-width: 380px; color: var(--gris); font-size: 15px; line-height: 1.45; }
+
+/* colecciones */
+.i-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.i-col { position: relative; border-radius: 22px; overflow: hidden; min-height: 470px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; isolation: isolate; }
+.i-col img { position: absolute; z-index: -1; left: 50%; bottom: -11%; width: min(90%, 400px); height: auto; max-width: none; transform: translateX(-50%); transition: transform .5s cubic-bezier(.2, .8, .2, 1); }
+.i-col:hover img { transform: translateX(-50%) translateY(-10px) rotate(-1.5deg); }
+.i-col h3 { margin: 0; font-size: clamp(30px, 3.2vw, 44px); font-weight: 800; letter-spacing: -.06em; text-transform: uppercase; line-height: .88; }
+.i-col .i-n { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.i-col .i-ir { align-self: start; }
+.info .i-col-fe { background: var(--tinta); color: var(--pared); }            /* remera clara sobre fondo negro */
+.i-col-fe h3 em { color: var(--naranja); }
+.i-col-fe .i-btn-t { background: var(--pared); color: var(--tinta); }
+.i-col-sr { background: var(--naranja); color: var(--tinta); }           /* remera negra sobre naranja */
+.i-col-sr h3 em { color: var(--blanco); }
+.i-col-sr .i-btn-n { background: var(--tinta); color: var(--pared); }
+.i-col-tu { background: var(--blanco); box-shadow: inset 0 0 0 1.5px rgba(20, 20, 20, .12); }
+.i-col-tu h3 em { color: var(--naranja); }
+.i-col-tu .i-hueco { border-color: var(--naranja); color: var(--naranja); }
+.i-nuevo { position: absolute; top: 20px; right: 20px; background: var(--tinta); color: var(--pared); font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 5px 9px; border-radius: 4px; }
+.i-hueco { position: absolute; z-index: -1; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 58%; aspect-ratio: 1 / 1.05; border: 3px dashed var(--tinta); border-radius: 16px; display: grid; place-items: center; text-align: center;
+  font-weight: 800; font-size: clamp(26px, 3vw, 38px); letter-spacing: -.06em; line-height: .9; text-transform: uppercase; }
+@media (max-width: 900px) { .i-cols { grid-template-columns: 1fr; } .i-col { min-height: 420px; } }
+
+/* destacadas */
+.i-grilla { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.i-rem { text-decoration: none; display: grid; gap: 10px; }
+.i-rem figure { margin: 0; background: var(--blanco); border-radius: 16px; padding: 10% 6% 4%; aspect-ratio: 1 / 1.08; display: grid; place-items: center; overflow: hidden; transition: background .3s; }
+.i-rem img { width: 100%; height: auto; transition: transform .4s cubic-bezier(.2, .8, .2, 1); }
+
+.i-rem:hover img { transform: translateY(-6px) scale(1.03); }
+.i-rem b { font-size: 16px; letter-spacing: -.04em; text-transform: uppercase; line-height: 1; }
+.i-rem span { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+.i-rem div { display: grid; gap: 4px; }
+.i-mas { text-align: center; margin-top: 34px; }
+@media (max-width: 900px) { .i-grilla { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+/* fotos reales */
+.i-reales { background: var(--tinta); color: var(--pared); }
+.i-reales .i-sec { display: grid; grid-template-columns: 1fr 1.3fr; gap: clamp(30px, 5vw, 70px); align-items: center; }
+.info .i-reales h2 em { color: var(--naranja); }
+.i-reales p.i-bajada { color: #BDB7AE; font-size: 16px; line-height: 1.5; max-width: 420px; margin: 18px 0 26px; }
+.i-collage { position: relative; height: clamp(440px, 52vw, 640px); }
+.i-collage figure.i-rev, .i-collage figure.i-rev.i-in { transform: translateY(var(--y, 0px)) rotate(var(--r, 0deg)); transition: opacity .9s ease; transition-delay: var(--d, 0s); }
+.i-collage figure { position: absolute; margin: 0; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 50px -20px rgba(0, 0, 0, .7); transform: translateY(var(--y, 0px)) rotate(var(--r, 0deg)); }
+.i-collage img { width: 100%; height: 100%; object-fit: cover; }
+.i-collage figcaption { position: absolute; left: 10px; bottom: 10px; white-space: nowrap; background: var(--naranja); color: var(--tinta); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 4px; }
+.i-c1 { left: 0; top: 0; width: 46%; height: 49%; --r: -3deg; }
+.i-c2 { left: 52%; top: 3%; width: 44%; height: 53%; --r: 3deg; z-index: 2; }
+.i-c3 { left: 5%; top: 51%; width: 43%; height: 49%; --r: 2deg; z-index: 3; }
+.i-c4 { right: 0; bottom: 0; width: 42%; height: 38%; --r: -3deg; z-index: 4; }
+@media (max-width: 900px) { .i-reales .i-sec { grid-template-columns: 1fr; } .i-collage { height: 150vw; max-height: 760px; } }
+
+/* cómo pedir */
+.i-pasos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; counter-reset: p; }
+.i-pasos li { counter-increment: p; background: var(--blanco); border-radius: 18px; padding: 22px; display: grid; gap: 8px; align-content: start; min-height: 220px; position: relative; }
+.i-pasos li::before { content: counter(p); width: 50px; height: 50px; border-radius: 50%; background: var(--naranja); display: grid; place-items: center; font-weight: 800; font-size: 24px; letter-spacing: -.04em; margin-bottom: 18px; }
+.i-pasos b { font-size: 20px; letter-spacing: -.05em; text-transform: uppercase; line-height: .95; }
+.i-pasos span { font-size: 14px; color: var(--gris); line-height: 1.4; }
+@media (max-width: 900px) { .i-pasos { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .i-pasos { grid-template-columns: 1fr; } .i-pasos li { min-height: 0; grid-template-columns: 50px 1fr; column-gap: 14px; align-items: center; } .i-pasos li::before { grid-row: span 2; margin: 0; } }
+
+/* colores */
+.i-colores { display: grid; gap: 26px; }
+.i-fila b { display: block; font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 12px; }
+.i-fila b small { color: var(--gris); font-weight: 700; }
+.i-pastillas { display: flex; flex-wrap: wrap; gap: 8px; }
+.i-pastillas i { width: clamp(34px, 4vw, 46px); height: clamp(34px, 4vw, 46px); border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(20, 20, 20, .14), 0 3px 8px -3px rgba(20, 20, 20, .3); }
+
+/* final */
+.i-final { background: var(--naranja); text-align: center; overflow: hidden; position: relative; }
+.i-final .i-sec { display: grid; justify-items: center; gap: 22px; }
+.info .i-final h2 { font-size: clamp(48px, 10vw, 150px); }
+.info .i-final h2 em { color: var(--blanco); }
+.i-final p { margin: 0; font-size: 16px; max-width: 460px; line-height: 1.45; }
+.i-final .i-acc { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.i-pie { background: var(--tinta); color: #BDB7AE; padding: 28px var(--g) calc(28px + env(safe-area-inset-bottom, 0px)); display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; align-items: center; font-size: 12px; }
+.i-pie img { height: 34px; width: auto; filter: invert(1) hue-rotate(180deg) brightness(1.1); }
+
+/* aparición al bajar */
+.i-rev { opacity: 0; transform: translateY(34px); transition: opacity .8s cubic-bezier(.2, .8, .2, 1), transform .8s cubic-bezier(.2, .8, .2, 1); transition-delay: var(--d, 0s); }
+.i-rev.i-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .i-rev { opacity: 1; transform: none; transition: none; } }
+/* fondo con contraste fuerte: remeras claras sobre negro, oscuras sobre naranja */
+.i-clara figure { background: var(--tinta); }
+.i-oscura figure { background: var(--naranja); }
+.i-rem:hover figure { filter: brightness(1.06); }
+
+</style>
+<canvas id="cielo" aria-hidden="true"></canvas>
+<section class="portada" id="portada" aria-label="Presentación" hidden>
+  <header class="p-top">
+    <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
+  </header>
+  <div class="p-titulo" aria-hidden="true"><span>Remeras</span><em>con fe</em></div>
+  <div class="p-escena" id="pEscena" aria-label="Remeras destacadas. Deslizá para ver más."></div>
+  <div class="p-pie" id="pPie">
+    <p class="p-cap" aria-live="polite"><b id="pNombre">&nbsp;</b><span id="pSub">&nbsp;</span></p>
+    <div class="p-puntos" id="pPuntos" role="group" aria-label="Elegir remera destacada"></div>
+    <button class="p-pedir" id="pPedir" type="button">¿Tenés tu propio diseño? <b>Cómo pedir</b></button>
+    <button class="p-entrar" id="pEntrar" type="button">Ver todo el perchero <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>
+  </div>
+  <aside class="p-info" id="pInfo" aria-label="Detalle de la remera" hidden>
+    <button class="p-cerrar" id="pCerrar" type="button" aria-label="Volver a la portada">← Volver</button>
+    <p class="p-etq" id="pEtq"></p>
+    <h2 id="pTitulo"></h2>
+    <p class="det-sub" id="pDet"></p>
+    <div class="seg" role="group" aria-label="Corte" id="pCorte"></div>
+    <div class="colores" id="pColores" role="group" aria-label="Color"></div>
+    <div class="color-name" id="pColorName"></div>
+    <div class="p-acciones">
+      <a class="cta" id="pCta" href="#" target="_blank" rel="noopener">Consultar por WhatsApp</a>
+      <button class="p-ver" id="pVer" type="button">Ver en el perchero</button>
+    </div>
+  </aside>
+</section>
+<div class="app">
+  <header class="top">
+    <button class="nav nav-pedir" id="navPedir" type="button">Cómo pedir</button>
+    <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
+    <a class="nav" id="navContacto" href="#" target="_blank" rel="noopener">Contacto</a>
+  </header>
+
+  <main class="stage" id="stage">
+    <section class="intro">
+      <div>
+        <p class="eyebrow">Remeras personalizadas en DTF</p>
+        <h1>Elegí tu <em>remera</em></h1>
+      </div>
+      <div class="chips" role="group" aria-label="Filtrar por corte o colección">
+        <button class="chip" type="button" data-f="todo" aria-pressed="true">Todo</button>
+        <button class="chip" type="button" data-f="oversize" aria-pressed="false">Oversize</button>
+        <button class="chip" type="button" data-f="basica" aria-pressed="false">Básica</button>
+        <button class="chip chip-col" type="button" data-f="salmos_romanos" aria-pressed="false">Salmos y Romanos</button>
+      </div>
+    </section>
+
+    <div class="rack" id="rack" aria-label="Perchero de remeras. Deslizá para ver más.">
+      <div class="rod"></div>
+      <div class="track" id="track"></div>
+    </div>
+
+    <p class="caption" id="caption" aria-live="polite"><b id="capName">&nbsp;</b><span id="capHint">Deslizá el perchero · tocá una remera</span><a class="mas-abajo" href="#i-colecciones">Colecciones, cómo pedir y más ↓</a></p>
+
+    <section class="detail" id="detail" hidden aria-label="Detalle de la remera">
+      <button class="det-close" id="detClose" type="button">← Volver al perchero</button>
+      <div class="det-view" id="detView">
+        <div class="det-rod"></div>
+        <button class="arrow prev" id="prev" type="button" aria-label="Remera anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+        <div class="det-fig" id="detFig"></div>
+        <button class="arrow next" id="next" type="button" aria-label="Remera siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+      </div>
+      <div class="det-info">
+        <h2 id="detName"></h2>
+        <p class="det-sub" id="detSub"></p>
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Corte" id="segCorte"></div>
+          <div class="seg" role="group" aria-label="Lado" id="segLado"></div>
+        </div>
+        <div class="colores-wrap"><div class="colores" id="colores" role="group" aria-label="Color"></div></div>
+        <div class="color-name" id="colorName"></div>
+        <a class="cta" id="cta" href="#" target="_blank" rel="noopener">Consultar</a>
+        <div class="count" id="count"></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="aviso" id="aviso" hidden aria-label="Nueva colección">
+    <button class="aviso-x" id="avisoX" type="button" aria-label="Cerrar aviso">×</button>
+    <div class="aviso-img" aria-hidden="true"><img src="disenos/sr_christ_romanos.webp" alt="" loading="lazy"></div>
+    <div class="aviso-txt">
+      <p class="aviso-eti">Nuevo</p>
+      <p class="aviso-tit">Colección Salmos y Romanos</p>
+      <p class="aviso-sub">26 diseños en la espalda · remeras negras</p>
+      <button class="aviso-btn" id="avisoVer" type="button">Ver la colección →</button>
+    </div>
+  </aside>
+  <footer class="ticker" aria-hidden="true"><div class="ticker-in" id="ticker"></div></footer>
+</div>
+<div class="info" id="info">
+<section class="i-sec" id="i-colecciones">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Colecciones</p><h2>¿Qué estás <em>buscando?</em></h2></div>
+    <p class="i-bajada">Diseños listos para elegir en oversize o básica, o una remera hecha desde cero con tu idea.</p>
+  </div>
+  <div class="i-cols">
+    <a class="i-col i-col-fe i-rev" href="#" data-ir="todo">
+      <div><p class="i-n">18 diseños · oversize y básica</p><h3>Colección <em>fe</em></h3></div>
+      <img src="img/inicio/you_are_a_child_of_god_marfil.webp" alt="" loading="lazy" width="900" height="887">
+      <span class="i-btn i-btn-t i-ir">Ver diseños →</span>
+    </a>
+    <a class="i-col i-col-sr i-rev" style="--d:.1s" href="#" data-ir="salmos_romanos">
+      <span class="i-nuevo">Nuevo</span>
+      <div><p class="i-n">26 diseños · en la espalda · negro</p><h3>Salmos <em>y</em> Romanos</h3></div>
+      <img src="img/inicio/salmos_fuego_negro.webp" alt="" loading="lazy" width="900" height="887">
+      <span class="i-btn i-btn-n i-ir">Ver colección →</span>
+    </a>
+    <a class="i-col i-col-tu i-rev" style="--d:.2s" href="#i-como-pedir">
+      <div><p class="i-n">Tu idea, foto o logo</p><h3>Tu propio <em>diseño</em></h3></div>
+      <div class="i-hueco" aria-hidden="true">Tu<br>diseño<br>acá</div>
+      <span class="i-btn i-btn-t i-ir">Cómo pedir →</span>
+    </a>
+  </div>
+</section>
+
+<section class="i-sec" id="i-destacadas" style="padding-top:0">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Las más pedidas</p><h2>Elegí tu <em>remera</em></h2></div>
+    <p class="i-bajada">Tocá una para verla en el perchero, cambiar el color y consultar por WhatsApp.</p>
+  </div>
+  <div class="i-grilla" id="iGrilla"></div>
+  <div class="i-mas i-rev"><a class="i-btn i-btn-l" href="#" data-ir="todo">Ver todas en el perchero →</a></div>
+</section>
+
+<section class="i-reales" id="i-clientes">
+  <div class="i-sec">
+    <div class="i-rev">
+      <p class="i-eti">Hecho de verdad</p>
+      <h2>Remeras <em>reales,</em> clientes reales</h2>
+      <p class="i-bajada">Cada remera se estampa a mano en DTF, con colores que duran lavado tras lavado. Antes de estampar te mandamos la prueba del diseño para que lo apruebes.</p>
+      <a class="i-btn i-btn-n" href="#i-como-pedir">Quiero la mía</a>
+    </div>
+    <div class="i-collage" id="iCollage">
+      <figure class="i-c1 i-rev" data-par="-30"><img src="img/inicio/foto_anime.webp" alt="Remera negra con diseño anime colgada en percha" loading="lazy"><figcaption>Recién estampada</figcaption></figure>
+      <figure class="i-c2 i-rev" data-par="25" style="--d:.1s"><img src="img/inicio/foto_cliente_cafe.webp" alt="Clienta de espaldas con remera negra estampada Café" loading="lazy"><figcaption>Puesta por un cliente</figcaption></figure>
+      <figure class="i-c3 i-rev" data-par="-20" style="--d:.2s"><img src="img/inicio/foto_cliente_galatas.webp" alt="Cliente mostrando la espalda de remera marrón con Gálatas 2:20" loading="lazy"><figcaption>Puesta por un cliente</figcaption></figure>
+      <figure class="i-c4 i-rev" data-par="35" style="--d:.3s"><img src="img/inicio/foto_pedido.webp" alt="Espalda de remera negra con diseño de pedido personalizado" loading="lazy" style="background:#fff;object-fit:contain"><figcaption>Pedido personalizado</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="i-sec" id="i-como-pedir">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Tu remera en 4 pasos</p><h2>Cómo <em>pedir</em></h2></div>
+    <p class="i-bajada">¿No encontraste lo que buscabas? Hacemos tu diseño: mandanos tu idea, una foto o tu logo y lo estampamos.</p>
+  </div>
+  <ol class="i-pasos">
+    <li class="i-rev"><b>Elegí o mandá tu diseño</b><span>De nuestro catálogo o tu propia idea, foto o logo.</span></li>
+    <li class="i-rev" style="--d:.08s"><b>Elegí color y talle</b><span>22 colores en remera básica y 6 en oversize.</span></li>
+    <li class="i-rev" style="--d:.16s"><b>Confirmá por WhatsApp</b><span>Te mandamos la prueba del diseño antes de estampar.</span></li>
+    <li class="i-rev" style="--d:.24s"><b>Retirá o recibí</b><span>Cuando esté lista coordinamos el retiro o el envío.</span></li>
+  </ol>
+</section>
+
+<section class="i-sec" id="i-colores" style="padding-top:0">
+  <div class="i-sec-cab i-rev">
+    <div><p class="i-eti">Colores disponibles</p><h2>Del <em>color</em> que quieras</h2></div>
+  </div>
+  <div class="i-colores i-rev">
+    <div class="i-fila"><b>Oversize <small>· 6 colores</small></b><div class="i-pastillas" id="iOver"></div></div>
+    <div class="i-fila"><b>Básica <small>· 22 colores</small></b><div class="i-pastillas" id="iBas"></div></div>
+  </div>
+</section>
+
+<section class="i-final">
+  <div class="i-sec">
+    <p class="i-eti i-rev" style="color:var(--tinta)">¿Tenés una idea?</p>
+    <h2 class="i-rev">La hacemos <em>remera</em></h2>
+    <p class="i-rev">Escribinos por WhatsApp con tu idea, foto o logo y te respondemos con la prueba del diseño.</p>
+    <div class="i-acc i-rev">
+      <a class="i-btn i-btn-t" href="https://wa.me/595983671590?text=Hola%20Agust%C3%ADn!%20Quiero%20una%20remera%20con%20mi%20propio%20dise%C3%B1o.%20Te%20cuento%20mi%20idea%3A" target="_blank" rel="noopener">Pedir por WhatsApp</a>
+      <a class="i-btn i-btn-l" href="https://instagram.com/agustindisenos_personalizado" target="_blank" rel="noopener">Instagram</a>
+    </div>
+  </div>
+</section>
+<footer class="i-pie">
+  <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
+  <span>Remeras personalizadas en DTF · Creatividad &amp; calidad</span>
+</footer>
+</div>
+<div class="pedido" id="pedido" role="dialog" aria-modal="true" aria-labelledby="pedTit" hidden>
+  <div class="ped-fondo" id="pedFondo"></div>
+  <div class="ped-caja" tabindex="-1">
+    <button class="ped-x" id="pedX" type="button" aria-label="Cerrar">×</button>
+    <p class="ped-eti">Tu remera en 4 pasos</p>
+    <h2 id="pedTit">Cómo <em>pedir</em></h2>
+    <p class="ped-intro">¿No encontraste lo que buscabas? Hacemos tu diseño: mandanos tu idea, una foto o tu logo y lo estampamos.</p>
+    <ol class="ped-pasos">
+      <li><b>Elegí o mandá tu diseño</b><span>De nuestro catálogo o tu propia idea, foto o logo.</span></li>
+      <li><b>Elegí color y talle</b><span id="pedColores">Remera básica u oversize, en varios colores.</span></li>
+      <li><b>Confirmá por WhatsApp</b><span>Te mandamos la prueba del diseño antes de estampar.</span></li>
+      <li><b>Retirá o recibí</b><span>Cuando esté lista coordinamos el retiro o el envío.</span></li>
+    </ol>
+    <div class="ped-acciones">
+      <a class="cta" id="pedCta" href="#" target="_blank" rel="noopener">Pedir mi diseño por WhatsApp</a>
+      <button class="ped-ver" id="pedVer" type="button">Ver el catálogo</button>
+    </div>
+  </div>
+</div>
+<script>
+/* Perchero interactivo · Agustín diseños personalizados
+   Los diseños se cargan desde catalogo.json: cada diseño es un PNG/WebP sin fondo en /disenos
+   y se estampa en vivo sobre la foto de la remera del color elegido. */
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ASPECTO = { oversize: 1050 / 1064, basica: 733 / 720 };
+  const ESCALA_CORTE = { oversize: 1, basica: 0.84 }; // la básica se ve más angosta, como en la realidad
+  const SOMBRA_PAD = { oversize: 60 / 720, basica: 60 / 720 };
+
+  let CFG, DIS = [], lista = [], filtro = 'todo';
+  const TU_DISENO = { id: 'tu_diseno', pedido: true, nombre: '¿Tenés tu propio diseño?', cortes: ['oversize', 'basica'], color: 'blanco', etiqueta: 'Tu idea' };
+
+  // remera lisa con un recuadro punteado "tu diseño acá"
+  function marcarHueco(canvas, corte) {
+    const c = canvas.getContext('2d'), W = canvas.width, H = canvas.height;
+    const e = CFG.cortes[corte].estampa.frente;
+    const w = W * e.ancho, h = Math.min(H * e.alto * 0.62, w * 1.05), x = W * e.cx - w / 2, y = H * (e.top + 0.03);
+    c.save();
+    c.strokeStyle = '#FF7A00'; c.lineWidth = Math.max(2, W * 0.006); c.setLineDash([W * 0.018, W * 0.012]);
+    c.beginPath(); c.roundRect ? c.roundRect(x, y, w, h, W * 0.02) : c.rect(x, y, w, h); c.stroke();
+    c.setLineDash([]); c.fillStyle = '#FF7A00'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    const f = w * 0.15;
+    c.font = `800 ${f}px "Helvetica Neue", Helvetica, Arial, sans-serif`;
+    c.fillText('TU', W * e.cx, y + h * 0.3); c.fillText('DISEÑO', W * e.cx, y + h * 0.5); c.fillText('ACÁ', W * e.cx, y + h * 0.7);
+    c.lineWidth = Math.max(1.5, W * 0.004); const s = f * 0.32, sx = x + w - s * 1.2, sy = y + s * 1.2;   // destello
+    c.beginPath(); c.moveTo(sx - s, sy); c.lineTo(sx + s, sy); c.moveTo(sx, sy - s); c.lineTo(sx, sy + s); c.stroke();
+    c.restore();
+  }
+
+  /* ---------- imágenes y composición ---------- */
+  const imgs = new Map();
+  function img(src) {
+    if (!imgs.has(src)) imgs.set(src, new Promise((ok, ko) => {
+      const i = new Image(); i.decoding = 'async';
+      i.onload = () => ok(i); i.onerror = () => ko(new Error('No se pudo cargar ' + src)); i.src = src;
+    }));
+    return imgs.get(src);
+  }
+  async function componer(canvas, d, corte, color, lado, maxW) {
+    const base = await img(`img/${corte}/${lado}_${color}.webp`);
+    const W = Math.round(Math.min(maxW, base.naturalWidth));
+    const H = Math.round(W * base.naturalHeight / base.naturalWidth);
+    const src = lado === 'frente' ? d.frente : d.espalda;
+    let est = null;
+    if (src) {
+      const [dis, luz] = await Promise.all([img(src), img(`img/${corte}/luz_${lado}.webp`)]);
+      // medidas de estampa del corte, con ajuste propio del diseño si lo tiene (ej. un logo chico en el pecho)
+      const e = Object.assign({}, CFG.cortes[corte].estampa[lado] || CFG.cortes[corte].estampa.frente, ((d.estampa || {})[corte] || {})[lado]);
+      const ancho = dis.naturalWidth / dis.naturalHeight > 2.2;
+      const r = Math.min(W * (ancho ? e.anchoAncho : e.ancho) / dis.naturalWidth, H * e.alto / dis.naturalHeight);
+      const dw = dis.naturalWidth * r, dh = dis.naturalHeight * r;
+      const x = W * e.cx - dw / 2, y = H * (ancho ? e.topAncho : e.top);
+      const off = document.createElement('canvas'); off.width = W; off.height = H;
+      const o = off.getContext('2d'); o.imageSmoothingQuality = 'high';
+      o.drawImage(dis, x, y, dw, dh);
+      o.globalCompositeOperation = 'multiply'; o.drawImage(luz, 0, 0, W, H);   // pliegues y luz de la tela
+      o.globalCompositeOperation = 'destination-in'; o.drawImage(dis, x, y, dw, dh);
+      est = off;
+    }
+    canvas.width = W; canvas.height = H;
+    const c = canvas.getContext('2d'); c.imageSmoothingQuality = 'high';
+    c.clearRect(0, 0, W, H);
+    c.drawImage(base, 0, 0, W, H);
+    if (est) { c.globalAlpha = 0.97; c.drawImage(est, 0, 0); c.globalAlpha = 1; }
+  }
+
+  /* ---------- percha de madera + gancho ---------- */
+  // Medidas de la percha tomadas de la foto de la remera básica (relativas al ancho de la básica).
+  const PERCHA = { ancho: 0.2598, izq: -0.1371, arriba: -0.096, prop: 186 / 379 };
+  // Gancho visto de frente, como en un perchero real: un alambre recto que sube desde la percha
+  // y se curva por encima de la barra.
+  function gancho(alto, rc, rodH) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const s = document.createElementNS(ns, 'svg');
+    const ancho = rodH * 2.6;
+    s.setAttribute('viewBox', `0 0 ${ancho} ${alto}`); s.setAttribute('class', 'hook');
+    s.style.height = alto + 'px'; s.style.width = ancho + 'px';
+    const cx = ancho / 2 - rodH * 0.35, r = rodH * 0.62, top = rc - r, grosor = Math.max(2, rodH * 0.26);
+    s.innerHTML = `<defs><linearGradient id="gm" x1="0" x2="1"><stop offset="0" stop-color="#55534F"/><stop offset=".5" stop-color="#C9C7C2"/><stop offset="1" stop-color="#6E6C68"/></linearGradient></defs>
+      <path d="M${cx} ${alto} V${rc + r * 0.2} C${cx} ${top - r * 0.9} ${cx + r * 1.7} ${top - r * 0.9} ${cx + r * 1.55} ${rc + r * 0.35}" fill="none" stroke="url(#gm)" stroke-width="${grosor}" stroke-linecap="round"/>`;
+    return s;
+  }
+  function geometria(w, corte) {
+    const swB = w * ESCALA_CORTE.basica;
+    const rodH = Math.max(8, Math.min(14, w * 0.036));
+    const rc = rodH * 1.1;                            // centro de la barra, desde arriba de la prenda
+    const hookH = rc + rodH * 1.7;                    // gancho corto: la percha queda justo debajo de la barra
+    const sw = w * ESCALA_CORTE[corte];
+    const sh = sw * ASPECTO[corte];
+    const shirtTop = hookH - PERCHA.arriba * swB;
+    return { swB, hookH, rodH, rc, sw, sh, shirtTop, alto: shirtTop + sh };
+  }
+  // Arma la percha + remera. Devuelve el nodo .swing y el canvas.
+  // Oscurece un color hex (k entre 0 y 1).
+  function oscurecer(hex, k) {
+    const n = parseInt(hex.slice(1), 16), f = (v) => Math.round(v * (1 - k));
+    return `rgb(${f(n >> 16)},${f((n >> 8) & 255)},${f(n & 255)})`;
+  }
+  // grosor: { capas, hex, color } → capas de tela detrás del frente, para que de costado tenga volumen.
+  function prenda(w, corte, grosor) {
+    const g = geometria(w, corte);
+    const swing = document.createElement('div'); swing.className = 'swing';
+    swing.style.width = w + 'px'; swing.style.height = g.alto + 'px';
+    swing.style.setProperty('--pivot', g.rc + 'px');
+    swing.appendChild(gancho(g.hookH + 2, g.rc, g.rodH));
+    const madera = new Image(); madera.className = 'madera'; madera.alt = ''; madera.src = 'img/percha.webp';
+    const mw = PERCHA.ancho * g.swB;
+    madera.style.width = mw + 'px'; madera.style.left = (w / 2 + PERCHA.izq * g.swB) + 'px'; madera.style.top = g.hookH + 'px';
+    swing.appendChild(madera);
+    const shirt = document.createElement('div'); shirt.className = 'shirt';
+    shirt.style.width = g.sw + 'px'; shirt.style.top = g.shirtTop + 'px';
+    const pad = SOMBRA_PAD[corte];
+    const sombra = new Image(); sombra.className = 'sombra'; sombra.alt = ''; sombra.src = `img/${corte}/sombra.webp`;
+    sombra.style.width = g.sw * (1 + 2 * pad) + 'px';
+    sombra.style.left = (-pad * g.sw + g.sw * 0.06) + 'px'; sombra.style.top = (-pad * g.sw + g.sw * 0.07) + 'px';
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(g.sw); canvas.height = Math.round(g.sh);
+    shirt.append(sombra);
+    if (grosor && grosor.capas) {
+      const prof = g.sw * 0.075;                       // profundidad de la remera colgada (pecho + espalda + percha)
+      const url = `url(img/${corte}/frente_${grosor.color}.webp)`;
+      for (let k = grosor.capas; k >= 1; k--) {
+        const c = document.createElement('div'); c.className = 'capa';
+        c.style.width = g.sw + 'px'; c.style.height = g.sh + 'px';
+        c.style.background = oscurecer(grosor.hex, 0.1 + 0.22 * (k / grosor.capas));
+        c.style.webkitMaskImage = c.style.maskImage = url;
+        // las capas del fondo se encogen un poco: la tela se cierra hacia la espalda
+        const esc = 1 - 0.012 * (k / grosor.capas);
+        c.style.transform = `translateZ(${-prof * k / grosor.capas}px) scale(${esc}, ${1 - 0.01 * k / grosor.capas})`;
+        shirt.appendChild(c);
+      }
+    }
+    shirt.append(canvas); swing.appendChild(shirt);
+    return { swing, canvas, hookH: g.hookH, sw: g.sw, shirt, g };
+  }
+  /* ---------- péndulo ---------- */
+  const pend = () => ({ a: 0, w: 0 });
+  function pasoPendulo(p, dt, empuje) {
+    p.w += (-55 * p.a - 4.2 * p.w + empuje) * dt;
+    p.a += p.w * dt;
+    if (p.a > 16) { p.a = 16; p.w *= -0.3; } if (p.a < -16) { p.a = -16; p.w *= -0.3; }
+    return Math.abs(p.a) > 0.02 || Math.abs(p.w) > 0.05;
+  }
+
+  /* ---------- perchero ---------- */
+  // Como en una tienda: las remeras cuelgan de costado y la que señalás (o la del centro, en el celu)
+  // gira y se pone de frente, abriéndose lugar entre las demás.
+  const rack = $('#rack'), track = $('#track');
+  let topOff = 0, items = [], W = 0, S = 0, E = 0, x = 0, v = 0, vPrev = 0, minX = 0, maxX = 0, viewW = 0;
+  let drag = null, movido = false, rafOn = false, last = 0, hoverIdx = -1, activo = 0;
+  const GIRO = 66; // grados de las remeras que están de costado
+
+  function corteDe(d) { return CFG.cortes[filtro] && d.cortes.includes(filtro) ? filtro : d.cortes[0]; }
+  // lado que se muestra primero: el que tiene el diseño (la colección Salmos y Romanos va en la espalda)
+  function ladoDe(d) { return d.lado || (!d.frente && d.espalda ? 'espalda' : 'frente'); }
+  // colores permitidos de un diseño en un corte (algunas colecciones van solo en negro)
+  function coloresDe(d, corte) { const cs = CFG.cortes[corte].colores; return d.colores ? cs.filter(c => d.colores.includes(c.id)) : cs; }
+  function colorDe(d, corte) {
+    const ids = coloresDe(d, corte).map(c => c.id);
+    const propio = (d.colorPor || {})[corte];   // color inicial distinto según el corte
+    if (ids.includes(propio)) return propio;
+    if (ids.includes(d.color)) return d.color;
+    const parecido = (CFG.parecidos || {})[d.color];   // ej.: verde musgo (oversize) → verde botella (básica)
+    return ids.includes(parecido) ? parecido : (ids.includes('blanco') ? 'blanco' : ids[0]);
+  }
+
+  // Mientras se ve la portada, las remeras del perchero se preparan de a una y sin apuro,
+  // para que el celular dedique la fuerza a la animación de la portada.
+  let pendientes = [], goteando = false;
+  function luego(fn) { if (document.body.classList.contains('con-portada')) pendientes.push(fn); else fn(); }
+  function soltarPendientes() { const p = pendientes; pendientes = []; p.forEach(fn => fn()); }
+  async function goteo() {
+    if (goteando) return; goteando = true;
+    while (pendientes.length && document.body.classList.contains('con-portada')) {
+      await pendientes.shift()();
+      await new Promise(ok => (window.requestIdleCallback ? requestIdleCallback(ok, { timeout: 900 }) : setTimeout(ok, 250)));
+    }
+    goteando = false;
+  }
+  function armarPerchero() {
+    // las colecciones (ej. Salmos y Romanos) van aparte: solo aparecen con su propio botón
+    const esColeccion = DIS.some(d => d.coleccion === filtro);
+    lista = DIS.filter(d => esColeccion ? d.coleccion === filtro : !d.coleccion && (filtro === 'todo' || d.cortes.includes(filtro)));
+    if (!esColeccion) lista.push(TU_DISENO);   // al final: remera lisa para pedir un diseño propio
+    const h = rack.clientHeight; viewW = rack.clientWidth;
+    const g1 = { alto: geometria(300, 'oversize').alto / 300 }; // proporción alto/ancho
+    W = Math.max(130, Math.min(360, (h - 16) / g1.alto, viewW * (viewW < 600 ? 0.62 : 0.26)));
+    S = W * 0.3; E = W * 0.86;
+    const g = geometria(W, 'oversize');
+    topOff = Math.max(6, (h - g.alto) * 0.4);
+    rack.style.setProperty('--rod-y', (topOff + g.rc - g.rodH / 2) + 'px');
+    rack.style.setProperty('--rod-h', g.rodH + 'px');
+    track.innerHTML = ''; items = [];
+    lista.forEach((d, i) => {
+      const corte = corteDe(d), color = colorDe(d, corte);
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'item';
+      b.setAttribute('aria-label', `${d.nombre}, corte ${CFG.cortes[corte].nombre}. Ver detalle`);
+      const hex = (CFG.cortes[corte].colores.find(c => c.id === color) || {}).hex || '#cccccc';
+      const { swing, canvas, shirt } = prenda(W, corte, { capas: 0, hex, color }); // sin capas de grosor (Agustín prefirió sin volumen)
+      b.style.width = W + 'px'; b.appendChild(swing); track.appendChild(b);
+      if (d.etiqueta) { const t = document.createElement('span'); t.className = 'etiqueta'; t.textContent = d.etiqueta; shirt.appendChild(t); }
+      luego(() => componer(canvas, d, corte, color, ladoDe(d), Math.min(1100, Math.ceil(W * ESCALA_CORTE[corte] * Math.max(2, devicePixelRatio || 1)))).then(() => { if (d.pedido) marcarHueco(canvas, corte); }).catch(console.warn));
+      const it = { el: b, swing, d, corte, color, i, p: pend(), o: 0, cx: 0 };
+      if (d.pedido) { b.classList.add('item-pedido'); b.setAttribute('aria-label', 'Pedí una remera con tu propio diseño. Ver cómo pedir'); }
+      b.addEventListener('click', (e) => { if (movido) { e.preventDefault(); return; } abrir(i); });
+      canvas.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse' && !drag && hoverIdx !== i) { hoverIdx = i; it.p.w += 30; kick(); } });
+      b.addEventListener('focus', () => { centrar(i); });
+      items.push(it);
+    });
+    const n = lista.length;
+    maxX = viewW / 2 - (S + E) / 2;
+    minX = viewW / 2 - ((n - 1) * S + (S + E) / 2);
+    if (!armado) { activo = Math.min(n - 1, viewW < 600 ? 1 : Math.floor(n / 2) > 3 ? 3 : 0); x = viewW / 2 - (activo * S + (S + E) / 2) + 260; v = 0; }
+    x = Math.min(maxX + 300, Math.max(minX - 300, x));
+    items.forEach((it, k) => { it.o = k === activo ? 1 : 0; it.p.a = reduce ? 0 : (k % 2 ? 5 : -5); });
+    armado = true;
+    kick();
+  }
+  let armado = false;
+  rack.addEventListener('pointerleave', () => { hoverIdx = -1; kick(); });
+
+  // posición del centro de cada remera según cuánto está abierta cada una
+  function layout() {
+    let acc = x;
+    for (const it of items) { const ancho = S + E * it.o; it.cx = acc + ancho / 2; acc += ancho; }
+  }
+  function centrar(i) {
+    hoverIdx = -1; activo = i;
+    const objetivo = viewW / 2 - (i * S + (S + E) / 2);
+    v = (objetivo - x) * 5; kick();
+  }
+
+  function kick() { if (!rafOn) { rafOn = true; last = performance.now(); requestAnimationFrame(loop); } }
+  function loop(t) {
+    const dt = Math.min(0.033, (t - last) / 1000); last = t;
+    let vivo = false;
+    layout();
+    // cuál remera está de frente: la señalada con el mouse o la más cercana al centro
+    if (hoverIdx >= 0) activo = hoverIdx;
+    else if (!drag || drag.h) {
+      let mejor = 1e9;
+      for (const it of items) { const dd = Math.abs(it.cx - viewW / 2); if (dd < mejor) { mejor = dd; activo = it.i; } }
+    }
+    if (!drag) {
+      x += v * dt;
+      v *= Math.pow(0.05, dt);                                 // inercia
+      if (x > maxX) { v += (maxX - x) * 110 * dt; v *= 0.86; } // rebote suave en los bordes
+      if (x < minX) { v += (minX - x) * 110 * dt; v *= 0.86; }
+      // al soltar, la remera del centro se acomoda (no cuando el mouse está señalando una)
+      if (hoverIdx < 0 && Math.abs(v) < 220 && items[activo]) {
+        const diff = viewW / 2 - items[activo].cx;
+        x += diff * Math.min(1, dt * 7);
+        if (Math.abs(diff) > 0.6) vivo = true;
+      }
+      if (Math.abs(v) > 3) vivo = true; else v = 0;
+    } else vivo = true;
+    const acc = (v - vPrev) / Math.max(dt, 0.001); vPrev = v;
+    layout();
+    for (const it of items) {
+      const meta = it.i === activo ? 1 : 0;
+      it.o += (meta - it.o) * Math.min(1, dt * (reduce ? 30 : 8));
+      if (Math.abs(meta - it.o) > 0.002) vivo = true; else it.o = meta;
+      const lado = it.i < activo ? 1 : -1;
+      const ry = (1 - it.o) * GIRO * lado;
+      const empuje = reduce ? 0 : Math.max(-700, Math.min(700, -acc * 0.04 - v * 0.015));
+      if (pasoPendulo(it.p, dt, empuje)) vivo = true;
+      // Sin 3D real: Safari en iPhone dibuja borrosas las capas 3D. El giro de costado se simula
+      // en 2D (se angosta y se inclina un poco), y la remera de frente queda sin ninguna escala.
+      const x = (it.cx - W / 2).toFixed(1);
+      if (Math.abs(ry) < 0.4) it.el.style.transform = `translate(${x}px,${topOff}px)`;
+      else {
+        const sx = Math.max(0.12, Math.cos(ry * Math.PI / 180));
+        it.el.style.transform = `translate(${x}px,${topOff}px) skewY(${(-lado * (1 - it.o) * 6).toFixed(2)}deg) scaleX(${sx.toFixed(3)})`;
+      }
+      it.el.style.zIndex = 500 - Math.abs(it.i - activo) * 2 + Math.round(it.o);
+      it.swing.style.transform = `rotate(${it.p.a}deg)`;
+      it.el.classList.toggle('frente', it.o > 0.5);
+    }
+    if (items[activo]) $('#capName').textContent = items[activo].d.nombre;
+    if (items[activo] && detail.hidden) Cielo.tono(hexDe(items[activo].corte, items[activo].color));
+    if (vivo) requestAnimationFrame(loop); else rafOn = false;
+  }
+  rack.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0) return;
+    drag = { x0: e.clientX, y0: e.clientY, xs: x, t: performance.now(), lx: e.clientX, lt: performance.now(), id: e.pointerId, h: null };
+    movido = false; kick();
+  });
+  window.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+    if (drag.h === null && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) drag.h = Math.abs(dx) > Math.abs(dy);
+    if (!drag.h) return;
+    movido = true; rack.classList.add('drag');
+    let nx = drag.xs + dx;
+    if (nx > maxX) nx = maxX + (nx - maxX) * 0.35;
+    if (nx < minX) nx = minX + (nx - minX) * 0.35;
+    const now = performance.now(), dtm = Math.max(1, now - drag.lt);
+    v = v * 0.4 + ((e.clientX - drag.lx) / dtm * 1000) * 0.6;
+    drag.lx = e.clientX; drag.lt = now; x = nx;
+  });
+  const soltar = (e) => {
+    if (!drag || (e && e.pointerId !== drag.id)) return;
+    if (performance.now() - drag.lt > 90) v = 0;
+    drag = null; rack.classList.remove('drag'); kick();
+    setTimeout(() => { movido = false; }, 0);
+  };
+  window.addEventListener('pointerup', soltar);
+  window.addEventListener('pointercancel', soltar);
+  rack.addEventListener('wheel', (e) => {
+    const vertical = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+    const d = vertical ? e.deltaY : e.deltaX;
+    if (minX === maxX) return;
+    // con la rueda vertical: si el perchero ya llegó al final (o la página está bajada), se deja bajar la página
+    if (vertical && (window.scrollY > 2 || (d > 0 && x <= minX + 1) || (d < 0 && x >= maxX - 1))) return;
+    e.preventDefault(); x -= d; x = Math.min(maxX + 40, Math.max(minX - 40, x)); v = -d * 18; kick();
+  }, { passive: false });
+  rack.addEventListener('keydown', (e) => {
+    const i = items.findIndex(it => it.el === document.activeElement);
+    if (i < 0) return;
+    if (e.key === 'ArrowRight' && items[i + 1]) { items[i + 1].el.focus(); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' && items[i - 1]) { items[i - 1].el.focus(); e.preventDefault(); }
+  });
+
+  document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+    filtro = b.dataset.f;
+    document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b ? 'true' : 'false'));
+    armado = false; armarPerchero();
+  }));
+
+  /* ---------- detalle ---------- */
+  const stage = $('#stage'), detail = $('#detail'), detFig = $('#detFig'), detView = $('#detView');
+  let sel = null, fig = null, figP = pend(), figRaf = false;
+
+  function animFig(t0) {
+    let lt = t0;
+    const f = (t) => {
+      const dt = Math.min(0.033, (t - lt) / 1000); lt = t;
+      const vivo = pasoPendulo(figP, dt, 0);
+      if (fig) fig.swing.style.transform = `rotate(${figP.a}deg)`;
+      if (vivo && !detail.hidden) requestAnimationFrame(f); else figRaf = false;
+    };
+    if (!figRaf) { figRaf = true; requestAnimationFrame(f); }
+  }
+  function empujar(f) { if (reduce) return; figP.w += f; animFig(performance.now()); }
+
+  function medidasFig(corte) {
+    const vh = detView.clientHeight, vw = detView.clientWidth;
+    const flechas = vw < 600 ? 84 : 140;
+    let w = Math.min(520, (vh * 0.98) / (geometria(400, corte).alto / 400), vw - flechas);
+    return Math.max(120, w);
+  }
+  async function pintarFig(dir = 0) {
+    const d = lista[sel.i];
+    const w = medidasFig(sel.corte);
+    const nuevo = prenda(w, sel.corte);
+    await componer(nuevo.canvas, d, sel.corte, sel.color, sel.lado, Math.round(w * (devicePixelRatio > 1 ? 2 : 1.4))).catch(console.warn);
+    detFig.innerHTML = ''; detFig.appendChild(nuevo.swing);
+    detFig.style.width = w + 'px'; detFig.style.marginLeft = (-w / 2) + 'px';
+    detView.style.setProperty('--rod-y', (nuevo.g.rc - nuevo.g.rodH / 2) + 'px');
+    detView.style.setProperty('--rod-h', nuevo.g.rodH + 'px');
+    fig = nuevo;
+    if (dir && !reduce) nuevo.swing.animate([{ transform: `translateX(${dir * 60}%) rotate(${dir * -10}deg)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  }
+
+  function textos() {
+    const d = lista[sel.i], cfgC = CFG.cortes[sel.corte];
+    $('#detName').textContent = d.nombre;
+    $('#detSub').textContent = d.detalle || '';
+    $('#count').textContent = `${String(sel.i + 1).padStart(2, '0')} / ${String(lista.length).padStart(2, '0')}`;
+    // corte
+    const sc = $('#segCorte'); sc.innerHTML = '';
+    Object.entries(CFG.cortes).forEach(([id, c]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = c.nombre;
+      b.setAttribute('aria-pressed', id === sel.corte ? 'true' : 'false');
+      b.disabled = !d.cortes.includes(id);
+      b.onclick = () => { if (id === sel.corte) return; sel.corte = id; sel.color = colorDe({ color: sel.color, colores: d.colores }, id); if (!CFG.cortes[id].lados.includes(sel.lado)) sel.lado = 'frente'; textos(); pintarFig().then(() => empujar(60)); };
+      sc.appendChild(b);
+    });
+    // lado
+    const sl = $('#segLado'); sl.innerHTML = '';
+    ['frente', 'espalda'].forEach(l => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = l === 'frente' ? 'Frente' : 'Espalda';
+      b.setAttribute('aria-pressed', l === sel.lado ? 'true' : 'false');
+      b.disabled = !cfgC.lados.includes(l);
+      if (b.disabled) b.title = 'Foto de espalda próximamente';
+      b.onclick = () => girar(l);
+      sl.appendChild(b);
+    });
+    // colores
+    const cs = $('#colores'); cs.innerHTML = '';
+    coloresDe(d, sel.corte).forEach(c => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'tag';
+      b.style.setProperty('--c', c.hex); b.setAttribute('aria-label', c.nombre); b.title = c.nombre;
+      b.setAttribute('aria-pressed', c.id === sel.color ? 'true' : 'false');
+      b.onclick = () => { sel.color = c.id; textos(); pintarFig().then(() => empujar(45)); };
+      cs.appendChild(b);
+      if (c.id === sel.color) requestAnimationFrame(() => b.scrollIntoView({ block: 'nearest', inline: 'center' }));
+    });
+    const col = cfgC.colores.find(c => c.id === sel.color);
+    if (col) Cielo.tono(col.hex);
+    $('#colorName').textContent = `Color: ${col ? col.nombre : ''}`;
+    // contacto
+    const msg = `Hola Agustín! Me interesa la remera "${d.nombre}" en corte ${cfgC.nombre}, color ${col ? col.nombre : ''}.`;
+    const cta = $('#cta');
+    if (CFG.whatsapp) { cta.href = `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}`; cta.textContent = 'Consultar por WhatsApp'; }
+    else { cta.href = `https://ig.me/m/${CFG.instagram}`; cta.textContent = 'Consultar por Instagram'; }
+  }
+
+  async function girar(l) {
+    if (l === sel.lado) return;
+    sel.lado = l; textos();
+    if (reduce || !fig) return pintarFig();
+    await fig.swing.animate([{ transform: 'perspective(900px) rotateY(0)' }, { transform: 'perspective(900px) rotateY(90deg)' }], { duration: 220, easing: 'ease-in' }).finished;
+    await pintarFig();
+    fig.swing.animate([{ transform: 'perspective(900px) rotateY(-90deg)' }, { transform: 'perspective(900px) rotateY(0)' }], { duration: 260, easing: 'ease-out' });
+  }
+
+  async function abrir(i) {
+    const d = lista[i], it = items[i];
+    if (d.pedido) return Pedido.abrir();
+    if (window.scrollY > 0) window.scrollTo(0, 0);
+    document.body.classList.add('quieto');
+    sel = { i, corte: it ? it.corte : d.cortes[0], color: it ? it.color : d.color, lado: ladoDe(d) };
+    const desde = it ? it.el.querySelector('canvas').getBoundingClientRect() : null;
+    detail.hidden = false; stage.classList.add('open');
+    textos(); await pintarFig();
+    figP = pend(); figP.a = reduce ? 0 : -7; animFig(performance.now());
+    if (desde && !reduce) {
+      const hasta = fig.canvas.getBoundingClientRect();
+      const s = desde.width / hasta.width;
+      fig.swing.animate([
+        { transform: `translate(${desde.left - hasta.left}px, ${desde.top - hasta.top}px) scale(${s})`, transformOrigin: '0 0' },
+        { transform: 'none', transformOrigin: '0 0' }], { duration: 480, easing: 'cubic-bezier(.2,.8,.2,1)' });
+      detail.querySelector('.det-info').animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 120, fill: 'backwards' });
+    }
+    try { history.replaceState(null, '', '#' + d.id.replace(/_/g, '-')); } catch (e) {}
+    $('#detClose').focus({ preventScroll: true });
+  }
+  function cerrar() {
+    if (detail.hidden) return;
+    const i = sel ? sel.i : -1;
+    detail.hidden = true; stage.classList.remove('open'); fig = null;
+    if ($('#pedido').hidden) document.body.classList.remove('quieto');
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    if (items[i]) { centrar(i); items[i].p.w += 70; kick(); items[i].el.focus({ preventScroll: true }); }
+  }
+  function mover(dir) {
+    if (!sel) return;
+    let n = (sel.i + dir + lista.length) % lista.length;
+    if (lista[n].pedido) n = (n + dir + lista.length) % lista.length;   // las flechas saltean la tarjeta "tu diseño"
+    const d = lista[n];
+    const corte = d.cortes.includes(sel.corte) ? sel.corte : d.cortes[0];
+    sel = { i: n, corte, color: colorDe(d, corte), lado: ladoDe(d) };
+    textos(); pintarFig(dir).then(() => empujar(dir * -90));
+  }
+  $('#prev').onclick = () => mover(-1);
+  $('#next').onclick = () => mover(1);
+  $('#detClose').onclick = cerrar;
+  document.addEventListener('keydown', (e) => {
+    if (detail.hidden || !$('#pedido').hidden) return;
+    if (e.key === 'Escape') cerrar();
+    if (e.key === 'ArrowRight' && !e.target.closest('.colores')) mover(1);
+    if (e.key === 'ArrowLeft' && !e.target.closest('.colores')) mover(-1);
+  });
+  // deslizar con el dedo en el detalle
+  let sw = null;
+  detView.addEventListener('pointerdown', (e) => { if (!e.target.closest('.arrow')) sw = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+  detView.addEventListener('pointermove', (e) => { if (sw && fig && !reduce) { const dx = e.clientX - sw.x; figP.a = Math.max(-12, Math.min(12, dx / 14)); fig.swing.style.transform = `translateX(${dx * 0.25}px) rotate(${figP.a}deg)`; } });
+  const finSwipe = (e) => {
+    if (!sw) return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y; sw = null;
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) mover(dx < 0 ? 1 : -1);
+    else { if (fig) fig.swing.style.transform = ''; animFig(performance.now()); }
+  };
+  detView.addEventListener('pointerup', finSwipe);
+  detView.addEventListener('pointercancel', finSwipe);
+
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { armado = true; armarPerchero(); if (!detail.hidden) pintarFig(); }, 150); });
+
+  /* ---------- cielo de atardecer que toma el tono de la remera ---------- */
+  const Cielo = (() => {
+    const cv = document.getElementById('cielo');
+    if (!cv || !cv.getContext) return { tono() {} };
+    const ctx = cv.getContext('2d');
+    const NW = 1200, NH = 640;
+    const mk = () => { const c = document.createElement('canvas'); c.width = NW; c.height = NH; return c; };
+    const mLuz = mk(), mSom = mk();
+    const cl = mLuz.getContext('2d'), cs = mSom.getContext('2d');
+    let semilla = 7; const rnd = () => (semilla = (semilla * 16807) % 2147483647) / 2147483647;
+    // nubes hechas de "copos" redondos agrupados, con la base más plana; se repiten en X sin corte
+    function copo(c, x, y, rx, ry, a) {
+      for (const dx of [-NW, 0, NW]) {
+        c.save(); c.translate(x + dx, y); c.scale(1, ry / rx);
+        const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+        g.addColorStop(0, `rgba(255,255,255,${a})`); g.addColorStop(0.55, `rgba(255,255,255,${a * 0.75})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+        c.fillStyle = g; c.beginPath(); c.arc(0, 0, rx, 0, Math.PI * 2); c.fill(); c.restore();
+      }
+    }
+    function nube(cx, cy, ancho, alto, n) {
+      for (let k = 0; k < n; k++) {
+        const t = rnd(), x = cx + (t - 0.5) * ancho, hump = Math.sin(t * Math.PI);
+        const r = (0.35 + rnd() * 0.65) * alto * (0.5 + hump * 0.8);
+        const y = cy - hump * alto * 0.45 * rnd();
+        copo(cs, x, y - r * 0.28, r, r * 0.8, 0.55);     // sombra: arriba del copo
+        copo(cl, x, y + r * 0.12, r * 0.92, r * 0.62, 0.8); // luz: abajo, donde pega el sol
+      }
+    }
+    // banco de nubes bajas (cerca del horizonte) y algunas más chicas arriba
+    for (let k = 0; k < 9; k++) nube(rnd() * NW, NH * (0.78 + rnd() * 0.16), 220 + rnd() * 260, 70 + rnd() * 60, 26);
+    for (let k = 0; k < 7; k++) nube(rnd() * NW, NH * (0.42 + rnd() * 0.22), 160 + rnd() * 200, 40 + rnd() * 34, 16);
+    for (let k = 0; k < 6; k++) { // jirones altos, alargados
+      const x = rnd() * NW, y = NH * (0.08 + rnd() * 0.2);
+      for (let q = 0; q < 10; q++) copo(cl, x + (rnd() - 0.5) * 260, y + (rnd() - 0.5) * 14, 40 + rnd() * 50, 7 + rnd() * 6, 0.35);
+    }
+    // nubes teñidas: una por máscara, y solo se vuelven a teñir si cambió el color (ahorra mucho en celulares)
+    const teñidas = new Map();
+    function teñir(m, col) {
+      let t = teñidas.get(m);
+      if (!t) { const cv2 = mk(); t = { cv: cv2, c: cv2.getContext('2d'), col: null }; teñidas.set(m, t); }
+      if (t.col === col) return t.cv;
+      t.col = col; const tc = t.c;
+      tc.globalCompositeOperation = 'source-over'; tc.clearRect(0, 0, NW, NH);
+      tc.fillStyle = col; tc.fillRect(0, 0, NW, NH);
+      tc.globalCompositeOperation = 'destination-in'; tc.drawImage(m, 0, 0);
+      return t.cv;
+    }
+    // paleta a partir del color de la remera (siempre clara, para que el texto negro se lea)
+    function hsl(hex) {
+      const n = parseInt(hex.slice(1), 16); let r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let h = 0, s = 0;
+      if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn);
+        h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+      return [h, s, l];
+    }
+    function paleta(hex) {
+      const [h, s, l] = hsl(hex || '#DAC7AB');
+      if (s < 0.14 || (l < 0.16 && s < 0.4) || (l > 0.78 && s < 0.6)) {
+        // neutros (negro, blanco, gris, marfil, beige): atardecer naranja de la marca
+        const oscuro = l < 0.3 ? 1 : 0;
+        return [[20 - oscuro * 8, 72, 72 - oscuro * 6], [28, 86, 79], [38, 92, 88], [32, 100, 96], [345 + oscuro * 10, 34, 74 - oscuro * 8]];
+      }
+      const mez = (a, b, t) => a + (((b - a + 540) % 360) - 180) * t;
+      return [[h, 50, 66], [h, 60, 77], [h, 58, 88], [h, 70, 96], [mez(h, h + 25, 1), 26, 72]];
+    }
+    let actual = paleta(), destino = actual, desde = actual, t0 = 0, dur = 1;
+    const lerpH = (a, b, t) => a + (((b - a + 540) % 360) - 180) * t;
+    function mezcla(p, q, t) { return p.map((c, i) => [lerpH(c[0], q[i][0], t), c[1] + (q[i][1] - c[1]) * t, c[2] + (q[i][2] - c[2]) * t]); }
+    const css = (c) => `hsl(${c[0].toFixed(1)} ${c[1].toFixed(1)}% ${c[2].toFixed(1)}%)`;
+    let offset = 0, last = 0, ultimoHex = null;
+    function tamaño() {
+      const r = Math.min(1, 640 / Math.max(innerWidth, 1));
+      cv.width = Math.round(innerWidth * r); cv.height = Math.round(innerHeight * r);
+    }
+    function dibujar() {
+      const W = cv.width, H = cv.height;
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, css(actual[0])); g.addColorStop(0.55, css(actual[1])); g.addColorStop(1, css(actual[2]));
+      ctx.globalCompositeOperation = 'source-over'; ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      // resplandor del sol detrás del horizonte
+      const sol = ctx.createRadialGradient(W * 0.5, H * 0.95, 0, W * 0.5, H * 0.95, H * 0.7);
+      sol.addColorStop(0, css([actual[3][0], 100, 97]).replace(')', ' / .75)')); sol.addColorStop(1, css(actual[2]).replace(')', ' / 0)'));
+      ctx.fillStyle = sol; ctx.fillRect(0, 0, W, H);
+      const ch = H * 1.0, cw = ch * NW / NH, ox = -((offset % 1) * cw);
+      for (const [m, col, a] of [[mSom, actual[4], 0.75], [mLuz, actual[3], 0.92]]) {
+        const tt = teñir(m, css(col)); ctx.globalAlpha = a;
+        for (let x = ox; x < W; x += cw) ctx.drawImage(tt, x, H - ch, cw, ch);
+      }
+      ctx.globalAlpha = 1;
+    }
+    function frame(t) {
+      const dt = Math.min(0.1, (t - (last || t)) / 1000); last = t;
+      if (t0) { const k = Math.min(1, (t - t0) / (dur * 1000)); const e = k * k * (3 - 2 * k); actual = mezcla(desde, destino, e); if (k >= 1) t0 = 0; }
+      if (!reduce) offset += dt * 0.004;
+      // se redibuja seguido solo mientras cambia de tono; si no, unas 8 veces por segundo (ahorra batería y memoria)
+      const tapado = document.hidden || document.body.classList.contains('con-portada');
+      if (!tapado && (t0 || t - (frame.ult || 0) > 120)) { frame.ult = t; dibujar(); }
+      requestAnimationFrame(frame);
+    }
+    tamaño(); addEventListener('resize', tamaño);
+    requestAnimationFrame(frame);
+    return {
+      tono(hex) {
+        if (!hex || hex === ultimoHex) return; ultimoHex = hex;
+        desde = actual; destino = paleta(hex); t0 = performance.now(); dur = reduce ? 0.01 : 1.1;
+      }
+    };
+  })();
+  function hexDe(corte, color) { return ((CFG.cortes[corte].colores.find(c => c.id === color)) || {}).hex; }
+
+  /* ---------- portada: las remeras destacadas en abanico (catalogo.json → "portada") ---------- */
+  // Al entrar, 5 remeras apoyadas y encimadas en abanico. Se deslizan con el scroll, el dedo o las flechas,
+  // y solas cada pocos segundos. Al tocar la del frente se agranda y aparece su ficha con colores y WhatsApp.
+  const Portada = (() => {
+    const el = $('#portada'), esc = $('#pEscena'), info = $('#pInfo');
+    let P = [], N = 0, c = 0, ct = 0, zoomK = -1, raf = 0, last = 0, toque = 0, auto = 0, foco = -1, medida = null, drag = null, ruedaT = 0;
+    const VELOCIDAD = 0.42;   // remeras por segundo que pasan solas
+    const visible = () => !el.hidden && !el.classList.contains('salir');
+    const envolver = (r) => ((r % N) + N + N / 2) % N - N / 2;      // distancia más corta en el abanico circular
+
+    function medir() {
+      const vw = innerWidth, eh = esc.clientHeight, movil = vw < 760;
+      const Wc = movil ? Math.min(vw * 0.74, eh * 0.62) : Math.min(eh * 0.8, vw * 0.34);
+      const ZW = movil ? Math.min(vw * 0.86, 520) : Math.min(innerHeight * 0.76, vw * 0.44, 980);
+      // en compu, remera y ficha forman un bloque centrado (antes la ficha quedaba muy a la derecha)
+      const infoW = Math.min(560, Math.max(340, vw * 0.3)), gap = Math.max(24, vw * 0.035);
+      return { vw, eh, movil, Wc, ZW, infoW, gap, EW: Math.max(Wc, ZW), sp: Wc * (movil ? 0.42 : 0.5) };
+    }
+    function armar() {
+      medida = medir(); esc.innerHTML = '';
+      const { EW } = medida, pad = SOMBRA_PAD.oversize;
+      P.forEach((p, k) => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'p-item';
+        b.style.width = EW + 'px'; b.setAttribute('aria-label', `${p.d.nombre}. Ver detalle`);
+        const shirt = document.createElement('div'); shirt.className = 'shirt'; shirt.style.width = EW * ESCALA_CORTE[p.corte] + 'px'; shirt.style.margin = '0 auto';
+        const sw = EW * ESCALA_CORTE[p.corte];
+        const sombra = new Image(); sombra.className = 'sombra'; sombra.alt = ''; sombra.src = `img/${p.corte}/sombra.webp`;
+        sombra.style.width = sw * (1 + 2 * pad) + 'px'; sombra.style.left = (-pad * sw + sw * 0.05) + 'px'; sombra.style.top = (-pad * sw + sw * 0.06) + 'px';
+        const canvas = document.createElement('canvas'); canvas.width = Math.round(sw); canvas.height = Math.round(sw * ASPECTO[p.corte]);
+        shirt.append(sombra, canvas); b.appendChild(shirt);
+        if (p.nueva) { const t = document.createElement('span'); t.className = 'p-nueva'; t.textContent = 'Nueva colección'; shirt.appendChild(t); p.tag = t; }
+        p.el = b; p.canvas = canvas; p.cur = p.cur || null;
+        pintar(p);
+        b.addEventListener('click', (e) => {
+          if (drag && drag.movido) return;
+          if (zoomK >= 0) return;
+          const r = envolver(k - c);
+          if (Math.abs(r) < 0.35) abrirZoom(k); else { ct = c + r; tocar(); }
+        });
+        esc.appendChild(b);
+      });
+      const pts = $('#pPuntos'); pts.innerHTML = '';
+      P.forEach((p, k) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', p.d.nombre); b.onclick = () => { if (zoomK < 0) { ct = c + envolver(k - c); tocar(); } }; pts.appendChild(b); });
+      foco = -1;
+    }
+    function pintar(p) {
+      return componer(p.canvas, p.d, p.corte, p.color, ladoDe(p.d), Math.min(1100, Math.ceil(medida.EW * ESCALA_CORTE[p.corte] * Math.max(1.5, devicePixelRatio || 1)))).catch(console.warn);
+    }
+    function tocar() { toque = performance.now(); arrancar(); }
+    function arrancar() { if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); } }
+
+    function destino(k) {
+      const { Wc, EW, sp, movil, vw, eh } = medida;
+      if (zoomK >= 0) {
+        if (k === zoomK) {
+          let x = movil ? 0 : -(medida.gap + medida.infoW) / 2, y = 0;
+          let s = medida.ZW / EW;
+          if (movil) {   // arriba, dejando lugar a la ficha de abajo
+            const er = esc.getBoundingClientRect(), libre = info.getBoundingClientRect().top - 12;
+            const top = Math.max(56, er.top - 40), alto = Math.max(120, libre - top);
+            s = Math.min(s, alto / (EW * ASPECTO.oversize)); y = top + alto / 2 - (er.top + er.height / 2);
+          }
+          return { x, y, s, rot: 0, o: 1, z: 30 };
+        }
+        const r = envolver(k - c); return { x: Math.sign(r || 1) * vw * 0.75, y: 0, s: Wc / EW * 0.8, rot: r * 6, o: 0, z: 1 };
+      }
+      const r = envolver(k - c), a = Math.abs(r);
+      return {
+        x: r * sp * (1 + 0.12 * a), y: a * a * Wc * 0.025 + (movil ? eh * 0.1 : eh * 0.07), s: (Wc / EW) * (1 - 0.11 * a),
+        rot: r * 5.5, o: Math.max(0, Math.min(1, (2.5 - a) / 0.45)), z: 20 - Math.round(a * 4)
+      };
+    }
+    function frame(t) {
+      const dt = Math.min(0.05, (t - last) / 1000); last = t;
+      // movimiento lento y constante, como una vidriera que gira; se pausa un momento si la persona las mueve
+      if (!el.hidden && zoomK < 0 && !drag && !reduce && t - toque > 1600) ct += dt * VELOCIDAD;
+      if (!drag) c += (ct - c) * (1 - Math.exp(-dt * (reduce ? 60 : 6.5)));
+      let quieto = Math.abs(ct - c) < 0.0005;
+      const f = 1 - Math.exp(-dt * (reduce ? 60 : 8));
+      P.forEach((p, k) => {
+        const d = destino(k);
+        if (!p.cur) p.cur = { ...d };
+        for (const key of ['x', 'y', 's', 'rot', 'o']) { p.cur[key] += (d[key] - p.cur[key]) * f; if (Math.abs(d[key] - p.cur[key]) > 0.001) quieto = false; }
+        const q = p.cur;
+        p.el.style.transform = `translate(-50%,-50%) translate(${q.x.toFixed(1)}px,${q.y.toFixed(1)}px) rotate(${q.rot.toFixed(2)}deg) scale(${q.s.toFixed(4)})`;
+        p.el.style.opacity = q.o.toFixed(3); p.el.style.zIndex = d.z;
+        p.el.style.visibility = q.o < 0.01 ? 'hidden' : 'visible';
+        p.el.tabIndex = zoomK < 0 && Math.abs(envolver(k - c)) < 0.5 ? 0 : -1;
+        if (p.tag) p.tag.style.opacity = zoomK >= 0 ? 0 : 1;
+      });
+      const fi = ((Math.round(c) % N) + N) % N;
+      if (fi !== foco) {
+        foco = fi; const p = P[fi];
+        $('#pNombre').textContent = p.d.nombre;
+        $('#pSub').textContent = p.nueva ? 'Nueva colección · Salmos y Romanos' : (p.d.detalle || '');
+        $('#pPuntos').querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-current', k === fi ? 'true' : 'false'));
+      }
+      // sigue animando mientras hay movimiento o falta poco para el próximo paso automático
+      if (visible() && (!quieto || drag || zoomK < 0)) raf = requestAnimationFrame(frame); else raf = 0;
+    }
+
+    /* ficha (zoom) */
+    function abrirZoom(k) {
+      zoomK = k; ct = c = Math.round(c) + envolver(k - Math.round(c)); el.classList.add('zoom');
+      info.hidden = false; ubicarFicha(); fichar(); arrancar();
+      setTimeout(() => $('#pCerrar').focus({ preventScroll: true }), 50);
+    }
+    function ubicarFicha() {
+      const m = medida;
+      if (m.movil) { info.style.left = info.style.width = ''; return; }
+      info.style.width = m.infoW + 'px';
+      info.style.left = (m.vw / 2 - (m.gap + m.infoW) / 2 + m.ZW / 2 + m.gap) + 'px';
+    }
+    function cerrarZoom() {
+      if (zoomK < 0) return; const k = zoomK; zoomK = -1; el.classList.remove('zoom'); info.hidden = true; tocar();
+      P[k].el.focus({ preventScroll: true });
+    }
+    function fichar() {
+      const p = P[zoomK], d = p.d, cfgC = CFG.cortes[p.corte];
+      $('#pEtq').textContent = p.nueva ? 'Nueva colección · Salmos y Romanos' : '';
+      $('#pTitulo').textContent = d.nombre;
+      $('#pDet').textContent = d.detalle || '';
+      const sc = $('#pCorte'); sc.innerHTML = '';
+      Object.entries(CFG.cortes).forEach(([id, cc]) => {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = cc.nombre;
+        b.setAttribute('aria-pressed', id === p.corte ? 'true' : 'false'); b.disabled = !d.cortes.includes(id);
+        b.onclick = () => { if (id === p.corte) return; p.corte = id; p.color = colorDe({ color: p.color, colores: d.colores }, id); armarUna(p); fichar(); };
+        sc.appendChild(b);
+      });
+      const cs = $('#pColores'); cs.innerHTML = '';
+      coloresDe(d, p.corte).forEach(col => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'tag';
+        b.style.setProperty('--c', col.hex); b.title = col.nombre; b.setAttribute('aria-label', col.nombre);
+        b.setAttribute('aria-pressed', col.id === p.color ? 'true' : 'false');
+        b.onclick = () => { p.color = col.id; pintar(p); fichar(); };
+        cs.appendChild(b);
+      });
+      const col = cfgC.colores.find(x => x.id === p.color);
+      $('#pColorName').textContent = d.colores && d.colores.length === 1 ? `Color: ${col ? col.nombre : ''} · única opción` : `Color: ${col ? col.nombre : ''}`;
+      const msg = `Hola Agustín! Me interesa la remera "${d.nombre}" en corte ${cfgC.nombre}, color ${col ? col.nombre : ''}.`;
+      $('#pCta').href = CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`;
+    }
+    function armarUna(p) {   // al cambiar de corte cambia el tamaño de la remera
+      const sw = medida.EW * ESCALA_CORTE[p.corte], pad = SOMBRA_PAD[p.corte];
+      const shirt = p.el.querySelector('.shirt'), sombra = shirt.querySelector('.sombra');
+      shirt.style.width = sw + 'px'; sombra.src = `img/${p.corte}/sombra.webp`;
+      sombra.style.width = sw * (1 + 2 * pad) + 'px'; sombra.style.left = (-pad * sw + sw * 0.05) + 'px'; sombra.style.top = (-pad * sw + sw * 0.06) + 'px';
+      p.canvas.width = Math.round(sw); p.canvas.height = Math.round(sw * ASPECTO[p.corte]);
+      pintar(p);
+    }
+
+    /* salir hacia el perchero */
+    function salir(despues) {
+      if (!visible()) return;
+      zoomK = -1; el.classList.remove('zoom'); info.hidden = true;
+      el.classList.add('salir');
+      document.body.classList.remove('con-portada'); soltarPendientes();
+      setTimeout(() => { el.hidden = true; if (despues) despues(); Aviso.mostrar(900); }, reduce ? 0 : 750);
+    }
+    function mostrar() {
+      el.hidden = false; el.classList.add('salir');
+      requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.remove('salir'); tocar(); }));
+      setTimeout(() => { if (visible()) document.body.classList.add('con-portada'); }, reduce ? 0 : 800);
+    }
+    $('#pEntrar').onclick = () => salir();
+    $('#pCerrar').onclick = cerrarZoom;
+    $('#pVer').onclick = () => {
+      const d = P[zoomK].d, corte = P[zoomK].corte, color = P[zoomK].color;
+      salir(() => {
+        const f = d.coleccion || (DIS.some(x => x.coleccion === filtro) ? 'todo' : filtro);
+        if (f !== filtro) { const chip = document.querySelector(`.chip[data-f="${f}"]`); if (chip) chip.click(); }
+        let i = lista.findIndex(x => x.id === d.id);
+        if (i < 0) { document.querySelector('.chip[data-f="todo"]').click(); i = lista.findIndex(x => x.id === d.id); }
+        if (i >= 0) { centrar(i); setTimeout(() => { abrir(i); if (sel) { sel.corte = d.cortes.includes(corte) ? corte : sel.corte; sel.color = colorDe({ color, colores: d.colores }, sel.corte); textos(); pintarFig(); } }, 450); }
+      });
+    };
+    document.querySelector('.top img').style.cursor = 'pointer';
+    document.querySelector('.top img').addEventListener('click', () => { if (detail.hidden) mostrar(); });
+
+    /* gestos */
+    esc.addEventListener('pointerdown', (e) => {
+      if (zoomK >= 0 || e.button) return;
+      drag = { x: e.clientX, y: e.clientY, c0: c, movido: false, id: e.pointerId }; tocar();
+    });
+    addEventListener('pointermove', (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      if (!drag.movido && Math.hypot(dx, dy) > 7) { drag.movido = true; esc.classList.add('drag'); try { esc.setPointerCapture(e.pointerId); } catch (_) {} }
+      if (drag.movido && Math.abs(dx) >= Math.abs(dy) * 0.6) { c = drag.c0 - dx / medida.sp; ct = c; }
+      drag.dx = dx; drag.dy = dy;
+    });
+    const soltar = (e) => {
+      if (!drag || (e.pointerId !== undefined && e.pointerId !== drag.id)) return;
+      const dx = drag.dx || 0, dy = drag.dy || 0, d0 = drag;
+      esc.classList.remove('drag');
+      if (d0.movido && medida.movil && dy < -70 && Math.abs(dy) > Math.abs(dx) * 1.3) salir();       // deslizar hacia arriba: al perchero
+      else if (d0.movido) ct = Math.abs(dx) > medida.sp * 0.12 ? (dx < 0 ? Math.ceil(c - 0.02) : Math.floor(c + 0.02)) : Math.round(c);
+      tocar();
+      setTimeout(() => { if (drag === d0) drag = null; }, 0);
+    };
+    addEventListener('pointerup', soltar); addEventListener('pointercancel', soltar);
+    el.addEventListener('wheel', (e) => {
+      if (!visible()) return; e.preventDefault();
+      if (zoomK >= 0) return;
+      ct += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) / 380; tocar();
+      clearTimeout(ruedaT); ruedaT = setTimeout(() => { ct = Math.round(ct); arrancar(); }, 140);
+    }, { passive: false });
+    addEventListener('keydown', (e) => {
+      if (!visible() || !$('#pedido').hidden) return;
+      if (zoomK >= 0) { if (e.key === 'Escape') cerrarZoom(); return; }
+      if (e.key === 'ArrowRight') { ct = Math.round(ct) + 1; tocar(); }
+      if (e.key === 'ArrowLeft') { ct = Math.round(ct) - 1; tocar(); }
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); salir(); }
+    });
+    let rT = 0;
+    addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { if (!el.hidden) { const z = zoomK; armar(); zoomK = z; if (z >= 0) ubicarFicha(); tocar(); } }, 200); });
+
+    return {
+      iniciar(lista) {
+        P = (lista || []).map(x => {
+          const d = DIS.find(y => y.id === x.id); if (!d) return null;
+          const corte = x.corte || d.cortes[0];
+          return { d, corte, color: colorDe({ color: x.color || d.color, colores: d.colores }, corte), nueva: !!x.nueva };
+        }).filter(Boolean);
+        N = P.length; if (N < 2) return;
+        el.hidden = false; document.body.classList.add('con-portada'); c = ct = Math.floor(N / 2); toque = -1e9;
+        setTimeout(goteo, 2500);   // el perchero se va armando de fondo   // arranca moviéndose apenas se entra
+        requestAnimationFrame(() => { armar(); arrancar(); });
+      }
+    };
+  })();
+
+  /* ---------- aviso: invita a ver la colección nueva ---------- */
+  // Aparece al llegar al perchero (en "Todo"). Se cierra solo, con la ×, o al entrar a la colección.
+  const Aviso = (() => {
+    const el = $('#aviso'); let timer = 0, visto = false;
+    try { visto = sessionStorage.getItem('aviso-sr') === '1'; } catch (e) {}
+    function ocultar() {
+      if (el.hidden) return; clearTimeout(timer); el.classList.add('fuera');
+      setTimeout(() => { el.hidden = true; el.classList.remove('fuera'); }, 380);
+      visto = true; try { sessionStorage.setItem('aviso-sr', '1'); } catch (e) {}
+    }
+    function mostrar(espera = 1200) {
+      if (visto || !DIS.some(d => d.coleccion === 'salmos_romanos')) return;
+      setTimeout(() => {
+        if (visto || filtro !== 'todo' || !detail.hidden || document.body.classList.contains('con-portada')) return;
+        el.hidden = false; clearTimeout(timer); timer = setTimeout(ocultar, 12000);
+      }, espera);
+    }
+    $('#avisoX').onclick = ocultar;
+    $('#avisoVer').onclick = () => { ocultar(); const chip = document.querySelector('.chip[data-f="salmos_romanos"]'); if (chip) chip.click(); };
+    document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { if (b.dataset.f === 'salmos_romanos') ocultar(); }));
+    return { mostrar, ocultar };
+  })();
+
+  /* ---------- cómo pedir (diseño propio) ---------- */
+  const Pedido = (() => {
+    const el = $('#pedido'); let antes = null;
+    function abrir() {
+      if (!el.hidden) return;
+      antes = document.activeElement;
+      const nb = CFG.cortes.basica ? CFG.cortes.basica.colores.length : 0, no = CFG.cortes.oversize ? CFG.cortes.oversize.colores.length : 0;
+      $('#pedColores').textContent = `${nb} colores en remera básica y ${no} en oversize.`;
+      const msg = 'Hola Agustín! Quiero una remera con mi propio diseño. Te cuento mi idea:';
+      $('#pedCta').href = CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`;
+      $('#pedCta').textContent = CFG.whatsapp ? 'Pedir mi diseño por WhatsApp' : 'Pedir mi diseño por Instagram';
+      $('#pedVer').textContent = document.body.classList.contains('con-portada') ? 'Ver el catálogo' : 'Seguir viendo el perchero';
+      el.hidden = false; Aviso.ocultar(); document.body.classList.add('quieto');
+      el.querySelector('.ped-caja').focus({ preventScroll: true });
+    }
+    function cerrar() {
+      if (el.hidden) return;
+      el.hidden = true;
+      if (detail.hidden) document.body.classList.remove('quieto');
+      if (antes && antes.focus) antes.focus({ preventScroll: true });
+    }
+    $('#pedX').onclick = cerrar; $('#pedFondo').onclick = cerrar;
+    $('#pedVer').onclick = () => { cerrar(); const e = $('#pEntrar'); if (document.body.classList.contains('con-portada') && e) e.click(); };
+    $('#navPedir').onclick = () => abrir();
+    $('#pPedir').onclick = (e) => { e.stopPropagation(); abrir(); };
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !el.hidden) { e.stopPropagation(); cerrar(); } }, true);
+    return { abrir, cerrar };
+  })();
+
+  /* ---------- secciones de información (debajo del perchero) ---------- */
+  const Info = (() => {
+    const DESTACADAS = { god_is_bigger: 'negro', jesus_loves_you: 'marfil', on_fire: 'blanco', victory: 'beige', jesus_corriendo: 'verde_musgo', jesus_always_wins: 'negro', dont_be_afraid: 'marfil', church_kids: 'blanco' };
+    function subir(fn) {
+      const listo = () => setTimeout(fn, 60);
+      if (window.scrollY < 4) return listo();
+      window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      let t = 0; const espera = () => (window.scrollY < 4 || ++t > 90) ? listo() : requestAnimationFrame(espera); espera();
+    }
+    function filtrar(f) { const chip = document.querySelector(`.chip[data-f="${f}"]`); if (chip && chip.getAttribute('aria-pressed') !== 'true') chip.click(); }
+    function armar() {
+      const g = $('#iGrilla');
+      Object.entries(DESTACADAS).forEach(([id, color], k) => {
+        const d = DIS.find(x => x.id === id); if (!d) return;
+        const a = document.createElement('a'); a.className = 'i-rem i-rev ' + (['negro', 'verde_musgo', 'azul_marino'].includes(color) ? 'i-oscura' : 'i-clara'); a.style.setProperty('--d', (k % 4) * .07 + 's');
+        a.href = '#' + id.replace(/_/g, '-');
+        a.innerHTML = `<figure><img src="img/inicio/${id}_${color}.webp" alt="" loading="lazy" width="900" height="887"></figure><div><b></b><span></span></div>`;
+        a.querySelector('b').textContent = d.nombre; a.querySelector('span').textContent = d.detalle || '';
+        a.querySelector('img').alt = 'Remera ' + d.nombre;
+        a.addEventListener('click', (e) => { e.preventDefault(); subir(() => { filtrar('todo'); const i = lista.findIndex(x => x.id === id); if (i >= 0) { centrar(i); setTimeout(() => abrir(i), 250); } }); });
+        g.appendChild(a);
+      });
+      const pint = (el, corte) => (CFG.cortes[corte] ? CFG.cortes[corte].colores : []).forEach(c => { const i = document.createElement('i'); i.style.background = c.hex; i.title = c.nombre; el.appendChild(i); });
+      pint($('#iOver'), 'oversize'); pint($('#iBas'), 'basica');
+      document.querySelectorAll('.info [data-ir]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); subir(() => filtrar(a.dataset.ir)); }));
+      document.querySelectorAll('.info a[href^="#i-"], .mas-abajo').forEach(a => a.addEventListener('click', (e) => {
+        const t = document.querySelector(a.getAttribute('href')); if (!t) return;
+        e.preventDefault(); t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }));
+      const io = new IntersectionObserver((es) => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('i-in'); io.unobserve(x.target); } }), { rootMargin: '0px 0px -8% 0px' });
+      document.querySelectorAll('.i-rev').forEach(el => io.observe(el));
+      const col = $('#iCollage'), pars = [...col.querySelectorAll('[data-par]')]; let pend = false;
+      addEventListener('scroll', () => {
+        if (pend) return; pend = true;
+        requestAnimationFrame(() => {
+          pend = false;
+          const c = col.getBoundingClientRect(), q = (c.top + c.height / 2 - innerHeight / 2) / innerHeight;
+          if (Math.abs(q) < 1.5) pars.forEach(f => f.style.setProperty('--y', (q * f.dataset.par).toFixed(1) + 'px'));
+        });
+      }, { passive: true });
+    }
+    return { armar };
+  })();
+
+  /* ---------- inicio ---------- */
+  fetch('catalogo.json').then(r => r.json()).then(cfg => {
+    CFG = cfg; DIS = cfg.disenos;
+    const ig = `https://instagram.com/${cfg.instagram}`;
+    $('#navContacto').href = cfg.whatsapp ? `https://wa.me/${cfg.whatsapp}` : ig;
+    const frase = ['Remeras personalizadas en DTF', 'Oversize y básicas', 'Creatividad & calidad', 'Nuevos diseños', 'Hacemos tu diseño'];
+    const t = $('#ticker'); const linea = frase.map(f => `<span>${f} ✦</span>`).join('');
+    t.innerHTML = linea + linea + linea + linea;
+    const h = location.hash.slice(1).replace(/-/g, '_');
+    const dh = DIS.find(d => d.id === h);
+    if (dh && dh.coleccion) {   // link directo a una remera de una colección: abrir con ese filtro
+      filtro = dh.coleccion;
+      document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.f === filtro ? 'true' : 'false'));
+    }
+    if (!dh && cfg.portada) document.body.classList.add('con-portada');   // hay portada: el perchero se arma de fondo
+    armarPerchero();
+    Info.armar();
+    const i = lista.findIndex(d => d.id === h);
+    if (i >= 0) setTimeout(() => abrir(i), 300);
+    else if (cfg.portada) Portada.iniciar(cfg.portada);
+    else Aviso.mostrar();   // con un link directo a una remera no se muestra la portada
+  }).catch(err => { $('#capName').textContent = 'No se pudo cargar el catálogo'; console.error(err); });
+})();
+
+</script>
