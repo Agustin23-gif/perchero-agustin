@@ -144,7 +144,8 @@ h1 em {
 .arrow.prev { left: 0; } .arrow.next { right: 0; }
 .arrow svg { width: 18px; height: 18px; }
 
-.det-info { display: grid; justify-items: center; gap: 10px; text-align: center; }
+.det-info { display: grid; justify-items: center; gap: 10px; text-align: center; min-width: 0; }
+.det-info h2, .p-info h2 { max-width: 100%; overflow-wrap: break-word; }
 .det-info h2 {
   margin: 0; font-size: clamp(26px, 4.4vw, 46px); line-height: .9; font-weight: 800;
   letter-spacing: -.055em; text-transform: uppercase; text-wrap: balance;

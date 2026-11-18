@@ -45,7 +45,8 @@
     let est = null;
     if (src) {
       const [dis, luz] = await Promise.all([img(src), img(`img/${corte}/luz_${lado}.webp`)]);
-      const e = CFG.cortes[corte].estampa[lado] || CFG.cortes[corte].estampa.frente;
+      // medidas de estampa del corte, con ajuste propio del diseño si lo tiene (ej. un logo chico en el pecho)
+      const e = Object.assign({}, CFG.cortes[corte].estampa[lado] || CFG.cortes[corte].estampa.frente, ((d.estampa || {})[corte] || {})[lado]);
       const ancho = dis.naturalWidth / dis.naturalHeight > 2.2;
       const r = Math.min(W * (ancho ? e.anchoAncho : e.ancho) / dis.naturalWidth, H * e.alto / dis.naturalHeight);
       const dw = dis.naturalWidth * r, dh = dis.naturalHeight * r;
@@ -157,6 +158,8 @@
   function coloresDe(d, corte) { const cs = CFG.cortes[corte].colores; return d.colores ? cs.filter(c => d.colores.includes(c.id)) : cs; }
   function colorDe(d, corte) {
     const ids = coloresDe(d, corte).map(c => c.id);
+    const propio = (d.colorPor || {})[corte];   // color inicial distinto según el corte
+    if (ids.includes(propio)) return propio;
     if (ids.includes(d.color)) return d.color;
     const parecido = (CFG.parecidos || {})[d.color];   // ej.: verde musgo (oversize) → verde botella (básica)
     return ids.includes(parecido) ? parecido : (ids.includes('blanco') ? 'blanco' : ids[0]);

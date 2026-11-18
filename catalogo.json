@@ -247,6 +247,38 @@
       "color": "naranja"
     },
     {
+      "id": "jesus_aura",
+      "nombre": "Definition of aura",
+      "detalle": "Espalda + frente (Don't be afraid)",
+      "etiqueta": "Nuevo",
+      "frente": "disenos/jesus_aura_frente.webp",
+      "espalda": "disenos/jesus_aura_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "marfil",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "anchoAncho": 0.18,
+            "topAncho": 0.21
+          }
+        },
+        "basica": {
+          "frente": {
+            "anchoAncho": 0.2,
+            "topAncho": 0.22
+          }
+        }
+      },
+      "colorPor": {
+        "oversize": "marfil",
+        "basica": "blanco"
+      }
+    },
+    {
       "id": "god_is_bigger",
       "nombre": "God is bigger",
       "detalle": "Than your fear",
