@@ -227,26 +227,6 @@
   ],
   "disenos": [
     {
-      "id": "lisa_oversize",
-      "nombre": "Oversize lisa",
-      "detalle": "Corte oversize · 5 colores",
-      "lisa": true,
-      "cortes": [
-        "oversize"
-      ],
-      "color": "beige"
-    },
-    {
-      "id": "lisa_basica",
-      "nombre": "Básica lisa",
-      "detalle": "Corte clásico · 22 colores",
-      "lisa": true,
-      "cortes": [
-        "basica"
-      ],
-      "color": "naranja"
-    },
-    {
       "id": "jesus_aura",
       "nombre": "Definition of aura",
       "detalle": "Espalda + frente (Don't be afraid)",
