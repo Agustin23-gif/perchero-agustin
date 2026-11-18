@@ -452,7 +452,7 @@
     },
     {
       "id": "romanos_cielo",
-      "nombre": "Romanos · Cielo",
+      "nombre": "Romanos · Aman a Dios",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_cielo_romanos.webp",
@@ -468,7 +468,7 @@
     },
     {
       "id": "romanos_fuego",
-      "nombre": "Romanos · Fuego",
+      "nombre": "Romanos · Su propósito",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_fuego_romanos.webp",
@@ -484,7 +484,7 @@
     },
     {
       "id": "romanos_hermoso",
-      "nombre": "Romanos · Hermoso",
+      "nombre": "Romanos · 8:28",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_hermoso_romanos.webp",
@@ -500,7 +500,7 @@
     },
     {
       "id": "romanos_gracia",
-      "nombre": "Romanos · Gracia",
+      "nombre": "Romanos · Ayudan",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_gracia_romanos.webp",
@@ -516,7 +516,7 @@
     },
     {
       "id": "romanos_miedo",
-      "nombre": "Romanos · Miedo",
+      "nombre": "Romanos · Bien",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_miedo_romanos.webp",
@@ -532,7 +532,7 @@
     },
     {
       "id": "romanos_fiel",
-      "nombre": "Romanos · Fiel",
+      "nombre": "Romanos · A bien",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_fiel_romanos.webp",
@@ -548,7 +548,7 @@
     },
     {
       "id": "romanos_club",
-      "nombre": "Romanos · Club",
+      "nombre": "Romanos · Todas las cosas",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_club_romanos.webp",
@@ -564,7 +564,7 @@
     },
     {
       "id": "romanos_christ",
-      "nombre": "Romanos · Christ",
+      "nombre": "Romanos · Les ayudan a bien",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_christ_romanos.webp",
@@ -580,7 +580,7 @@
     },
     {
       "id": "romanos_roca",
-      "nombre": "Romanos · Roca",
+      "nombre": "Romanos · Todas · Cruz",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_roca_romanos.webp",
@@ -596,7 +596,7 @@
     },
     {
       "id": "romanos_onda",
-      "nombre": "Romanos · Onda",
+      "nombre": "Romanos · Todas las cosas · Paloma",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_onda_romanos.webp",
@@ -612,7 +612,7 @@
     },
     {
       "id": "romanos_humillo",
-      "nombre": "Romanos · Humillo",
+      "nombre": "Romanos · A los que aman",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_humillo_romanos.webp",
@@ -628,7 +628,7 @@
     },
     {
       "id": "romanos_graffiti",
-      "nombre": "Romanos · Graffiti",
+      "nombre": "Romanos · Ayudan a bien",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_graffiti_romanos.webp",
@@ -644,7 +644,7 @@
     },
     {
       "id": "romanos_montanas",
-      "nombre": "Romanos · Montañas",
+      "nombre": "Romanos · A bien · Paloma",
       "detalle": "Romanos 8:28 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_montanas_romanos.webp",
@@ -660,8 +660,8 @@
     },
     {
       "id": "salmos_cielo",
-      "nombre": "Salmos · Cielo",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Abrigo y sombra",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_cielo_salmos.webp",
       "cortes": [
@@ -676,8 +676,8 @@
     },
     {
       "id": "salmos_fuego",
-      "nombre": "Salmos · Fuego",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Castillo mío",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_fuego_salmos.webp",
       "cortes": [
@@ -692,8 +692,8 @@
     },
     {
       "id": "salmos_hermoso",
-      "nombre": "Salmos · Hermoso",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · 91:1-3",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_hermoso_salmos.webp",
       "cortes": [
@@ -708,8 +708,8 @@
     },
     {
       "id": "salmos_gracia",
-      "nombre": "Salmos · Gracia",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · El que habita",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_gracia_salmos.webp",
       "cortes": [
@@ -724,8 +724,8 @@
     },
     {
       "id": "salmos_miedo",
-      "nombre": "Salmos · Miedo",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Omnipotente",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_miedo_salmos.webp",
       "cortes": [
@@ -740,8 +740,8 @@
     },
     {
       "id": "salmos_fiel",
-      "nombre": "Salmos · Fiel",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Bajo la sombra",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_fiel_salmos.webp",
       "cortes": [
@@ -756,8 +756,8 @@
     },
     {
       "id": "salmos_club",
-      "nombre": "Salmos · Club",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Morará",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_club_salmos.webp",
       "cortes": [
@@ -772,8 +772,8 @@
     },
     {
       "id": "salmos_christ",
-      "nombre": "Salmos · Christ",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Sombra",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_christ_salmos.webp",
       "cortes": [
@@ -788,8 +788,8 @@
     },
     {
       "id": "salmos_roca",
-      "nombre": "Salmos · Roca",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Abrigo · Cruz",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_roca_salmos.webp",
       "cortes": [
@@ -804,8 +804,8 @@
     },
     {
       "id": "salmos_onda",
-      "nombre": "Salmos · Onda",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Bajo la sombra · Paloma",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_onda_salmos.webp",
       "cortes": [
@@ -820,8 +820,8 @@
     },
     {
       "id": "salmos_humillo",
-      "nombre": "Salmos · Humillo",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Al abrigo del Altísimo",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_humillo_salmos.webp",
       "cortes": [
@@ -836,8 +836,8 @@
     },
     {
       "id": "salmos_graffiti",
-      "nombre": "Salmos · Graffiti",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Esperanza mía",
+      "detalle": "Salmos 91:2 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_graffiti_salmos.webp",
       "cortes": [
@@ -852,8 +852,8 @@
     },
     {
       "id": "salmos_montanas",
-      "nombre": "Salmos · Montañas",
-      "detalle": "Salmos 91 · diseño en la espalda · solo en negro",
+      "nombre": "Salmos · Omnipotente · Paloma",
+      "detalle": "Salmos 91:1-3 · diseño en la espalda · solo en negro",
       "frente": null,
       "espalda": "disenos/sr_montanas_salmos.webp",
       "cortes": [
