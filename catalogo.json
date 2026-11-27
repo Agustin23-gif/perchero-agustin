@@ -226,6 +226,35 @@
   ],
   "disenos": [
     {
+      "id": "xmen_cyclops",
+      "nombre": "To me, my X-Men",
+      "detalle": "Cyclops · frente",
+      "frente": "disenos/xmen_cyclops_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize"
+      ],
+      "color": "marfil",
+      "colores": [
+        "marfil"
+      ],
+      "coleccion": "doomsday",
+      "etiqueta": "Nuevo",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.497,
+            "ancho": 0.289,
+            "anchoAncho": 0.289,
+            "top": 0.228,
+            "topAncho": 0.228,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
       "id": "doom_rayos",
       "nombre": "Doom",
       "detalle": "Espalda + logo DOOM en el frente",
@@ -1472,6 +1501,6 @@
     "id": "doom_rayos",
     "coleccion": "doomsday",
     "titulo": "Doomsday",
-    "sub": "15 diseños · Doom, Iron Man y Thor"
+    "sub": "16 diseños · Doom, Iron Man, Thor y X-Men"
   }
 }
