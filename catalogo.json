@@ -335,6 +335,46 @@
       }
     },
     {
+      "id": "doom_hell",
+      "nombre": "Hell answers to me",
+      "detalle": "Doom · espalda",
+      "frente": null,
+      "espalda": "disenos/doom_hell_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "etiqueta": "Nuevo",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.329,
+            "anchoAncho": 0.329,
+            "top": 0.15,
+            "topAncho": 0.15,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.329,
+            "anchoAncho": 0.329,
+            "top": 0.15,
+            "topAncho": 0.15,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
       "id": "doom_rayos",
       "nombre": "Doom",
       "detalle": "Espalda + logo DOOM en el frente",
@@ -1581,6 +1621,6 @@
     "id": "doom_rayos",
     "coleccion": "doomsday",
     "titulo": "Doomsday",
-    "sub": "18 diseños · Doom, Iron Man, Thor, Loki y X-Men"
+    "sub": "19 diseños · Doom, Iron Man, Thor, Loki y X-Men"
   }
 }
