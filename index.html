@@ -12,7 +12,7 @@
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Agustín diseños">
-<link rel="stylesheet" href="styles.css?v=202611270700">
+<link rel="stylesheet" href="styles.css?v=202611272041">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -93,7 +93,11 @@
         </div>
         <div class="colores-wrap"><div class="colores" id="colores" role="group" aria-label="Color"></div></div>
         <div class="color-name" id="colorName"></div>
-        <a class="cta" id="cta" href="#" target="_blank" rel="noopener">Consultar</a>
+        <div class="det-acciones">
+          <button class="cta" id="detAgregar" type="button"><span aria-hidden="true">+</span> Agregar a mi pedido</button>
+          <a class="ico-btn" id="cta" href="#" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp" title="Consultar por WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.4.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1 2.7c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3z"/></svg></a>
+          <button class="ico-btn" id="detCompartir" type="button" aria-label="Compartir esta remera" title="Compartir esta remera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></button>
+        </div>
         <div class="count" id="count"></div>
       </div>
     </section>
@@ -134,10 +138,10 @@
       <img src="img/inicio/salmos_fuego_negro.webp" alt="" loading="lazy" width="900" height="887">
       <span class="i-btn i-btn-n i-ir">Ver colección →</span>
     </a>
-    <a class="i-col i-col-tu i-rev" style="--d:.2s" href="#i-como-pedir">
+    <a class="i-col i-col-tu i-rev" style="--d:.2s" href="#i-como-pedir" id="iColTu">
       <div><p class="i-n">Tu idea, foto o logo</p><h3>Tu propio <em>diseño</em></h3></div>
       <div class="i-hueco" aria-hidden="true">Tu<br>diseño<br>acá</div>
-      <span class="i-btn i-btn-t i-ir">Cómo pedir →</span>
+      <span class="i-btn i-btn-t i-ir">Probá tu diseño →</span>
     </a>
   </div>
 </section>
@@ -221,11 +225,66 @@
       <li><b>Retirá o recibí</b><span>Cuando esté lista coordinamos el retiro o el envío.</span></li>
     </ol>
     <div class="ped-acciones">
-      <a class="cta" id="pedCta" href="#" target="_blank" rel="noopener">Pedir mi diseño por WhatsApp</a>
+      <button class="cta" id="pedProbar" type="button">Probá tu diseño en la remera</button>
+      <a class="ped-wa" id="pedCta" href="#" target="_blank" rel="noopener">Pedir mi diseño por WhatsApp</a>
       <button class="ped-ver" id="pedVer" type="button">Ver el catálogo</button>
     </div>
   </div>
 </div>
-<script src="app.js?v=202611270700"></script>
+
+<button class="carro-btn" id="carroBtn" type="button" hidden aria-label="Ver mi pedido"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><span>Mi pedido</span><b id="carroN">0</b></button>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<div class="pedido carro" id="carro" role="dialog" aria-modal="true" aria-labelledby="carroTit" hidden>
+  <div class="ped-fondo" data-cerrar></div>
+  <div class="ped-caja" tabindex="-1">
+    <button class="ped-x" type="button" aria-label="Cerrar" data-cerrar>×</button>
+    <p class="ped-eti">Todo en un solo mensaje</p>
+    <h2 id="carroTit">Mi <em>pedido</em></h2>
+    <ul class="carro-lista" id="carroLista"></ul>
+    <p class="carro-vacio" id="carroVacio">Todavía no agregaste remeras. Tocá una remera del perchero y elegí <b>Agregar a mi pedido</b>.</p>
+    <label class="carro-nota" id="carroNotaWrap"><span>Talles y aclaraciones</span><textarea id="carroNota" rows="2" maxlength="400" placeholder="Ej.: 2 talle M y 1 talle XL. Retiro en el local."></textarea></label>
+    <div class="ped-acciones">
+      <a class="cta" id="carroEnviar" href="#" target="_blank" rel="noopener">Enviar pedido por WhatsApp</a>
+      <button class="ped-ver" id="carroSeguir" type="button">Seguir mirando</button>
+      <button class="ped-ver carro-vaciar" id="carroVaciar" type="button">Vaciar</button>
+    </div>
+  </div>
+</div>
+
+<div class="pedido crea" id="crea" role="dialog" aria-modal="true" aria-labelledby="creaTit" hidden>
+  <div class="ped-fondo" data-cerrar></div>
+  <div class="ped-caja crea-caja" tabindex="-1">
+    <button class="ped-x" type="button" aria-label="Cerrar" data-cerrar>×</button>
+    <div class="crea-vista"><canvas id="creaCanvas" width="10" height="10" aria-label="Vista previa de tu remera"></canvas>
+      <div class="seg crea-lado" role="group" aria-label="Lado" id="creaLado"></div>
+    </div>
+    <div class="crea-panel">
+      <p class="ped-eti">Probalo antes de pedir</p>
+      <h2 id="creaTit">Diseñá <em>la tuya</em></h2>
+      <div class="seg crea-modo" role="group" aria-label="Tipo de diseño">
+        <button type="button" data-modo="imagen" aria-pressed="true">Subir imagen</button>
+        <button type="button" data-modo="texto" aria-pressed="false">Escribir texto</button>
+      </div>
+      <div class="crea-imagen" id="creaImagen">
+        <label class="crea-subir"><input type="file" id="creaArchivo" accept="image/*"><span id="creaArchivoTxt">Elegir imagen</span></label>
+        <p class="crea-ayuda">Tu foto, logo o dibujo. Si es PNG sin fondo, queda mejor.</p>
+      </div>
+      <div class="crea-texto" id="creaTexto" hidden>
+        <textarea id="creaFrase" rows="2" maxlength="60" placeholder="Escribí tu frase"></textarea>
+        <div class="crea-fila"><div class="seg" role="group" aria-label="Letra" id="creaLetra"></div><div class="crea-tinta" role="group" aria-label="Color de letra" id="creaTinta"></div></div>
+      </div>
+      <div class="crea-grupo"><span>Corte</span><div class="seg" role="group" aria-label="Corte" id="creaCorte"></div></div>
+      <div class="crea-grupo"><span>Tamaño</span><div class="seg" role="group" aria-label="Tamaño" id="creaTam"></div></div>
+      <div class="crea-grupo crea-grupo-col"><span id="creaColorNom">Color</span><div class="colores-wrap"><div class="colores" id="creaColores" role="group" aria-label="Color de remera"></div></div></div>
+      <div class="ped-acciones">
+        <button class="cta" id="creaAgregar" type="button"><span aria-hidden="true">+</span> Agregar a mi pedido</button>
+        <button class="ped-ver" id="creaEnviar" type="button">Enviar por WhatsApp</button>
+      </div>
+      <p class="crea-ayuda" id="creaNota">Es una vista previa: antes de estampar te mandamos la prueba final.</p>
+    </div>
+  </div>
+</div>
+<script src="app.js?v=202611272041"></script>
 </body>
 </html>

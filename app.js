@@ -4,6 +4,17 @@
 (() => {
   const $ = (s) => document.querySelector(s);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const MODALES = ['#pedido', '#carro', '#crea'];
+  const modalAbierto = () => MODALES.some(m => { const el = document.querySelector(m); return el && !el.hidden; });
+  // se vuelve a poder bajar la página cuando no queda ninguna ventana ni detalle abierto
+  function libre() { if (document.querySelector('#detail').hidden && !modalAbierto()) document.body.classList.remove('quieto'); }
+  let toastT = 0;
+  function avisar(txt, accion) {
+    const t = document.querySelector('#toast'); t.innerHTML = ''; const s = document.createElement('span'); s.textContent = txt; t.append(s);
+    if (accion) { const b = document.createElement('button'); b.type = 'button'; b.textContent = accion.txt; b.onclick = () => { t.hidden = true; accion.fn(); }; t.append(b); }
+    t.hidden = false; t.classList.remove('sale'); clearTimeout(toastT);
+    toastT = setTimeout(() => { t.classList.add('sale'); setTimeout(() => { t.hidden = true; t.classList.remove('sale'); }, 300); }, 3200);
+  }
   const ASPECTO = { oversize: 1050 / 1064, basica: 733 / 720 };
   const ESCALA_CORTE = { oversize: 1, basica: 0.84 }; // la básica se ve más angosta, como en la realidad
   const SOMBRA_PAD = { oversize: 60 / 720, basica: 60 / 720 };
@@ -324,6 +335,7 @@
 
   document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
     filtro = b.dataset.f;
+    Cielo.tema(filtro === 'doomsday' ? 'doom' : null);
     document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b ? 'true' : 'false'));
     armado = false; armarPerchero();
   }));
@@ -402,10 +414,21 @@
     $('#colorName').textContent = `Color: ${col ? col.nombre : ''}`;
     // contacto
     const msg = `Hola Agustín! Me interesa la remera "${d.nombre}" en corte ${cfgC.nombre}, color ${col ? col.nombre : ''}.`;
-    const cta = $('#cta');
-    if (CFG.whatsapp) { cta.href = `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}`; cta.textContent = 'Consultar por WhatsApp'; }
-    else { cta.href = `https://ig.me/m/${CFG.instagram}`; cta.textContent = 'Consultar por Instagram'; }
+    $('#cta').href = CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`;
   }
+  $('#detAgregar').onclick = () => {
+    if (!sel) return;
+    const d = lista[sel.i];
+    Carro.agregar({ id: d.id, nombre: d.nombre, corte: sel.corte, color: sel.color, lado: sel.lado }, d, $('#detAgregar'));
+  };
+  $('#detCompartir').onclick = async () => {
+    if (!sel) return;
+    const d = lista[sel.i], url = location.origin + location.pathname + '#' + d.id.replace(/_/g, '-');
+    try {
+      if (navigator.share) { await navigator.share({ title: d.nombre, text: `Mirá esta remera: ${d.nombre}`, url }); return; }
+      await navigator.clipboard.writeText(url); avisar('Link copiado');
+    } catch (e) { if (e && e.name !== 'AbortError') avisar('No se pudo compartir'); }
+  };
 
   async function girar(l) {
     if (l === sel.lado) return;
@@ -418,7 +441,7 @@
 
   async function abrir(i) {
     const d = lista[i], it = items[i];
-    if (d.pedido) return Pedido.abrir();
+    if (d.pedido) return Crea.abrir();
     if (window.scrollY > 0) window.scrollTo(0, 0);
     document.body.classList.add('quieto');
     sel = { i, corte: it ? it.corte : d.cortes[0], color: it ? it.color : d.color, lado: ladoDe(d) };
@@ -434,14 +457,14 @@
         { transform: 'none', transformOrigin: '0 0' }], { duration: 480, easing: 'cubic-bezier(.2,.8,.2,1)' });
       detail.querySelector('.det-info').animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 120, fill: 'backwards' });
     }
-    try { history.replaceState(null, '', '#' + d.id.replace(/_/g, '-')); } catch (e) {}
+    try { history.replaceState(null, '', location.pathname + location.search + '#' + d.id.replace(/_/g, '-')); } catch (e) {}
     $('#detClose').focus({ preventScroll: true });
   }
   function cerrar() {
     if (detail.hidden) return;
     const i = sel ? sel.i : -1;
     detail.hidden = true; stage.classList.remove('open'); fig = null;
-    if ($('#pedido').hidden) document.body.classList.remove('quieto');
+    libre();
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     if (items[i]) { centrar(i); items[i].p.w += 70; kick(); items[i].el.focus({ preventScroll: true }); }
   }
@@ -458,7 +481,7 @@
   $('#next').onclick = () => mover(1);
   $('#detClose').onclick = cerrar;
   document.addEventListener('keydown', (e) => {
-    if (detail.hidden || !$('#pedido').hidden) return;
+    if (detail.hidden || modalAbierto()) return;
     if (e.key === 'Escape') cerrar();
     if (e.key === 'ArrowRight' && !e.target.closest('.colores')) mover(1);
     if (e.key === 'ArrowLeft' && !e.target.closest('.colores')) mover(-1);
@@ -480,7 +503,7 @@
   /* ---------- cielo de atardecer que toma el tono de la remera ---------- */
   const Cielo = (() => {
     const cv = document.getElementById('cielo');
-    if (!cv || !cv.getContext) return { tono() {} };
+    if (!cv || !cv.getContext) return { tono() {}, tema() {} };
     const ctx = cv.getContext('2d');
     const NW = 1200, NH = 640;
     const mk = () => { const c = document.createElement('canvas'); c.width = NW; c.height = NH; return c; };
@@ -532,7 +555,11 @@
         h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
       return [h, s, l];
     }
+    // colección Doomsday: cielo verde como los rayos de los diseños, sin importar el color de la remera
+    const TEMAS = { doom: [[138, 34, 46], [130, 36, 58], [108, 40, 72], [96, 50, 86], [152, 34, 30]] };
+    let tema = null;
     function paleta(hex) {
+      if (tema && TEMAS[tema]) return TEMAS[tema];
       const [h, s, l] = hsl(hex || '#DAC7AB');
       if (s < 0.14 || (l < 0.16 && s < 0.4) || (l > 0.78 && s < 0.6)) {
         // neutros (negro, blanco, gris, marfil, beige): atardecer naranja de la marca
@@ -579,6 +606,10 @@
     tamaño(); addEventListener('resize', tamaño);
     requestAnimationFrame(frame);
     return {
+      tema(t) {
+        if (t === tema) return; tema = t;
+        desde = actual; destino = paleta(ultimoHex); t0 = performance.now(); dur = reduce ? 0.01 : 1.1;
+      },
       tono(hex) {
         if (!hex || hex === ultimoHex) return; ultimoHex = hex;
         desde = actual; destino = paleta(hex); t0 = performance.now(); dur = reduce ? 0.01 : 1.1;
@@ -907,7 +938,7 @@
       $('#pedColores').textContent = `${nb} colores en remera básica y ${no} en oversize.`;
       const msg = 'Hola Agustín! Quiero una remera con mi propio diseño. Te cuento mi idea:';
       $('#pedCta').href = CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`;
-      $('#pedCta').textContent = CFG.whatsapp ? 'Pedir mi diseño por WhatsApp' : 'Pedir mi diseño por Instagram';
+      $('#pedCta').textContent = CFG.whatsapp ? 'O contanos tu idea por WhatsApp' : 'O contanos tu idea por Instagram';
       $('#pedVer').textContent = document.body.classList.contains('con-portada') ? 'Ver el catálogo' : 'Seguir viendo el perchero';
       el.hidden = false; Aviso.ocultar(); document.body.classList.add('quieto');
       el.querySelector('.ped-caja').focus({ preventScroll: true });
@@ -915,15 +946,279 @@
     function cerrar() {
       if (el.hidden) return;
       el.hidden = true;
-      if (detail.hidden) document.body.classList.remove('quieto');
+      libre();
       if (antes && antes.focus) antes.focus({ preventScroll: true });
     }
     $('#pedX').onclick = cerrar; $('#pedFondo').onclick = cerrar;
+    $('#pedProbar').onclick = () => { cerrar(); Crea.abrir(); };
     $('#pedVer').onclick = () => { cerrar(); const e = $('#pEntrar'); if (document.body.classList.contains('con-portada') && e) e.click(); };
     $('#navPedir').onclick = () => abrir();
     $('#pPedir').onclick = (e) => { e.stopPropagation(); abrir(); };
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !el.hidden) { e.stopPropagation(); cerrar(); } }, true);
     return { abrir, cerrar };
+  })();
+
+  /* ---------- ventanas: abrir / cerrar con foco, Escape y fondo ---------- */
+  function ventana(sel, alCerrar) {
+    const el = $(sel); let antes = null;
+    const abrir = () => {
+      if (!el.hidden) return;
+      antes = document.activeElement; el.hidden = false; Aviso.ocultar();
+      document.body.classList.add('quieto', 'con-modal');
+      el.querySelector('.ped-caja').focus({ preventScroll: true });
+    };
+    const cerrar = () => {
+      if (el.hidden) return;
+      el.hidden = true; libre(); if (!modalAbierto()) document.body.classList.remove('con-modal'); if (alCerrar) alCerrar();
+      if (antes && antes.focus) antes.focus({ preventScroll: true });
+    };
+    el.querySelectorAll('[data-cerrar]').forEach(b => b.addEventListener('click', cerrar));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !el.hidden) { e.stopPropagation(); cerrar(); } }, true);
+    return { el, abrir, cerrar };
+  }
+  function nombreColor(corte, color) { const c = (CFG.cortes[corte].colores.find(x => x.id === color)) || {}; return c.nombre || color; }
+  function waLink(msg) { return CFG.whatsapp ? `https://wa.me/${CFG.whatsapp}?text=${encodeURIComponent(msg)}` : `https://ig.me/m/${CFG.instagram}`; }
+  // foto chiquita de la remera para la lista del pedido
+  async function miniatura(d, corte, color, lado) {
+    const c = document.createElement('canvas');
+    await componer(c, d, corte, color, lado, 220);
+    if (d.pedido) marcarHueco(c, corte);
+    const o = document.createElement('canvas'); o.width = c.width; o.height = c.height;
+    const x = o.getContext('2d'); x.fillStyle = '#EDE9E2'; x.fillRect(0, 0, o.width, o.height); x.drawImage(c, 0, 0);
+    return o.toDataURL('image/jpeg', 0.8);
+  }
+
+  /* ---------- mi pedido: varias remeras en un solo WhatsApp ---------- */
+  const Carro = (() => {
+    const CLAVE = 'mi-pedido-v1';
+    let items = [], nota = '';
+    const v = ventana('#carro');
+    const btn = $('#carroBtn');
+    function guardar() { try { localStorage.setItem(CLAVE, JSON.stringify({ items, nota })); } catch (e) {} }
+    function total() { return items.reduce((n, it) => n + it.cant, 0); }
+    function mensaje() {
+      const l = items.map((it, k) => {
+        const ladoTxt = it.propio ? `diseño propio en ${it.lado === 'espalda' ? 'la espalda' : 'el frente'} (te mando la imagen)` : (it.lado === 'espalda' ? 'diseño en la espalda' : 'diseño en el frente');
+        return `${k + 1}) ${it.nombre} · ${CFG.cortes[it.corte].nombre}, ${nombreColor(it.corte, it.color)} · ${ladoTxt} · x${it.cant}`;
+      });
+      let m = `Hola Agustín! Quiero hacer este pedido:\n${l.join('\n')}`;
+      if (nota.trim()) m += `\n\nTalles y aclaraciones: ${nota.trim()}`;
+      return m;
+    }
+    function pintarBoton(golpe) {
+      const n = total();
+      btn.hidden = n === 0; $('#carroN').textContent = n;
+      if (golpe && !reduce) btn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.14)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'cubic-bezier(.2,.8,.2,1)' });
+    }
+    function pintar() {
+      const ul = $('#carroLista'); ul.innerHTML = '';
+      items.forEach((it, k) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<img alt="" width="64" height="64"><div class="cl-txt"><b></b><span></span></div>
+          <div class="cl-cant" role="group"><button type="button" data-d="-1" aria-label="Una menos">−</button><output></output><button type="button" data-d="1" aria-label="Una más">+</button></div>
+          <button type="button" class="cl-x" aria-label="Quitar">×</button>`;
+        if (it.foto) li.querySelector('img').src = it.foto; else li.querySelector('img').remove();
+        li.querySelector('b').textContent = it.nombre;
+        li.querySelector('span').textContent = `${CFG.cortes[it.corte].nombre} · ${nombreColor(it.corte, it.color)} · ${it.lado === 'espalda' ? 'Espalda' : 'Frente'}`;
+        li.querySelector('output').textContent = it.cant;
+        li.querySelectorAll('[data-d]').forEach(b => b.onclick = () => { it.cant = Math.max(1, Math.min(50, it.cant + +b.dataset.d)); guardar(); pintar(); });
+        li.querySelector('.cl-x').onclick = () => { items.splice(k, 1); guardar(); pintar(); };
+        ul.appendChild(li);
+      });
+      const vacio = items.length === 0;
+      $('#carroVacio').hidden = !vacio; $('#carroNotaWrap').hidden = vacio;
+      $('#carroEnviar').hidden = vacio; $('#carroVaciar').hidden = vacio;
+      $('#carroEnviar').href = waLink(mensaje());
+      pintarBoton();
+    }
+    async function agregar(it, d, origen) {
+      const key = it.propio ? 'propio-' + Date.now() : `${it.id}|${it.corte}|${it.color}|${it.lado}`;
+      const ya = items.find(x => x.key === key);
+      if (ya) ya.cant++;
+      else {
+        const nuevo = Object.assign({ key, cant: 1 }, it);
+        items.push(nuevo);
+        if (!nuevo.foto) miniatura(d, it.corte, it.color, it.lado).then(f => { nuevo.foto = f; guardar(); if (!v.el.hidden) pintar(); }).catch(() => {});
+      }
+      guardar(); pintar(); pintarBoton(true);
+      if (origen && !reduce) origen.animate([{ transform: 'scale(.94)' }, { transform: 'none' }], { duration: 260 });
+      avisar(`Agregada a tu pedido (${total()})`, { txt: 'Ver pedido', fn: abrir });
+    }
+    function abrir() { pintar(); v.abrir(); }
+    function iniciar() {
+      try {
+        const g = JSON.parse(localStorage.getItem(CLAVE) || 'null');
+        if (g && Array.isArray(g.items)) {
+          items = g.items.filter(it => it && CFG.cortes[it.corte] && (it.propio || DIS.some(d => d.id === it.id)));
+          nota = g.nota || '';
+        }
+      } catch (e) {}
+      $('#carroNota').value = nota;
+      pintar();
+    }
+    $('#carroNota').addEventListener('input', (e) => { nota = e.target.value; guardar(); $('#carroEnviar').href = waLink(mensaje()); });
+    $('#carroVaciar').onclick = () => { items = []; guardar(); pintar(); };
+    $('#carroSeguir').onclick = () => v.cerrar();
+    btn.onclick = abrir;
+    return { agregar, abrir, iniciar };
+  })();
+
+  /* ---------- diseñá la tuya: subís una imagen o escribís un texto y lo ves en la remera ---------- */
+  const Crea = (() => {
+    const v = ventana('#crea');
+    const LETRAS = [
+      { id: 'bold', nombre: 'Bold', font: (px) => `900 ${px}px "Helvetica Neue", Helvetica, Arial, sans-serif`, mayus: true },
+      { id: 'cursiva', nombre: 'Cursiva', font: (px) => `italic 600 ${px}px "Playfair Display", Georgia, serif` },
+      { id: 'clasica', nombre: 'Clásica', font: (px) => `700 ${px}px Georgia, "Times New Roman", serif` }];
+    const TINTAS = [{ id: 'negro', nombre: 'Negro', hex: '#141414' }, { id: 'blanco', nombre: 'Blanco', hex: '#FBFAF7' }, { id: 'naranja', nombre: 'Naranja', hex: '#FF7A00' }, { id: 'dorado', nombre: 'Dorado', hex: '#C9A227' }];
+    const TAM = [{ id: 'chico', nombre: 'Chico', k: 0.5 }, { id: 'mediano', nombre: 'Mediano', k: 0.75 }, { id: 'grande', nombre: 'Grande', k: 1 }];
+    const st = { modo: 'imagen', img: null, imgNombre: '', frase: '', letra: 'bold', tinta: null, corte: 'oversize', color: 'blanco', lado: 'frente', tam: 'grande' };
+    let fuente = null, turno = 0, abierto = false;
+    const canvas = $('#creaCanvas');
+
+    function seg(el, opciones, actual, fn) {
+      el.innerHTML = '';
+      opciones.forEach(o => {
+        const b = document.createElement('button'); b.type = 'button'; b.textContent = o.nombre;
+        b.setAttribute('aria-pressed', o.id === actual ? 'true' : 'false'); b.disabled = !!o.off;
+        b.onclick = () => { fn(o.id); controles(); pintar(); };
+        el.appendChild(b);
+      });
+    }
+    // tinta por defecto: la que más contrasta con la remera
+    function tintaAuto() { return ['negro', 'azul_marino', 'verde_musgo', 'verde_botella', 'bordo', 'marron', 'gris_plomo', 'violeta', 'azul_francia', 'rojo'].includes(st.color) ? 'blanco' : 'negro'; }
+    function controles() {
+      const cortes = Object.entries(CFG.cortes).map(([id, c]) => ({ id, nombre: c.nombre }));
+      seg($('#creaCorte'), cortes, st.corte, (id) => { st.corte = id; if (!CFG.cortes[id].colores.some(c => c.id === st.color)) st.color = 'blanco'; if (!CFG.cortes[id].lados.includes(st.lado)) st.lado = 'frente'; });
+      seg($('#creaLado'), ['frente', 'espalda'].map(l => ({ id: l, nombre: l === 'frente' ? 'Frente' : 'Espalda', off: !CFG.cortes[st.corte].lados.includes(l) })), st.lado, (l) => { st.lado = l; });
+      seg($('#creaTam'), TAM, st.tam, (t) => { st.tam = t; });
+      seg($('#creaLetra'), LETRAS, st.letra, (l) => { st.letra = l; fuente = null; });
+      document.querySelectorAll('.crea-modo button').forEach(b => b.setAttribute('aria-pressed', b.dataset.modo === st.modo ? 'true' : 'false'));
+      $('#creaImagen').hidden = st.modo !== 'imagen'; $('#creaTexto').hidden = st.modo !== 'texto';
+      const ti = $('#creaTinta'); ti.innerHTML = '';
+      const tinta = st.tinta || tintaAuto();
+      TINTAS.forEach(t => {
+        const b = document.createElement('button'); b.type = 'button'; b.style.setProperty('--c', t.hex);
+        b.setAttribute('aria-label', 'Letra ' + t.nombre); b.title = t.nombre; b.setAttribute('aria-pressed', t.id === tinta ? 'true' : 'false');
+        b.onclick = () => { st.tinta = t.id; fuente = null; controles(); pintar(); };
+        ti.appendChild(b);
+      });
+      const cs = $('#creaColores'); cs.innerHTML = '';
+      CFG.cortes[st.corte].colores.forEach(c => {
+        const b = document.createElement('button'); b.type = 'button'; b.className = 'tag';
+        b.style.setProperty('--c', c.hex); b.setAttribute('aria-label', c.nombre); b.title = c.nombre;
+        b.setAttribute('aria-pressed', c.id === st.color ? 'true' : 'false');
+        b.onclick = () => { st.color = c.id; if (st.modo === 'texto' && !st.tinta) fuente = null; controles(); pintar(); };
+        cs.appendChild(b);
+      });
+      $('#creaColorNom').textContent = 'Color: ' + nombreColor(st.corte, st.color);
+    }
+    // el texto se dibuja en una imagen transparente recortada justo al borde de las letras
+    async function imagenTexto() {
+      const L = LETRAS.find(l => l.id === st.letra);
+      let txt = st.frase.trim(); if (!txt) return null;
+      if (L.mayus) txt = txt.toUpperCase();
+      try { await document.fonts.load(L.font(80)); } catch (e) {}
+      const lineas = txt.split(/\n+/).map(s => s.trim()).filter(Boolean).slice(0, 4);
+      const W = 1400, px = 200, alto = px * 1.12;
+      const c = document.createElement('canvas'); c.width = W; c.height = Math.ceil(alto * lineas.length + px * 0.6);
+      const x = c.getContext('2d'); x.font = L.font(px);
+      const anchoMax = Math.max(...lineas.map(l => x.measureText(l).width));
+      const k = Math.min(1, (W - 40) / anchoMax);
+      x.font = L.font(px * k); x.textAlign = 'center'; x.textBaseline = 'alphabetic';
+      x.fillStyle = (TINTAS.find(t => t.id === (st.tinta || tintaAuto()))).hex;
+      lineas.forEach((l, i) => x.fillText(l, W / 2, px * k * 0.95 + i * alto * k + px * 0.1));
+      const d = x.getImageData(0, 0, c.width, c.height).data;
+      let x0 = c.width, y0 = c.height, x1 = 0, y1 = 0;
+      for (let yy = 0; yy < c.height; yy += 2) for (let xx = 0; xx < c.width; xx += 2) if (d[(yy * c.width + xx) * 4 + 3] > 10) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (yy < y0) y0 = yy; if (yy > y1) y1 = yy; }
+      if (x1 <= x0) return null;
+      const o = document.createElement('canvas'); o.width = x1 - x0 + 12; o.height = y1 - y0 + 12;
+      o.getContext('2d').drawImage(c, x0 - 6, y0 - 6, o.width, o.height, 0, 0, o.width, o.height);
+      return o.toDataURL('image/png');
+    }
+    async function diseno() {
+      if (st.modo === 'imagen') return st.img;
+      if (fuente === null) fuente = (await imagenTexto()) || '';
+      return fuente || null;
+    }
+    function pseudo(src) {
+      const k = TAM.find(t => t.id === st.tam).k, base = CFG.cortes[st.corte].estampa[st.lado] || CFG.cortes[st.corte].estampa.frente;
+      const e = { ancho: base.ancho * k, alto: base.alto * k, anchoAncho: base.anchoAncho * k };
+      const d = { id: 'propio', nombre: 'Mi diseño propio', estampa: { [st.corte]: { [st.lado]: e } } };
+      d[st.lado] = src;
+      return d;
+    }
+    async function pintar() {
+      if (!abierto) return;
+      const t = ++turno;
+      const src = await diseno();
+      const off = document.createElement('canvas');
+      const caja = canvas.parentElement.getBoundingClientRect();
+      const maxW = Math.round(Math.min(900, Math.max(300, caja.width * (devicePixelRatio > 1 ? 2 : 1.3))));
+      await componer(off, src ? pseudo(src) : { id: 'vacio' }, st.corte, st.color, st.lado, maxW).catch(console.warn);
+      if (!src) marcarHueco(off, st.corte);
+      if (t !== turno) return;
+      canvas.width = off.width; canvas.height = off.height; canvas.getContext('2d').drawImage(off, 0, 0);
+      const listo = !!src;
+      $('#creaAgregar').disabled = !listo; $('#creaEnviar').disabled = !listo;
+    }
+    function leerArchivo(f) {
+      if (!f || !f.type.startsWith('image/')) return;
+      const r = new FileReader();
+      r.onload = () => {
+        // se achica para que el celular no se trabe con fotos enormes
+        const i = new Image();
+        i.onload = () => {
+          const k = Math.min(1, 1600 / Math.max(i.naturalWidth, i.naturalHeight));
+          const c = document.createElement('canvas'); c.width = Math.round(i.naturalWidth * k); c.height = Math.round(i.naturalHeight * k);
+          c.getContext('2d').drawImage(i, 0, 0, c.width, c.height);
+          st.img = c.toDataURL(f.type === 'image/jpeg' ? 'image/jpeg' : 'image/png', 0.9); st.imgNombre = f.name;
+          $('#creaArchivoTxt').textContent = 'Cambiar imagen';
+          pintar();
+        };
+        i.src = r.result;
+      };
+      r.readAsDataURL(f);
+    }
+    $('#creaArchivo').addEventListener('change', (e) => leerArchivo(e.target.files[0]));
+    let ft = 0;
+    $('#creaFrase').addEventListener('input', (e) => { st.frase = e.target.value; fuente = null; clearTimeout(ft); ft = setTimeout(pintar, 180); });
+    document.querySelectorAll('.crea-modo button').forEach(b => b.onclick = () => { st.modo = b.dataset.modo; controles(); pintar(); if (st.modo === 'texto') $('#creaFrase').focus({ preventScroll: true }); });
+    async function fotoFinal() {
+      return new Promise((ok) => {
+        const o = document.createElement('canvas'); o.width = canvas.width; o.height = canvas.height;
+        const x = o.getContext('2d'); x.fillStyle = '#EDE9E2'; x.fillRect(0, 0, o.width, o.height); x.drawImage(canvas, 0, 0);
+        o.toBlob(ok, 'image/jpeg', 0.9);
+      });
+    }
+    function resumen() { return `${CFG.cortes[st.corte].nombre}, ${nombreColor(st.corte, st.color)}, diseño ${st.tam} en ${st.lado === 'espalda' ? 'la espalda' : 'el frente'}`; }
+    $('#creaAgregar').onclick = async () => {
+      const src = await diseno(); if (!src) return;
+      const c = document.createElement('canvas'); c.width = 220; c.height = Math.round(220 * canvas.height / canvas.width);
+      const x = c.getContext('2d'); x.fillStyle = '#EDE9E2'; x.fillRect(0, 0, c.width, c.height); x.drawImage(canvas, 0, 0, c.width, c.height);
+      const nombre = st.modo === 'texto' ? `Mi frase: "${st.frase.trim().replace(/\s+/g, ' ').slice(0, 40)}"` : 'Mi diseño propio';
+      Carro.agregar({ propio: true, id: 'propio', nombre, corte: st.corte, color: st.color, lado: st.lado, foto: c.toDataURL('image/jpeg', 0.8) }, null, $('#creaAgregar'));
+    };
+    $('#creaEnviar').onclick = async () => {
+      const src = await diseno(); if (!src) return;
+      const frase = st.modo === 'texto' ? ` con la frase "${st.frase.trim().replace(/\s+/g, ' ')}"` : '';
+      const msg = `Hola Agustín! Quiero una remera con mi propio diseño${frase}: ${resumen()}. Te mando la vista previa.`;
+      const blob = await fotoFinal();
+      const file = blob && new File([blob], 'mi-remera.jpg', { type: 'image/jpeg' });
+      // en el celular se comparte la foto directo (WhatsApp aparece entre las opciones)
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try { await navigator.share({ files: [file], text: msg }); return; } catch (e) { if (e.name === 'AbortError') return; }
+      }
+      // en la compu: se descarga la foto y se abre WhatsApp con el mensaje, para adjuntarla
+      if (blob) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'mi-remera.jpg'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
+      window.open(waLink(msg + ' (la imagen se descargó en tu compu, adjuntala acá)'), '_blank', 'noopener');
+    };
+    function abrir() {
+      if (detail && !detail.hidden) cerrar();
+      abierto = true; v.abrir(); controles();
+      requestAnimationFrame(pintar);
+    }
+    return { abrir };
   })();
 
   /* ---------- secciones de información (debajo del perchero) ---------- */
@@ -950,6 +1245,7 @@
       });
       const pint = (el, corte) => (CFG.cortes[corte] ? CFG.cortes[corte].colores : []).forEach(c => { const i = document.createElement('i'); i.style.background = c.hex; i.title = c.nombre; el.appendChild(i); });
       pint($('#iOver'), 'oversize'); pint($('#iBas'), 'basica');
+      $('#iColTu').addEventListener('click', (e) => { e.preventDefault(); Crea.abrir(); });
       document.querySelectorAll('.info [data-ir]').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); subir(() => filtrar(a.dataset.ir)); }));
       document.querySelectorAll('.info a[href^="#i-"], .mas-abajo').forEach(a => a.addEventListener('click', (e) => {
         const t = document.querySelector(a.getAttribute('href')); if (!t) return;
@@ -984,9 +1280,11 @@
       filtro = dh.coleccion;
       document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.f === filtro ? 'true' : 'false'));
     }
+    Cielo.tema(filtro === 'doomsday' ? 'doom' : null);
     if (!dh && cfg.portada) document.body.classList.add('con-portada');   // hay portada: el perchero se arma de fondo
     armarPerchero();
     Info.armar();
+    Carro.iniciar();
     const i = lista.findIndex(d => d.id === h);
     if (i >= 0) setTimeout(() => abrir(i), 300);
     else if (cfg.portada) Portada.iniciar(cfg.portada, cfg.novedad);
