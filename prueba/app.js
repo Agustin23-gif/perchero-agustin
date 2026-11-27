@@ -335,6 +335,7 @@
 
   document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
     filtro = b.dataset.f;
+    Cielo.tema(filtro === 'doomsday' ? 'doom' : null);
     document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === b ? 'true' : 'false'));
     armado = false; armarPerchero();
   }));
@@ -502,7 +503,7 @@
   /* ---------- cielo de atardecer que toma el tono de la remera ---------- */
   const Cielo = (() => {
     const cv = document.getElementById('cielo');
-    if (!cv || !cv.getContext) return { tono() {} };
+    if (!cv || !cv.getContext) return { tono() {}, tema() {} };
     const ctx = cv.getContext('2d');
     const NW = 1200, NH = 640;
     const mk = () => { const c = document.createElement('canvas'); c.width = NW; c.height = NH; return c; };
@@ -554,7 +555,11 @@
         h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
       return [h, s, l];
     }
+    // colección Doomsday: cielo verde como los rayos de los diseños, sin importar el color de la remera
+    const TEMAS = { doom: [[138, 34, 46], [130, 36, 58], [108, 40, 72], [96, 50, 86], [152, 34, 30]] };
+    let tema = null;
     function paleta(hex) {
+      if (tema && TEMAS[tema]) return TEMAS[tema];
       const [h, s, l] = hsl(hex || '#DAC7AB');
       if (s < 0.14 || (l < 0.16 && s < 0.4) || (l > 0.78 && s < 0.6)) {
         // neutros (negro, blanco, gris, marfil, beige): atardecer naranja de la marca
@@ -601,6 +606,10 @@
     tamaño(); addEventListener('resize', tamaño);
     requestAnimationFrame(frame);
     return {
+      tema(t) {
+        if (t === tema) return; tema = t;
+        desde = actual; destino = paleta(ultimoHex); t0 = performance.now(); dur = reduce ? 0.01 : 1.1;
+      },
       tono(hex) {
         if (!hex || hex === ultimoHex) return; ultimoHex = hex;
         desde = actual; destino = paleta(hex); t0 = performance.now(); dur = reduce ? 0.01 : 1.1;
@@ -1271,6 +1280,7 @@
       filtro = dh.coleccion;
       document.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.f === filtro ? 'true' : 'false'));
     }
+    Cielo.tema(filtro === 'doomsday' ? 'doom' : null);
     if (!dh && cfg.portada) document.body.classList.add('con-portada');   // hay portada: el perchero se arma de fondo
     armarPerchero();
     Info.armar();
