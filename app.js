@@ -607,7 +607,7 @@
     requestAnimationFrame(frame);
     return {
       tema(t) {
-        if (t === tema) return; tema = t;
+        if (t === tema) return; tema = t; document.body.classList.toggle('tema-doom', t === 'doom');
         desde = actual; destino = paleta(ultimoHex); t0 = performance.now(); dur = reduce ? 0.01 : 1.1;
       },
       tono(hex) {
