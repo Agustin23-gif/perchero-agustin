@@ -12,7 +12,7 @@
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Agustín diseños">
-<link rel="stylesheet" href="styles.css?v=202611181924">
+<link rel="stylesheet" href="styles.css?v=202611270700">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -22,6 +22,10 @@
     <img src="img/logo.png" alt="Agustín diseños personalizados" width="880" height="210">
   </header>
   <div class="p-titulo" aria-hidden="true"><span>Remeras</span><em>con fe</em></div>
+  <button class="p-doom" id="pDoom" type="button" aria-label="Nueva colección Doomsday. Ver la colección" hidden>
+    <span class="pd-giro" aria-hidden="true"><span class="pd-piso"></span><canvas id="pdCanvas" width="10" height="10"></canvas></span>
+    <span class="pd-txt"><span class="pd-eti">Nueva colección</span><span class="pd-tit" id="pdTit">Doomsday</span><span class="pd-sub" id="pdSub"></span><span class="pd-btn">Ver colección <span aria-hidden="true">→</span></span></span>
+  </button>
   <div class="p-escena" id="pEscena" aria-label="Remeras destacadas. Deslizá para ver más."></div>
   <div class="p-pie" id="pPie">
     <p class="p-cap" aria-live="polite"><b id="pNombre">&nbsp;</b><span id="pSub">&nbsp;</span></p>
@@ -60,6 +64,7 @@
         <button class="chip" type="button" data-f="todo" aria-pressed="true">Todo</button>
         <button class="chip" type="button" data-f="oversize" aria-pressed="false">Oversize</button>
         <button class="chip" type="button" data-f="basica" aria-pressed="false">Básica</button>
+        <button class="chip chip-col chip-doom" type="button" data-f="doomsday" aria-pressed="false">Doomsday</button>
         <button class="chip chip-col" type="button" data-f="salmos_romanos" aria-pressed="false">Salmos y Romanos</button>
       </div>
     </section>
@@ -96,11 +101,11 @@
 
   <aside class="aviso" id="aviso" hidden aria-label="Nueva colección">
     <button class="aviso-x" id="avisoX" type="button" aria-label="Cerrar aviso">×</button>
-    <div class="aviso-img" aria-hidden="true"><img src="disenos/sr_christ_romanos.webp" alt="" loading="lazy"></div>
+    <div class="aviso-img" aria-hidden="true"><img src="disenos/doom_rayos_espalda.webp" alt="" loading="lazy"></div>
     <div class="aviso-txt">
       <p class="aviso-eti">Nuevo</p>
-      <p class="aviso-tit">Colección Salmos y Romanos</p>
-      <p class="aviso-sub">26 diseños en la espalda · remeras negras</p>
+      <p class="aviso-tit">Colección Doomsday</p>
+      <p class="aviso-sub">15 diseños · Doom, Iron Man y Thor</p>
       <button class="aviso-btn" id="avisoVer" type="button">Ver la colección →</button>
     </div>
   </aside>
@@ -118,8 +123,13 @@
       <img src="img/inicio/you_are_a_child_of_god_marfil.webp" alt="" loading="lazy" width="900" height="887">
       <span class="i-btn i-btn-t i-ir">Ver diseños →</span>
     </a>
-    <a class="i-col i-col-sr i-rev" style="--d:.1s" href="#" data-ir="salmos_romanos">
+    <a class="i-col i-col-sr i-col-doom i-rev" style="--d:.05s" href="#" data-ir="doomsday">
       <span class="i-nuevo">Nuevo</span>
+      <div><p class="i-n">15 diseños · Doom y Thor</p><h3>Doomsday</h3></div>
+      <img src="img/inicio/doom_rayos_negro.webp" alt="" loading="lazy" width="900" height="887">
+      <span class="i-btn i-btn-n i-ir">Ver colección →</span>
+    </a>
+    <a class="i-col i-col-sr i-rev" style="--d:.1s" href="#" data-ir="salmos_romanos">
       <div><p class="i-n">26 diseños · en la espalda · negro</p><h3>Salmos <em>y</em> Romanos</h3></div>
       <img src="img/inicio/salmos_fuego_negro.webp" alt="" loading="lazy" width="900" height="887">
       <span class="i-btn i-btn-n i-ir">Ver colección →</span>
@@ -216,6 +226,6 @@
     </div>
   </div>
 </div>
-<script src="app.js?v=202611181924"></script>
+<script src="app.js?v=202611270700"></script>
 </body>
 </html>

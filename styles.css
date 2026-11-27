@@ -433,7 +433,7 @@ body.con-portada, body.quieto { overflow: hidden; }
 .i-sec-cab p.i-bajada { margin: 0; max-width: 380px; color: var(--gris); font-size: 15px; line-height: 1.45; }
 
 /* colecciones */
-.i-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.i-cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .i-col { position: relative; border-radius: 22px; overflow: hidden; min-height: 470px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; isolation: isolate; }
 .i-col img { position: absolute; z-index: -1; left: 50%; bottom: -11%; width: min(90%, 400px); height: auto; max-width: none; transform: translateX(-50%); transition: transform .5s cubic-bezier(.2, .8, .2, 1); }
 .i-col:hover img { transform: translateX(-50%) translateY(-10px) rotate(-1.5deg); }
@@ -452,6 +452,7 @@ body.con-portada, body.quieto { overflow: hidden; }
 .i-nuevo { position: absolute; top: 20px; right: 20px; background: var(--tinta); color: var(--pared); font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 5px 9px; border-radius: 4px; }
 .i-hueco { position: absolute; z-index: -1; left: 50%; top: 52%; transform: translate(-50%, -50%); width: 58%; aspect-ratio: 1 / 1.05; border: 3px dashed var(--tinta); border-radius: 16px; display: grid; place-items: center; text-align: center;
   font-weight: 800; font-size: clamp(26px, 3vw, 38px); letter-spacing: -.06em; line-height: .9; text-transform: uppercase; }
+@media (max-width: 1180px) and (min-width: 901px) { .i-cols { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 900px) { .i-cols { grid-template-columns: 1fr; } .i-col { min-height: 420px; } }
 
 /* destacadas */
@@ -517,3 +518,51 @@ body.con-portada, body.quieto { overflow: hidden; }
 .i-clara figure { background: var(--tinta); }
 .i-oscura figure { background: var(--naranja); }
 .i-rem:hover figure { filter: brightness(1.06); }
+
+/* ---------- colección Doomsday ---------- */
+.info .i-col-doom { background: #1E4A2B; color: var(--pared); }   /* remera negra sobre verde Doom */
+.info .i-col-doom .i-btn-n { background: var(--naranja); color: var(--tinta); }
+.chip-doom { background: var(--tinta); color: var(--pared); border-color: var(--tinta); }
+.chip-doom[aria-pressed="true"] { background: var(--naranja); color: var(--tinta); border-color: var(--naranja); }
+.chip-doom[aria-pressed="false"] { border-color: var(--tinta); }
+.chip-col:not(.chip-doom)[aria-pressed="false"]::after { display: none; }   /* el puntito "nuevo" ahora es de Doomsday */
+.chip-col:not(.chip-doom)[aria-pressed="false"] { border-color: var(--tinta); }
+
+/* portada: remera de la colección nueva girando, con su cartel */
+.p-doom {
+  position: absolute; z-index: 5; left: clamp(16px, 2.4vw, 40px); top: 54%; transform: translateY(-50%);
+  width: clamp(230px, 19vw, 310px); display: grid; gap: 4px; justify-items: center; text-align: center;
+  border: 0; cursor: pointer; color: var(--tinta); background: var(--naranja); border-radius: 20px; padding: 16px 16px 18px;
+  box-shadow: 0 24px 50px -18px rgba(20, 20, 20, .6); transition: opacity .4s, transform .5s;
+  animation: pdEntra .9s .5s cubic-bezier(.2, .8, .2, 1) backwards;
+}
+@keyframes pdEntra { from { opacity: 0; transform: translate(-30px, -50%); } }
+.p-doom:hover { box-shadow: 0 0 0 3px var(--tinta), 0 24px 50px -18px rgba(20, 20, 20, .6); }
+.pd-giro { position: relative; display: block; width: 100%; aspect-ratio: 1 / .99; }
+.pd-giro canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transform-origin: 50% 50%; }
+.pd-piso { position: absolute; left: 16%; right: 16%; bottom: -1%; height: 8%; border-radius: 50%; background: radial-gradient(closest-side, rgba(20, 20, 20, .35), rgba(20, 20, 20, 0)); }
+.pd-txt { display: grid; gap: 4px; justify-items: center; }
+.pd-eti { background: var(--tinta); color: var(--naranja); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 3px; animation: pdLate 1.6s ease-in-out infinite; }
+@keyframes pdLate { 50% { opacity: .55; } }
+.pd-tit { font-size: clamp(30px, 2.9vw, 46px); font-weight: 800; letter-spacing: -.07em; text-transform: uppercase; line-height: .9; margin-top: 4px; }
+.pd-sub { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: rgba(20, 20, 20, .72); }
+.pd-btn { margin-top: 8px; background: var(--tinta); color: var(--pared); border-radius: 99px; padding: 9px 16px; font-size: 12px; font-weight: 800; letter-spacing: -.01em; text-transform: uppercase; }
+.p-doom:hover .pd-btn { background: var(--pared); color: var(--tinta); }
+.portada.zoom .p-doom { opacity: 0; pointer-events: none; }
+@media (max-width: 760px) {
+  /* en el celular va como franja arriba del pie, a lo ancho */
+  .p-doom {
+    position: relative; left: auto; top: auto; transform: none; width: auto; margin: 0 var(--gutter-r) 10px var(--gutter-l);
+    grid-row: 3; grid-template-columns: 88px 1fr; justify-items: start; text-align: left; gap: 12px; align-items: center;
+    padding: 8px 14px 8px 8px; border-radius: 16px; animation-name: pdEntraCel;
+  }
+  @keyframes pdEntraCel { from { opacity: 0; transform: translateY(20px); } }
+  .pd-txt { justify-items: start; gap: 2px; }
+  .pd-tit { font-size: 30px; margin-top: 2px; }
+  .pd-sub { font-size: 10px; }
+  .pd-btn { margin-top: 4px; padding: 6px 12px; font-size: 11px; }
+  .portada { grid-template-rows: auto 1fr auto auto; }
+  .p-pie { grid-row: 4; }
+  .portada.zoom .p-doom { transform: translateY(20px); }
+}
+@media (prefers-reduced-motion: reduce) { .p-doom, .pd-eti { animation: none; } }
