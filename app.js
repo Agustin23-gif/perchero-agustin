@@ -603,7 +603,10 @@
       const ZW = movil ? Math.min(vw * 0.86, 520) : Math.min(innerHeight * 0.76, vw * 0.44, 980);
       // en compu, remera y ficha forman un bloque centrado (antes la ficha quedaba muy a la derecha)
       const infoW = Math.min(560, Math.max(340, vw * 0.3)), gap = Math.max(24, vw * 0.035);
-      return { vw, eh, movil, Wc, ZW, infoW, gap, EW: Math.max(Wc, ZW), sp: Wc * (movil ? 0.42 : 0.5) };
+      // en compu, si está el cartel de la colección nueva a la izquierda, el abanico y su texto se corren un poco a la derecha
+      const pd = $('#pDoom'), off = !movil && pd && !pd.hidden ? (pd.offsetLeft + pd.offsetWidth) * 0.5 : 0;
+      $('#pPie').style.paddingLeft = off ? (off * 2) + 'px' : '';
+      return { vw, eh, movil, Wc, ZW, infoW, gap, off, EW: Math.max(Wc, ZW), sp: Wc * (movil ? 0.42 : 0.5) };
     }
     function armar() {
       medida = medir(); esc.innerHTML = '';
@@ -655,7 +658,7 @@
       }
       const r = envolver(k - c), a = Math.abs(r);
       return {
-        x: r * sp * (1 + 0.12 * a), y: a * a * Wc * 0.025 + (movil ? eh * 0.1 : eh * 0.07), s: (Wc / EW) * (1 - 0.11 * a),
+        x: medida.off + r * sp * (1 + 0.12 * a), y: a * a * Wc * 0.025 + (movil ? eh * 0.1 : eh * 0.07), s: (Wc / EW) * (1 - 0.11 * a),
         rot: r * 5.5, o: Math.max(0, Math.min(1, (2.5 - a) / 0.45)), z: 20 - Math.round(a * 4)
       };
     }
@@ -748,10 +751,61 @@
     }
     function mostrar() {
       el.hidden = false; el.classList.add('salir');
-      requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.remove('salir'); tocar(); }));
+      requestAnimationFrame(() => requestAnimationFrame(() => { el.classList.remove('salir'); tocar(); Nov.arrancar(); }));
       setTimeout(() => { if (visible()) document.body.classList.add('con-portada'); }, reduce ? 0 : 800);
     }
     $('#pEntrar').onclick = () => salir();
+
+    /* colección nueva: una remera que gira sola (frente ↔ espalda) en un cartel de la portada.
+       El giro es solo un achique horizontal (sin 3D ni agrandar), que en iPhone se ve nítido. */
+    const Nov = (() => {
+      const btn = $('#pDoom'), cv = $('#pdCanvas');
+      let cfg = null, caras = null, raf = 0, t0 = 0;
+      const FIJA = 1.5, GIRO = 1.0, T = 2 * (FIJA + GIRO);
+      async function preparar(n) {
+        const d = DIS.find(x => x.id === n.id); if (!d) return;
+        cfg = { n, d }; btn.hidden = false;
+        $('#pdTit').textContent = n.titulo || d.nombre; $('#pdSub').textContent = n.sub || '';
+        const color = colorDe(d, 'oversize'), w = Math.min(700, Math.ceil(btn.clientWidth * Math.max(1.5, devicePixelRatio || 1)));
+        const lados = ['frente', 'espalda'].filter(l => d[l]);
+        caras = await Promise.all(lados.map(async l => { const c = document.createElement('canvas'); await componer(c, d, 'oversize', color, l, w); return c; }));
+        if (ladoDe(d) === 'espalda' && caras.length > 1) caras.reverse();   // arranca mostrando el diseño grande
+        cv.width = caras[0].width; cv.height = caras[0].height;
+        cv.getContext('2d').drawImage(caras[0], 0, 0);
+        arrancar();
+      }
+      let cara = -1;
+      function dibujar(k) {
+        if (k === cara || !caras[k]) return; cara = k;
+        const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.drawImage(caras[k], 0, 0);
+      }
+      function frame(t) {
+        raf = 0;
+        if (!caras || !visible()) return;
+        if (!t0) t0 = t;
+        const s = ((t - t0) / 1000) % T, medio = FIJA + GIRO;
+        const fase = s % medio, vuelta = s < medio ? 0 : 1;
+        let th = 0;
+        if (fase > FIJA) { const u = (fase - FIJA) / GIRO; th = Math.PI * (0.5 - 0.5 * Math.cos(Math.PI * u)); }
+        const k = caras.length > 1 ? (th < Math.PI / 2 ? vuelta : 1 - vuelta) : 0;
+        dibujar(k);
+        const sx = Math.max(0.03, Math.abs(Math.cos(th)));
+        cv.style.transform = `scale(${sx.toFixed(3)},1)`;
+        cv.style.filter = sx < 0.98 ? `brightness(${(0.55 + 0.45 * sx).toFixed(2)})` : '';
+        raf = requestAnimationFrame(frame);
+      }
+      function arrancar() { if (reduce) return alternar(); if (!raf && caras) raf = requestAnimationFrame(frame); }
+      let altT = 0;
+      function alternar() {   // sin animaciones: cambia de cara cada pocos segundos
+        clearInterval(altT); if (!caras || caras.length < 2) return;
+        let k = 0; altT = setInterval(() => { if (visible()) { k = 1 - k; cara = -1; dibujar(k); } }, 3500);
+      }
+      btn.addEventListener('click', () => {
+        if (!cfg) return;
+        salir(() => { const chip = document.querySelector(`.chip[data-f="${cfg.n.coleccion}"]`); if (chip && chip.getAttribute('aria-pressed') !== 'true') chip.click(); });
+      });
+      return { preparar, arrancar };
+    })();
     $('#pCerrar').onclick = cerrarZoom;
     $('#pVer').onclick = () => {
       const d = P[zoomK].d, corte = P[zoomK].corte, color = P[zoomK].color;
@@ -805,7 +859,8 @@
     addEventListener('resize', () => { clearTimeout(rT); rT = setTimeout(() => { if (!el.hidden) { const z = zoomK; armar(); zoomK = z; if (z >= 0) ubicarFicha(); tocar(); } }, 200); });
 
     return {
-      iniciar(lista) {
+      iniciar(lista, novedad) {
+        if (novedad) requestAnimationFrame(() => Nov.preparar(novedad).catch(console.warn));
         P = (lista || []).map(x => {
           const d = DIS.find(y => y.id === x.id); if (!d) return null;
           const corte = x.corte || d.cortes[0];
@@ -823,22 +878,22 @@
   // Aparece al llegar al perchero (en "Todo"). Se cierra solo, con la ×, o al entrar a la colección.
   const Aviso = (() => {
     const el = $('#aviso'); let timer = 0, visto = false;
-    try { visto = sessionStorage.getItem('aviso-sr') === '1'; } catch (e) {}
+    try { visto = sessionStorage.getItem('aviso-doom') === '1'; } catch (e) {}
     function ocultar() {
       if (el.hidden) return; clearTimeout(timer); el.classList.add('fuera');
       setTimeout(() => { el.hidden = true; el.classList.remove('fuera'); }, 380);
-      visto = true; try { sessionStorage.setItem('aviso-sr', '1'); } catch (e) {}
+      visto = true; try { sessionStorage.setItem('aviso-doom', '1'); } catch (e) {}
     }
     function mostrar(espera = 1200) {
-      if (visto || !DIS.some(d => d.coleccion === 'salmos_romanos')) return;
+      if (visto || !DIS.some(d => d.coleccion === 'doomsday')) return;
       setTimeout(() => {
         if (visto || filtro !== 'todo' || !detail.hidden || document.body.classList.contains('con-portada')) return;
         el.hidden = false; clearTimeout(timer); timer = setTimeout(ocultar, 12000);
       }, espera);
     }
     $('#avisoX').onclick = ocultar;
-    $('#avisoVer').onclick = () => { ocultar(); const chip = document.querySelector('.chip[data-f="salmos_romanos"]'); if (chip) chip.click(); };
-    document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { if (b.dataset.f === 'salmos_romanos') ocultar(); }));
+    $('#avisoVer').onclick = () => { ocultar(); const chip = document.querySelector('.chip[data-f="doomsday"]'); if (chip) chip.click(); };
+    document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { if (b.dataset.f === 'doomsday') ocultar(); }));
     return { mostrar, ocultar };
   })();
 
@@ -934,7 +989,7 @@
     Info.armar();
     const i = lista.findIndex(d => d.id === h);
     if (i >= 0) setTimeout(() => abrir(i), 300);
-    else if (cfg.portada) Portada.iniciar(cfg.portada);
+    else if (cfg.portada) Portada.iniciar(cfg.portada, cfg.novedad);
     else Aviso.mostrar();   // con un link directo a una remera no se muestra la portada
   }).catch(err => { $('#capName').textContent = 'No se pudo cargar el catálogo'; console.error(err); });
 })();

@@ -221,11 +221,612 @@
       "id": "jesus_loves_you"
     },
     {
-      "id": "romanos_christ",
-      "nueva": true
+      "id": "romanos_christ"
     }
   ],
   "disenos": [
+    {
+      "id": "doom_rayos",
+      "nombre": "Doom",
+      "detalle": "Espalda + logo DOOM en el frente",
+      "frente": "disenos/doom_rayos_frente.webp",
+      "espalda": "disenos/doom_rayos_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.37,
+            "anchoAncho": 0.37,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          },
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.107,
+            "anchoAncho": 0.107,
+            "top": 0.3,
+            "topAncho": 0.3,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.37,
+            "anchoAncho": 0.37,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          },
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.107,
+            "anchoAncho": 0.107,
+            "top": 0.3,
+            "topAncho": 0.3,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_doomsday",
+      "nombre": "Doomsday",
+      "detalle": "Diseño en la espalda",
+      "frente": null,
+      "espalda": "disenos/doom_doomsday_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.5,
+            "ancho": 0.398,
+            "anchoAncho": 0.398,
+            "top": 0.174,
+            "topAncho": 0.174,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.5,
+            "ancho": 0.398,
+            "anchoAncho": 0.398,
+            "top": 0.174,
+            "topAncho": 0.174,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_new_mask",
+      "nombre": "New mask, same task",
+      "detalle": "Iron Man / Doom · espalda",
+      "frente": null,
+      "espalda": "disenos/doom_new_mask_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.381,
+            "anchoAncho": 0.381,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.381,
+            "anchoAncho": 0.381,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_victor",
+      "nombre": "Victor Von Doom",
+      "detalle": "Diseño en la espalda",
+      "frente": null,
+      "espalda": "disenos/doom_victor_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.347,
+            "anchoAncho": 0.347,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.347,
+            "anchoAncho": 0.347,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_doctor",
+      "nombre": "Doctor Doom",
+      "detalle": "Diseño en la espalda",
+      "frente": null,
+      "espalda": "disenos/doom_doctor_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.288,
+            "anchoAncho": 0.288,
+            "top": 0.185,
+            "topAncho": 0.185,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.499,
+            "ancho": 0.288,
+            "anchoAncho": 0.288,
+            "top": 0.185,
+            "topAncho": 0.185,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_i_am",
+      "nombre": "I am Doom",
+      "detalle": "Diseño en la espalda",
+      "frente": null,
+      "espalda": "disenos/doom_i_am_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.5,
+            "ancho": 0.33,
+            "anchoAncho": 0.33,
+            "top": 0.177,
+            "topAncho": 0.177,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.537,
+            "ancho": 0.299,
+            "anchoAncho": 0.299,
+            "top": 0.177,
+            "topAncho": 0.177,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_avengers",
+      "nombre": "Avengers Doomsday",
+      "detalle": "Doom / Stark · frente",
+      "frente": "disenos/doom_avengers_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.497,
+            "ancho": 0.359,
+            "anchoAncho": 0.359,
+            "top": 0.263,
+            "topAncho": 0.263,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "frente": {
+            "cx": 0.497,
+            "ancho": 0.359,
+            "anchoAncho": 0.359,
+            "top": 0.263,
+            "topAncho": 0.263,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_vs_stark",
+      "nombre": "Doom vs Stark",
+      "detalle": "Diseño en el frente",
+      "frente": "disenos/doom_vs_stark_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.334,
+            "anchoAncho": 0.334,
+            "top": 0.214,
+            "topAncho": 0.214,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.334,
+            "anchoAncho": 0.334,
+            "top": 0.214,
+            "topAncho": 0.214,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_comic",
+      "nombre": "Doom cómic",
+      "detalle": "Collage · frente",
+      "frente": "disenos/doom_comic_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.497,
+            "ancho": 0.281,
+            "anchoAncho": 0.281,
+            "top": 0.193,
+            "topAncho": 0.193,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "frente": {
+            "cx": 0.497,
+            "ancho": 0.281,
+            "anchoAncho": 0.281,
+            "top": 0.193,
+            "topAncho": 0.193,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_sketch",
+      "nombre": "Doom sketch",
+      "detalle": "Diseño en el frente",
+      "frente": "disenos/doom_sketch_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.291,
+            "anchoAncho": 0.291,
+            "top": 0.184,
+            "topAncho": 0.184,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.291,
+            "anchoAncho": 0.291,
+            "top": 0.184,
+            "topAncho": 0.184,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "doom_yes",
+      "nombre": "Yes! I am Doom",
+      "detalle": "Diseño en el frente",
+      "frente": "disenos/doom_yes_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "blanco",
+      "colores": [
+        "blanco",
+        "marfil"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.506,
+            "ancho": 0.318,
+            "anchoAncho": 0.318,
+            "top": 0.181,
+            "topAncho": 0.181,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "frente": {
+            "cx": 0.506,
+            "ancho": 0.318,
+            "anchoAncho": 0.318,
+            "top": 0.181,
+            "topAncho": 0.181,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "thor_odinson",
+      "nombre": "Thor Odinson",
+      "detalle": "Diseño en la espalda",
+      "frente": null,
+      "espalda": "disenos/thor_odinson_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.5,
+            "ancho": 0.333,
+            "anchoAncho": 0.333,
+            "top": 0.214,
+            "topAncho": 0.214,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.5,
+            "ancho": 0.333,
+            "anchoAncho": 0.333,
+            "top": 0.214,
+            "topAncho": 0.214,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "thor_comic",
+      "nombre": "Thor cómic",
+      "detalle": "Collage · espalda",
+      "frente": null,
+      "espalda": "disenos/thor_comic_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.498,
+            "ancho": 0.302,
+            "anchoAncho": 0.302,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.498,
+            "ancho": 0.302,
+            "anchoAncho": 0.302,
+            "top": 0.173,
+            "topAncho": 0.173,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "thor_titulo",
+      "nombre": "Thor",
+      "detalle": "Diseño en el frente",
+      "frente": "disenos/thor_titulo_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.303,
+            "anchoAncho": 0.303,
+            "top": 0.215,
+            "topAncho": 0.215,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.303,
+            "anchoAncho": 0.303,
+            "top": 0.215,
+            "topAncho": 0.215,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "thor_armas",
+      "nombre": "Armas de Thor",
+      "detalle": "Stormbreaker y Mjölnir · frente",
+      "frente": "disenos/thor_armas_frente.webp",
+      "espalda": null,
+      "lado": "frente",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "estampa": {
+        "oversize": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.303,
+            "anchoAncho": 0.303,
+            "top": 0.189,
+            "topAncho": 0.189,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "frente": {
+            "cx": 0.498,
+            "ancho": 0.303,
+            "anchoAncho": 0.303,
+            "top": 0.189,
+            "topAncho": 0.189,
+            "alto": 1
+          }
+        }
+      }
+    },
     {
       "id": "jesus_aura",
       "nombre": "Definition of aura",
@@ -866,5 +1467,11 @@
       ],
       "coleccion": "salmos_romanos"
     }
-  ]
+  ],
+  "novedad": {
+    "id": "doom_rayos",
+    "coleccion": "doomsday",
+    "titulo": "Doomsday",
+    "sub": "15 diseños · Doom, Iron Man y Thor"
+  }
 }
