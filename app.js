@@ -791,45 +791,54 @@
        El giro es solo un achique horizontal (sin 3D ni agrandar), que en iPhone se ve nítido. */
     const Nov = (() => {
       const btn = $('#pDoom'), cv = $('#pdCanvas');
-      let cfg = null, caras = null, raf = 0, t0 = 0;
-      const FIJA = 1.5, GIRO = 1.0, T = 2 * (FIJA + GIRO);
+      let cfg = null, raf = 0, t0 = 0, w = 0;
+      const FIJA = 1.6, GIRO = 1.0;
+      // En cada media vuelta la remera muestra otro diseño de la colección (empieza por el de "novedad").
+      // Solo se guardan la cara actual y la siguiente, para no llenar la memoria del celular.
+      let lista = [], k = 0, actual = null, sig = null, cargando = false;
+      function caraDe(d) { const corte = d.cortes.includes('oversize') ? 'oversize' : d.cortes[0]; return { d, corte, color: colorDe(d, corte), lado: ladoDe(d) }; }
+      async function pintarCara(x) { const c = document.createElement('canvas'); await componer(c, x.d, x.corte, x.color, x.lado, w); return c; }
+      function pedirSiguiente() {
+        if (sig || cargando || lista.length < 2) return;
+        cargando = true; const n = (k + 1) % lista.length;
+        pintarCara(lista[n]).then(c => { sig = c; }).catch(console.warn).finally(() => { cargando = false; });
+      }
       async function preparar(n) {
         const d = DIS.find(x => x.id === n.id); if (!d) return;
         cfg = { n, d }; btn.hidden = false;
         $('#pdTit').textContent = n.titulo || d.nombre; $('#pdSub').textContent = n.sub || '';
-        const color = colorDe(d, 'oversize'), w = Math.min(700, Math.ceil(btn.clientWidth * Math.max(1.5, devicePixelRatio || 1)));
-        const lados = ['frente', 'espalda'].filter(l => d[l]);
-        caras = await Promise.all(lados.map(async l => { const c = document.createElement('canvas'); await componer(c, d, 'oversize', color, l, w); return c; }));
-        if (ladoDe(d) === 'espalda' && caras.length > 1) caras.reverse();   // arranca mostrando el diseño grande
-        cv.width = caras[0].width; cv.height = caras[0].height;
-        cv.getContext('2d').drawImage(caras[0], 0, 0);
-        arrancar();
+        w = Math.min(700, Math.ceil(btn.clientWidth * Math.max(1.5, devicePixelRatio || 1)));
+        lista = [caraDe(d)].concat(DIS.filter(x => x.coleccion === n.coleccion && x.id !== d.id).map(caraDe));
+        actual = await pintarCara(lista[0]);
+        cv.width = actual.width; cv.height = actual.height;
+        cv.getContext('2d').drawImage(actual, 0, 0);
+        pedirSiguiente(); arrancar();
       }
-      let cara = -1;
-      function dibujar(k) {
-        if (k === cara || !caras[k]) return; cara = k;
-        const c = cv.getContext('2d'); c.clearRect(0, 0, cv.width, cv.height); c.drawImage(caras[k], 0, 0);
+      function mostrarCara(c) {
+        const x = cv.getContext('2d'); x.clearRect(0, 0, cv.width, cv.height); x.drawImage(c, 0, 0, cv.width, cv.height);
       }
+      function avanzar() { k = (k + 1) % lista.length; actual = sig; sig = null; mostrarCara(actual); pedirSiguiente(); }
+      let cambiada = false;
       function frame(t) {
         raf = 0;
-        if (!caras || !visible()) return;
+        if (!actual || !visible()) return;
         if (!t0) t0 = t;
-        const s = ((t - t0) / 1000) % T, medio = FIJA + GIRO;
-        const fase = s % medio, vuelta = s < medio ? 0 : 1;
+        let s = (t - t0) / 1000;
+        if (s > FIJA && !cambiada && !sig) { t0 = t - FIJA * 1000; s = FIJA; pedirSiguiente(); }   // espera a que esté lista la próxima
         let th = 0;
-        if (fase > FIJA) { const u = (fase - FIJA) / GIRO; th = Math.PI * (0.5 - 0.5 * Math.cos(Math.PI * u)); }
-        const k = caras.length > 1 ? (th < Math.PI / 2 ? vuelta : 1 - vuelta) : 0;
-        dibujar(k);
+        if (s > FIJA) { const u = Math.min(1, (s - FIJA) / GIRO); th = Math.PI * (0.5 - 0.5 * Math.cos(Math.PI * u)); }
+        if (th >= Math.PI / 2 && !cambiada) { cambiada = true; avanzar(); }
+        if (s >= FIJA + GIRO) { t0 = t; cambiada = false; th = 0; }
         const sx = Math.max(0.03, Math.abs(Math.cos(th)));
         cv.style.transform = `scale(${sx.toFixed(3)},1)`;
         cv.style.filter = sx < 0.98 ? `brightness(${(0.55 + 0.45 * sx).toFixed(2)})` : '';
         raf = requestAnimationFrame(frame);
       }
-      function arrancar() { if (reduce) return alternar(); if (!raf && caras) raf = requestAnimationFrame(frame); }
+      function arrancar() { if (reduce) return alternar(); if (!raf && actual) { t0 = 0; cambiada = false; raf = requestAnimationFrame(frame); } }
       let altT = 0;
-      function alternar() {   // sin animaciones: cambia de cara cada pocos segundos
-        clearInterval(altT); if (!caras || caras.length < 2) return;
-        let k = 0; altT = setInterval(() => { if (visible()) { k = 1 - k; cara = -1; dibujar(k); } }, 3500);
+      function alternar() {   // sin animaciones: cambia de diseño cada pocos segundos
+        clearInterval(altT); if (lista.length < 2) return;
+        altT = setInterval(() => { if (visible() && sig) avanzar(); else pedirSiguiente(); }, 3500);
       }
       btn.addEventListener('click', () => {
         if (!cfg) return;
