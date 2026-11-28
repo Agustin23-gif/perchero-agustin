@@ -12,7 +12,7 @@
 <link rel="icon" href="favicon.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Agustín diseños">
-<link rel="stylesheet" href="styles.css?v=202611280335">
+<link rel="stylesheet" href="styles.css?v=202611280352">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img{max-width:100%}[hidden]{display:none!important}</style>
 </head>
 <body>
@@ -85,6 +85,7 @@
         <div class="det-rod"></div>
         <button class="arrow prev" id="prev" type="button" aria-label="Remera anterior"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
         <div class="det-fig" id="detFig"></div>
+        <button class="det-lupa" id="detLupa" type="button" aria-label="Ver el diseño de cerca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M10.5 7.5v6M7.5 10.5h6"/></svg><span>Ver de cerca</span></button>
         <button class="arrow next" id="next" type="button" aria-label="Remera siguiente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
       </div>
       <div class="det-info">
@@ -105,6 +106,16 @@
       </div>
     </section>
   </main>
+  <div class="zoom" id="zoom" hidden role="dialog" aria-modal="true" aria-label="Diseño de cerca">
+    <canvas id="zoomCanvas"></canvas>
+    <div class="zoom-top"><p id="zoomNombre"></p><button class="zoom-x" id="zoomCerrar" type="button" aria-label="Cerrar el zoom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p class="zoom-tip" aria-hidden="true"><span class="t-touch">Pellizcá para acercar · arrastrá para mover</span><span class="t-mouse">Rueda para acercar · arrastrá para mover</span></p>
+    <div class="zoom-bar">
+      <div class="seg zoom-lados" role="group" aria-label="Lado"><button type="button" data-lado="frente">Frente</button><button type="button" data-lado="espalda">Espalda</button></div>
+      <div class="zoom-mm"><button type="button" id="zoomMenos" aria-label="Alejar">−</button><button type="button" id="zoomMas" aria-label="Acercar">+</button></div>
+    </div>
+    <div class="zoom-carga" aria-hidden="true"></div>
+  </div>
 
   <aside class="aviso" id="aviso" hidden aria-label="Nueva colección">
     <button class="aviso-x" id="avisoX" type="button" aria-label="Cerrar aviso">×</button>
@@ -288,6 +299,6 @@
     </div>
   </div>
 </div>
-<script src="app.js?v=202611280335"></script>
+<script src="app.js?v=202611280352"></script>
 </body>
 </html>

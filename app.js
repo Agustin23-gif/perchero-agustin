@@ -4,7 +4,7 @@
 (() => {
   const $ = (s) => document.querySelector(s);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const MODALES = ['#pedido', '#carro', '#crea'];
+  const MODALES = ['#pedido', '#carro', '#crea', '#zoom'];
   const modalAbierto = () => MODALES.some(m => { const el = document.querySelector(m); return el && !el.hidden; });
   // se vuelve a poder bajar la página cuando no queda ninguna ventana ni detalle abierto
   function libre() { if (document.querySelector('#detail').hidden && !modalAbierto()) document.body.classList.remove('quieto'); }
@@ -48,9 +48,9 @@
     }));
     return imgs.get(src);
   }
-  async function componer(canvas, d, corte, color, lado, maxW) {
+  async function componer(canvas, d, corte, color, lado, maxW, agrandar) {
     const base = await img(`img/${corte}/${lado}_${color}.webp`);
-    const W = Math.round(Math.min(maxW, base.naturalWidth));
+    const W = Math.round(agrandar ? maxW : Math.min(maxW, base.naturalWidth));   // agrandar: para el zoom (el diseño queda nítido)
     const H = Math.round(W * base.naturalHeight / base.naturalWidth);
     const src = lado === 'frente' ? d.frente : d.espalda;
     let est = null;
@@ -67,7 +67,7 @@
       o.drawImage(dis, x, y, dw, dh);
       o.globalCompositeOperation = 'multiply'; o.drawImage(luz, 0, 0, W, H);   // pliegues y luz de la tela
       o.globalCompositeOperation = 'destination-in'; o.drawImage(dis, x, y, dw, dh);
-      est = off;
+      est = off; canvas.caja = { x, y, w: dw, h: dh };
     }
     canvas.width = W; canvas.height = H;
     const c = canvas.getContext('2d'); c.imageSmoothingQuality = 'high';
@@ -487,16 +487,151 @@
     if (e.key === 'ArrowLeft' && !e.target.closest('.colores')) mover(-1);
   });
   // deslizar con el dedo en el detalle
-  let sw = null;
+  let sw = null, movSwipe = 0;
   detView.addEventListener('pointerdown', (e) => { if (!e.target.closest('.arrow')) sw = { x: e.clientX, y: e.clientY, t: performance.now() }; });
   detView.addEventListener('pointermove', (e) => { if (sw && fig && !reduce) { const dx = e.clientX - sw.x; figP.a = Math.max(-12, Math.min(12, dx / 14)); fig.swing.style.transform = `translateX(${dx * 0.25}px) rotate(${figP.a}deg)`; } });
   const finSwipe = (e) => {
-    if (!sw) return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y; sw = null;
+    if (!sw) return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y; sw = null; movSwipe = Math.hypot(dx, dy);
     if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) mover(dx < 0 ? 1 : -1);
     else { if (fig) fig.swing.style.transform = ''; animFig(performance.now()); }
   };
   detView.addEventListener('pointerup', finSwipe);
   detView.addEventListener('pointercancel', finSwipe);
+
+  /* ---------- zoom: ver el diseño de cerca ----------
+     Se dibuja en un canvas del tamaño de la pantalla (sin escalar capas con CSS, que en iPhone pixela).
+     Pellizcar o rueda = acercar · arrastrar = mover · doble toque = acercar/alejar. */
+  const Zoom = (() => {
+    const el = $('#zoom'), cv = $('#zoomCanvas'), ctx = cv.getContext('2d');
+    let src = null, W = 0, H = 0, vw = 0, vh = 0, dpr = 1, s = 1, tx = 0, ty = 0, fit = 1, maxS = 4, raf = 0, anim = null, z = null;
+    const pts = new Map(); let pinch = null, tap = null, ultimoTap = 0;
+    function medir() {
+      vw = el.clientWidth; vh = el.clientHeight; dpr = Math.min(3, devicePixelRatio || 1);
+      cv.width = Math.round(vw * dpr); cv.height = Math.round(vh * dpr);
+      if (src) { fit = Math.min(vw / W, vh / H) * 0.94; maxS = Math.max(fit * 5, (src.caja ? vw * 0.98 / src.caja.w : fit * 3)); }
+    }
+    function limitar() {
+      s = Math.max(fit, Math.min(maxS, s));
+      const iw = W * s, ih = H * s;
+      tx = iw <= vw ? (vw - iw) / 2 : Math.min(0, Math.max(vw - iw, tx));
+      ty = ih <= vh ? (vh - ih) / 2 : Math.min(0, Math.max(vh - ih, ty));
+    }
+    function pintar() {
+      raf = 0; if (!src) return;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, vw, vh);
+      ctx.imageSmoothingQuality = 'high'; ctx.drawImage(src, tx, ty, W * s, H * s);
+      el.classList.toggle('cerca', s > fit * 1.05);
+    }
+    const pedir = () => { if (!raf) raf = requestAnimationFrame(pintar); };
+    function zoomEn(ns, px, py) { const k = Math.max(fit, Math.min(maxS, ns)) / s; tx = px - (px - tx) * k; ty = py - (py - ty) * k; s *= k; limitar(); pedir(); }
+    function irA(ns, ntx, nty, ms = 380) {
+      const a = { s, tx, ty }, t0 = performance.now();
+      if (reduce) ms = 0;
+      anim = (t) => {
+        const u = ms ? Math.min(1, (t - t0) / ms) : 1, e = 1 - Math.pow(1 - u, 3);
+        s = a.s + (ns - a.s) * e; tx = a.tx + (ntx - a.tx) * e; ty = a.ty + (nty - a.ty) * e;
+        if (u >= 1) { anim = null; limitar(); } pintar(); if (anim) requestAnimationFrame(anim);
+      };
+      requestAnimationFrame(anim);
+    }
+    function alDiseno(ms) {   // encuadra el diseño estampado
+      const c = src.caja;
+      if (!c) return irA(fit, (vw - W * fit) / 2, (vh - H * fit) / 2, ms);
+      const ns = Math.max(fit, Math.min(maxS, vw * 0.9 / c.w, vh * 0.82 / c.h));
+      const nx = vw / 2 - (c.x + c.w / 2) * ns, ny = vh / 2 - (c.y + c.h / 2) * ns;
+      const g = { s, tx, ty }; s = ns; tx = nx; ty = ny; limitar(); const fin = { s, tx, ty }; s = g.s; tx = g.tx; ty = g.ty;
+      irA(fin.s, fin.tx, fin.ty, ms);
+    }
+    async function cargar(lado) {
+      el.classList.add('cargando');
+      const c = document.createElement('canvas');
+      await componer(c, z.d, z.corte, z.color, lado, 1800, true).catch(console.warn);
+      if (el.hidden) return;
+      z.lado = lado; src = c; W = c.width; H = c.height; medir();
+      s = fit; tx = (vw - W * s) / 2; ty = (vh - H * s) / 2; pintar();
+      el.classList.remove('cargando');
+      setTimeout(() => alDiseno(650), 250);
+      el.querySelectorAll('.zoom-lados button').forEach(b => b.setAttribute('aria-pressed', b.dataset.lado === lado ? 'true' : 'false'));
+    }
+    let antes = null;
+    function abrir() {
+      if (!sel || !el.hidden) return;
+      const d = lista[sel.i]; if (d.pedido) return;
+      z = { d, corte: sel.corte, color: sel.color, lado: sel.lado };
+      antes = document.activeElement; el.hidden = false; document.body.classList.add('con-modal');
+      $('#zoomNombre').textContent = d.nombre;
+      const lados = el.querySelector('.zoom-lados'); lados.hidden = !(d.frente && d.espalda);
+      el.classList.remove('visto'); setTimeout(() => el.classList.add('visto'), 3200);
+      src = null; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+      cargar(sel.lado);
+      $('#zoomCerrar').focus({ preventScroll: true });
+    }
+    function cerrar() {
+      if (el.hidden) return;
+      el.hidden = true; src = null; anim = null; pts.clear(); pinch = null;
+      cv.width = cv.height = 1;   // libera la memoria del canvas grande
+      if (!modalAbierto()) document.body.classList.remove('con-modal');
+      if (antes && antes.focus) antes.focus({ preventScroll: true });
+    }
+    $('#zoomCerrar').onclick = cerrar;
+    $('#zoomMas').onclick = () => { anim = null; const ns = Math.min(maxS, s * 1.6); const g = { s, tx, ty }; zoomEn(ns, vw / 2, vh / 2); const f = { s, tx, ty }; s = g.s; tx = g.tx; ty = g.ty; irA(f.s, f.tx, f.ty, 260); };
+    $('#zoomMenos').onclick = () => { anim = null; const g = { s, tx, ty }; zoomEn(s / 1.6, vw / 2, vh / 2); const f = { s, tx, ty }; s = g.s; tx = g.tx; ty = g.ty; irA(f.s, f.tx, f.ty, 260); };
+    el.querySelectorAll('.zoom-lados button').forEach(b => b.onclick = () => { if (z && b.dataset.lado !== z.lado) cargar(b.dataset.lado); });
+    document.addEventListener('keydown', (e) => {
+      if (el.hidden) return;
+      if (e.key === 'Escape') { e.stopPropagation(); cerrar(); }
+      else if (e.key === '+' || e.key === '=') $('#zoomMas').click();
+      else if (e.key === '-') $('#zoomMenos').click();
+    }, true);
+    addEventListener('resize', () => { if (!el.hidden && src) { medir(); limitar(); pedir(); } });
+
+    // gestos
+    const pos = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+    cv.addEventListener('pointerdown', (e) => {
+      if (!src) return; anim = null;
+      try { cv.setPointerCapture(e.pointerId); } catch (_) {}
+      pts.set(e.pointerId, pos(e));
+      if (pts.size === 1) tap = { ...pos(e), t: performance.now(), x0: tx, y0: ty, movido: false };
+      if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), s0: s, m: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, tx0: tx, ty0: ty }; tap = null; }
+    });
+    cv.addEventListener('pointermove', (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.set(e.pointerId, pos(e));
+      if (pinch && pts.size >= 2) {
+        const [a, b] = [...pts.values()], d = Math.hypot(a.x - b.x, a.y - b.y), m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+        const ns = Math.max(fit * 0.85, Math.min(maxS * 1.15, pinch.s0 * d / pinch.d)), k = ns / pinch.s0;
+        s = ns; tx = m.x - (pinch.m.x - pinch.tx0) * k; ty = m.y - (pinch.m.y - pinch.ty0) * k; pedir();
+      } else if (tap && pts.size === 1) {
+        const p = pos(e), dx = p.x - tap.x, dy = p.y - tap.y;
+        if (Math.hypot(dx, dy) > 6) tap.movido = true;
+        tx = tap.x0 + dx; ty = tap.y0 + dy; limitar(); pedir();
+      }
+    });
+    const soltar = (e) => {
+      if (!pts.has(e.pointerId)) return;
+      pts.delete(e.pointerId);
+      if (pinch && pts.size < 2) {
+        pinch = null; const g = { s, tx, ty }; limitar(); const f = { s, tx, ty }; s = g.s; tx = g.tx; ty = g.ty; irA(f.s, f.tx, f.ty, 220);
+        if (pts.size === 1) { const p = [...pts.values()][0]; tap = { ...p, t: 0, x0: f.tx, y0: f.ty, movido: true }; }
+        return;
+      }
+      if (tap && !tap.movido && e.type === 'pointerup') {
+        const ahora = performance.now();
+        if (ahora - ultimoTap < 320) {   // doble toque
+          ultimoTap = 0;
+          if (s > fit * 1.3) irA(fit, (vw - W * fit) / 2, (vh - H * fit) / 2);
+          else { const ns = Math.min(maxS, fit * 3), k = ns / s; const g = { s, tx, ty }; s = ns; tx = tap.x - (tap.x - g.tx) * k; ty = tap.y - (tap.y - g.ty) * k; limitar(); const f = { s, tx, ty }; s = g.s; tx = g.tx; ty = g.ty; irA(f.s, f.tx, f.ty); }
+        } else ultimoTap = ahora;
+      }
+      tap = null;
+    };
+    cv.addEventListener('pointerup', soltar); cv.addEventListener('pointercancel', soltar);
+    cv.addEventListener('wheel', (e) => { if (!src) return; e.preventDefault(); anim = null; const p = pos(e); zoomEn(s * Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0018)), p.x, p.y); }, { passive: false });
+    return { abrir, cerrar };
+  })();
+  $('#detLupa').onclick = () => Zoom.abrir();
+  // tocar la remera (sin deslizar) también abre el zoom
+  detView.addEventListener('click', (e) => { if (movSwipe < 8 && e.target.closest('.det-fig') && !e.target.closest('button')) Zoom.abrir(); });
 
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { armado = true; armarPerchero(); if (!detail.hidden) pintarFig(); }, 150); });
 
