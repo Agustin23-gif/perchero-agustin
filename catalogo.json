@@ -375,6 +375,46 @@
       }
     },
     {
+      "id": "doom_ironman_legacy",
+      "nombre": "Iron Man Legacy",
+      "detalle": "Iron Man · espalda",
+      "frente": null,
+      "espalda": "disenos/doom_ironman_legacy_espalda.webp",
+      "lado": "espalda",
+      "cortes": [
+        "oversize",
+        "basica"
+      ],
+      "color": "negro",
+      "colores": [
+        "negro"
+      ],
+      "coleccion": "doomsday",
+      "etiqueta": "Nuevo",
+      "estampa": {
+        "oversize": {
+          "espalda": {
+            "cx": 0.506,
+            "ancho": 0.325,
+            "anchoAncho": 0.325,
+            "top": 0.161,
+            "topAncho": 0.161,
+            "alto": 1
+          }
+        },
+        "basica": {
+          "espalda": {
+            "cx": 0.506,
+            "ancho": 0.325,
+            "anchoAncho": 0.325,
+            "top": 0.161,
+            "topAncho": 0.161,
+            "alto": 1
+          }
+        }
+      }
+    },
+    {
       "id": "doom_rayos",
       "nombre": "Doom",
       "detalle": "Espalda + logo DOOM en el frente",
@@ -1621,6 +1661,6 @@
     "id": "doom_rayos",
     "coleccion": "doomsday",
     "titulo": "Doomsday",
-    "sub": "19 diseños · Doom, Iron Man, Thor, Loki y X-Men"
+    "sub": "20 diseños · Doom, Iron Man, Thor, Loki y X-Men"
   }
 }
