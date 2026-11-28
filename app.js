@@ -850,6 +850,8 @@
     };
     document.querySelector('.top img').style.cursor = 'pointer';
     document.querySelector('.top img').addEventListener('click', () => { if (detail.hidden) mostrar(); });
+    const vm = $('#volverMenu'); vm.hidden = false;
+    vm.onclick = () => { if (!detail.hidden) return; window.scrollTo({ top: 0 }); mostrar(); };
 
     /* gestos */
     esc.addEventListener('pointerdown', (e) => {

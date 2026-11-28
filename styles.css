@@ -691,3 +691,24 @@ body.con-portada .carro-btn, body.con-modal .carro-btn { display: none; }
 
 /* cielo verde de Doomsday: los textos grises pasan a verde oscuro para leerse bien */
 body.tema-doom { --gris: #1E3B27; }
+
+/* ---------- volver a la portada ---------- */
+.intro-arriba { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 0 0 6px; }
+.intro-arriba .eyebrow { margin: 0; }
+.volver-menu {
+  display: inline-flex; align-items: center; gap: 7px; min-height: 36px; padding: 0 15px 0 11px;
+  border: 1.5px solid var(--tinta); border-radius: 99px; background: rgba(255,255,255,.55); color: var(--tinta);
+  font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: pointer;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.volver-menu svg { width: 15px; height: 15px; flex: none; }
+.volver-menu[hidden] { display: none; }
+@media (hover: hover) { .volver-menu:hover { background: var(--tinta); color: var(--pared); } }
+.volver-menu { position: relative; }
+.volver-menu::after { content: ""; position: absolute; inset: -8px -4px; }   /* área de toque más grande que el botón */
+@media (max-width: 640px) {
+  .intro-arriba { justify-content: flex-start; margin: -2px 0 6px; }
+  .intro-arriba .volver-menu:not([hidden]) + .eyebrow { display: none; }
+  .volver-menu { min-height: 28px; padding: 0 11px 0 8px; gap: 5px; font-size: 9.5px; letter-spacing: .06em; border-width: 1.2px; }
+  .volver-menu svg { width: 12px; height: 12px; }
+}
